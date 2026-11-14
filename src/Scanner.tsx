@@ -45,6 +45,8 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   // The card the camera shows when we stop looking for it (found, added, skipped or not found):
   // auto-scan waits until a different card is in the frame.
   const ignored = useRef<CardRead | null>(null);
+  // shortcut: shows what the last photo read, to tune scanning on a real phone; remove once scanning works.
+  const [seen, setSeen] = useState('');
 
   async function run(label: string, work: () => Promise<void>) {
     setBusy(label);
@@ -142,8 +144,14 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
     let previous: CardRead | null = null;
     (async () => {
       while (!stopped) {
+        const started = Date.now();
         const read = await snap();
         if (stopped) return;
+        setSeen(
+          read
+            ? `Read: ${read.name ?? '-'} · ${read.setCode ?? '-'} ${read.collectorNumber ?? '-'} (${Date.now() - started} ms)`
+            : `Nothing read (${Date.now() - started} ms)`,
+        );
         const readable = read && (read.setCode || read.name);
         if (readable && !(ignored.current && sameCard(read, ignored.current))) {
           if (previous && sameCard(read, previous)) return void recognise(read);
@@ -207,6 +215,7 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
             <Text style={styles.muted}>
               {looking ? 'Hold the whole card in the frame, upright. It scans by itself.' : 'Paused while a card is shown.'}
             </Text>
+            {!!seen && <Text style={styles.muted}>{seen}</Text>}
           </>
         ) : (
           <Pressable style={styles.button} onPress={requestPermission} accessibilityRole="button">
