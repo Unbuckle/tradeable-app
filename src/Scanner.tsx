@@ -14,8 +14,8 @@ import {
   type Preferences,
   undoAdd,
 } from './catalog';
-import { parseCollectorLine } from './collector-line';
-import { canReadText, readText } from './text-recognition';
+import { type CardRead, readCard, sameCard } from './card-reader';
+import { canReadText, readLines } from './text-recognition';
 import { colors, styles } from './theme';
 
 interface Added {
@@ -42,6 +42,9 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   const [added, setAdded] = useState<Added[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // The card the camera shows when we stop looking for it (found, added, skipped or not found):
+  // auto-scan waits until a different card is in the frame.
+  const ignored = useRef<CardRead | null>(null);
 
   async function run(label: string, work: () => Promise<void>) {
     setBusy(label);
@@ -90,25 +93,79 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
       if (found.length === 1) show(found[0], prefs);
     });
 
-  const scan = () =>
-    run('Reading card', async () => {
-      const photo = await camera.current?.takePictureAsync({ quality: 0.8 });
-      if (!photo) return;
-      const line = parseCollectorLine(await readText(photo.uri));
-      if (!line.setCode || !line.collectorNumber) {
-        if (line.collectorNumber) setNumber(line.collectorNumber);
-        throw new Error('Could not read the set code and number. Type them in, search by name, or try again closer.');
-      }
+  /** One photo of what the camera shows, read on the device; null when nothing was readable. */
+  async function snap(): Promise<CardRead | null> {
+    try {
+      const photo = await camera.current?.takePictureAsync({ quality: 0.7, shutterSound: false });
+      return photo ? readCard(await readLines(photo.uri)) : null;
+    } catch {
+      return null; // camera not ready yet, or the photo had no text
+    }
+  }
+
+  /** Finds the printing for a read: by set code and number, else by name (cards before 2014 print no set code). */
+  const recognise = (read: CardRead) =>
+    run('Looking up', async () => {
+      ignored.current = read;
       const wanted = {
         ...prefs,
-        ...(line.language ? { language: line.language } : {}),
-        ...(line.foil !== null ? { finish: line.foil ? 'foil' : 'nonfoil' } : {}),
+        ...(read.language ? { language: read.language } : {}),
+        ...(read.foil !== null ? { finish: read.foil ? 'foil' : 'nonfoil' } : {}),
       };
-      setSetCode(line.setCode);
-      setNumber(line.collectorNumber);
       setPrefs(wanted);
-      await lookUp(line.setCode, line.collectorNumber, wanted);
+      setSetCode(read.setCode ?? '');
+      setNumber(read.collectorNumber ?? '');
+      setName(read.name ?? '');
+      if (read.setCode && read.collectorNumber) {
+        try {
+          return await lookUp(read.setCode, read.collectorNumber, wanted);
+        } catch (e) {
+          if (!(e instanceof ApiError && e.status === 404) || !read.name) throw e;
+        }
+      }
+      if (!read.name) throw new Error('Could not read this card. Search it by name.');
+      const cards = await searchCards(read.name);
+      const card = cards.find((c) => c.canonical_name.toLowerCase() === read.name?.toLowerCase()) ?? cards[0];
+      if (!card) throw new Error(`No card named "${read.name}". Search it by name.`);
+      const printings = await printingsOfCard(card.product_id);
+      const exact = printings.find((p) => read.collectorNumber && p.collector_number === read.collectorNumber);
+      setHits([]);
+      setChoices(exact ? [] : printings);
+      show(exact ?? printings[0], wanted);
     });
+
+  // Auto-scan: while no card is shown, read a photo about every second and look up a card once two reads agree.
+  const looking = canReadText && !!permission?.granted && !printing && !busy;
+  useEffect(() => {
+    if (!looking) return;
+    let stopped = false;
+    let previous: CardRead | null = null;
+    (async () => {
+      while (!stopped) {
+        const read = await snap();
+        if (stopped) return;
+        const readable = read && (read.setCode || read.name);
+        if (readable && !(ignored.current && sameCard(read, ignored.current))) {
+          if (previous && sameCard(read, previous)) return void recognise(read);
+          previous = read;
+        } else {
+          previous = null;
+          if (!readable) ignored.current = null; // the card left the frame: the same card may be scanned again
+        }
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+    })();
+    return () => {
+      stopped = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- restart only when looking starts or stops
+  }, [looking]);
+
+  const skip = () => {
+    setPrinting(null);
+    setChoices([]);
+    setMessage(null);
+  };
 
   const add = () =>
     run('Adding', async () => {
@@ -144,13 +201,12 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
       {canReadText ? (
         permission?.granted ? (
           <>
-            <View style={{ height: 180, borderRadius: 12, overflow: 'hidden' }}>
-              <CameraView ref={camera} style={{ flex: 1 }} facing="back" />
+            <View style={{ height: 360, borderRadius: 12, overflow: 'hidden' }}>
+              <CameraView ref={camera} style={{ flex: 1 }} facing="back" animateShutter={false} />
             </View>
-            <Text style={styles.muted}>Fill the frame with the bottom-left corner: set code and number.</Text>
-            <Pressable style={styles.button} disabled={!!busy} onPress={scan} accessibilityRole="button">
-              <Text style={styles.buttonText}>Scan</Text>
-            </Pressable>
+            <Text style={styles.muted}>
+              {looking ? 'Hold the whole card in the frame, upright. It scans by itself.' : 'Paused while a card is shown.'}
+            </Text>
           </>
         ) : (
           <Pressable style={styles.button} onPress={requestPermission} accessibilityRole="button">
@@ -274,6 +330,9 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
           )}
           <Pressable style={styles.button} disabled={!!busy || !skuId} onPress={add} accessibilityRole="button">
             <Text style={styles.buttonText}>Add to collection</Text>
+          </Pressable>
+          <Pressable style={[styles.button, styles.secondary]} disabled={!!busy} onPress={skip} accessibilityRole="button">
+            <Text style={styles.buttonText}>Skip, scan the next card</Text>
           </Pressable>
         </View>
       )}
