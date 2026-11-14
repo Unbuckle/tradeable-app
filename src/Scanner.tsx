@@ -3,7 +3,17 @@ import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { API_URL, ApiError, type CollectionItem, type Printing, type Schemas } from './api';
-import { addToCollection, conditions, findPrinting, pickSku, type Preferences, undoAdd } from './catalog';
+import {
+  addToCollection,
+  conditions,
+  findPrinting,
+  folders,
+  pickSku,
+  printingsOfCard,
+  searchCards,
+  type Preferences,
+  undoAdd,
+} from './catalog';
 import { parseCollectorLine } from './collector-line';
 import { canReadText, readText } from './text-recognition';
 import { colors, styles } from './theme';
@@ -22,9 +32,13 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   const [number, setNumber] = useState('');
   const [printing, setPrinting] = useState<Printing | null>(null);
   const [skuId, setSkuId] = useState<string | null>(null);
-  // Condition, finish and language stay set between scans.
-  const [prefs, setPrefs] = useState<Preferences>({ condition: 1, finish: 'nonfoil', language: 'en' });
+  // Condition, finish, language and folder stay set between scans.
+  const [prefs, setPrefs] = useState<Preferences>({ condition: 1, finish: 'nonfoil', language: 'en', folderId: null });
   const [conditionList, setConditionList] = useState<Schemas['CatalogReferenceItem'][]>([]);
+  const [folderList, setFolderList] = useState<Schemas['CollectionFolder'][]>([]);
+  const [name, setName] = useState('');
+  const [hits, setHits] = useState<Schemas['SearchCatalogHit'][]>([]);
+  const [choices, setChoices] = useState<Printing[]>([]);
   const [added, setAdded] = useState<Added[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -44,14 +58,37 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
 
   useEffect(() => {
     conditions().then(setConditionList, (e: Error) => setMessage(e.message));
+    folders().then(setFolderList, (e: Error) => setMessage(e.message));
   }, []);
 
-  async function lookUp(code: string, collectorNumber: string, wanted: Preferences) {
-    setPrinting(null);
-    const found = await findPrinting(code, collectorNumber);
+  function show(found: Printing, wanted: Preferences) {
     setPrinting(found);
     setSkuId(pickSku(found.skus, wanted)?.id ?? null);
   }
+
+  async function lookUp(code: string, collectorNumber: string, wanted: Preferences) {
+    setPrinting(null);
+    setHits([]);
+    setChoices([]);
+    show(await findPrinting(code, collectorNumber), wanted);
+  }
+
+  const search = () =>
+    run('Searching', async () => {
+      setPrinting(null);
+      setChoices([]);
+      const found = await searchCards(name);
+      setHits(found);
+      if (!found.length) throw new Error(`No card named "${name.trim()}"`);
+    });
+
+  const pickCard = (productId: string) =>
+    run('Loading printings', async () => {
+      const found = await printingsOfCard(productId);
+      setHits([]);
+      setChoices(found);
+      if (found.length === 1) show(found[0], prefs);
+    });
 
   const scan = () =>
     run('Reading card', async () => {
@@ -60,7 +97,7 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
       const line = parseCollectorLine(await readText(photo.uri));
       if (!line.setCode || !line.collectorNumber) {
         if (line.collectorNumber) setNumber(line.collectorNumber);
-        throw new Error('Could not read the set code and number. Type them in, or try again closer.');
+        throw new Error('Could not read the set code and number. Type them in, search by name, or try again closer.');
       }
       const wanted = {
         ...prefs,
@@ -76,10 +113,12 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   const add = () =>
     run('Adding', async () => {
       if (!skuId) return;
-      const item = await addToCollection(skuId, prefs.condition);
+      const item = await addToCollection(skuId, prefs.condition, prefs.folderId);
       setAdded((list) => [{ item, undone: false }, ...list]);
       setPrinting(null);
+      setChoices([]);
       setNumber('');
+      setName('');
     });
 
   const undo = (entry: Added) =>
@@ -151,8 +190,48 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
         </Pressable>
       </View>
 
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 1 }]}
+          placeholder="Card name"
+          placeholderTextColor="#9A8FA3"
+          autoCorrect={false}
+          value={name}
+          onChangeText={setName}
+          onSubmitEditing={search}
+          returnKeyType="search"
+        />
+        <Pressable
+          style={[styles.button, styles.secondary, { paddingHorizontal: 16 }]}
+          disabled={!!busy || name.trim().length < 2}
+          onPress={search}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonText}>Search</Text>
+        </Pressable>
+      </View>
+
       {busy && <Text style={styles.muted}>{busy}…</Text>}
       {message && <Text style={styles.error}>{message}</Text>}
+
+      {hits.length > 0 && (
+        <Chips
+          items={hits.map((h) => ({ key: h.product_id, label: h.canonical_name }))}
+          selected={null}
+          onSelect={pickCard}
+        />
+      )}
+
+      {choices.length > 1 && (
+        <Chips
+          items={choices.map((p) => ({ key: p.id, label: `${p.set_code.toUpperCase()} ${p.collector_number ?? ''}` }))}
+          selected={printing?.id ?? null}
+          onSelect={(id) => {
+            const found = choices.find((p) => p.id === id);
+            if (found) show(found, prefs);
+          }}
+        />
+      )}
 
       {printing && (
         <View style={{ gap: 10 }}>
@@ -186,6 +265,13 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
             selected={String(prefs.condition)}
             onSelect={(id) => setPrefs((p) => ({ ...p, condition: Number(id) }))}
           />
+          {folderList.length > 0 && (
+            <Chips
+              items={[{ key: '', label: 'No folder' }, ...folderList.map((f) => ({ key: f.id, label: f.name }))]}
+              selected={prefs.folderId ?? ''}
+              onSelect={(id) => setPrefs((p) => ({ ...p, folderId: id || null }))}
+            />
+          )}
           <Pressable style={styles.button} disabled={!!busy || !skuId} onPress={add} accessibilityRole="button">
             <Text style={styles.buttonText}>Add to collection</Text>
           </Pressable>

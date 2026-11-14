@@ -35,6 +35,8 @@ export interface Preferences {
   condition: number;
   finish: string;
   language: string;
+  /** Folder new cards go into; null leaves them unfiled. */
+  folderId: string | null;
 }
 
 /** The single SKU closest to the preferred finish and language. */
@@ -54,11 +56,24 @@ export const conditions = () =>
     r.data.filter((c) => c.scale === 'card'),
   );
 
-export const addToCollection = (skuId: string, condition: number) =>
+export const addToCollection = (skuId: string, condition: number, folderId: string | null) =>
   api<CollectionItem>('/collection/items', {
     method: 'POST',
-    body: JSON.stringify({ sku_id: skuId, condition, quantity: 1 }),
+    body: JSON.stringify({ sku_id: skuId, condition, quantity: 1, folder_id: folderId }),
   });
+
+export const folders = () =>
+  api<{ items: Schemas['CollectionFolder'][] }>('/collection/folders').then((r) => r.items);
+
+/** Single cards whose name matches, for cards whose collector line can't be read. */
+export const searchCards = (name: string) =>
+  api<Schemas['SearchResponse']>(`/search?scope=catalog&limit=10&q=${encodeURIComponent(name.trim())}`).then((r) =>
+    r.results.catalog.filter((hit) => hit.category === 'single'),
+  );
+
+/** Every printing of a card with its SKUs, newest set first. */
+export const printingsOfCard = (productId: string) =>
+  api<{ data: Printing[] }>(`/catalog/products/${productId}/printings`).then((r) => r.data.reverse());
 
 /** Takes back one added copy: archives a new item, or lowers the count of the stack it joined. */
 export async function undoAdd(added: CollectionItem): Promise<unknown> {
