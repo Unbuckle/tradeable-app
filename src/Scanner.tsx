@@ -47,6 +47,8 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   const ignored = useRef<CardRead | null>(null);
   // shortcut: shows what the last photo read, to tune scanning on a real phone; remove once scanning works.
   const [seen, setSeen] = useState('');
+  const [locked, setLocked] = useState(false); // one read waits for a second, agreeing one
+  const [torch, setTorch] = useState(false);
 
   async function run(label: string, work: () => Promise<void>) {
     setBusy(label);
@@ -154,10 +156,15 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
         );
         const readable = read && (read.setCode || read.name);
         if (readable && !(ignored.current && sameCard(read, ignored.current))) {
-          if (previous && sameCard(read, previous)) return void recognise(read);
+          if (previous && sameCard(read, previous)) {
+            setLocked(false);
+            return void recognise(read);
+          }
           previous = read;
+          setLocked(true);
         } else {
           previous = null;
+          setLocked(false);
           if (!readable) ignored.current = null; // the card left the frame: the same card may be scanned again
         }
         await new Promise((resolve) => setTimeout(resolve, 300));
@@ -209,8 +216,28 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
       {canReadText ? (
         permission?.granted ? (
           <>
-            <View style={{ height: 360, borderRadius: 12, overflow: 'hidden' }}>
-              <CameraView ref={camera} style={{ flex: 1 }} facing="back" animateShutter={false} />
+            <View style={{ height: 440, borderRadius: 12, overflow: 'hidden' }}>
+              <CameraView ref={camera} style={{ flex: 1 }} facing="back" animateShutter={false} enableTorch={torch} />
+              {/* Card-shaped guide (63 x 88 mm); green while a card is locked on or being looked up. */}
+              <View pointerEvents="none" style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center' }}>
+                <View
+                  style={{
+                    width: '72%',
+                    aspectRatio: 63 / 88,
+                    borderRadius: 14,
+                    borderWidth: 3,
+                    borderColor: locked || busy === 'Looking up' ? colors.green : 'rgba(255,255,255,0.85)',
+                  }}
+                />
+              </View>
+              <Pressable
+                onPress={() => setTorch((on) => !on)}
+                accessibilityRole="button"
+                accessibilityLabel={torch ? 'Turn light off' : 'Turn light on'}
+                style={[styles.chip, torch && styles.chipOn, { position: 'absolute', top: 10, left: 10 }]}
+              >
+                <Text style={styles.text}>Light</Text>
+              </Pressable>
             </View>
             <Text style={styles.muted}>
               {looking ? 'Hold the whole card in the frame, upright. It scans by itself.' : 'Paused while a card is shown.'}
@@ -224,6 +251,76 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
         )
       ) : (
         <Text style={styles.muted}>Camera scanning needs the development build. Type the set code and number.</Text>
+      )}
+
+      {busy && <Text style={styles.muted}>{busy}…</Text>}
+      {message && <Text style={styles.error}>{message}</Text>}
+
+      {hits.length > 0 && (
+        <Chips
+          items={hits.map((h) => ({ key: h.product_id, label: h.canonical_name }))}
+          selected={null}
+          onSelect={pickCard}
+        />
+      )}
+
+      {choices.length > 1 && (
+        <Chips
+          items={choices.map((p) => ({ key: p.id, label: `${p.set_code.toUpperCase()} ${p.collector_number ?? ''}` }))}
+          selected={printing?.id ?? null}
+          onSelect={(id) => {
+            const found = choices.find((p) => p.id === id);
+            if (found) show(found, prefs);
+          }}
+        />
+      )}
+
+      {printing && (
+        <View style={{ gap: 10 }}>
+          <View style={styles.row}>
+            <Image
+              source={imageUrl(printing.images.front?.normal)}
+              style={{ width: 160, height: 224, borderRadius: 8, backgroundColor: colors.mauve }}
+              contentFit="cover"
+              accessibilityLabel={printing.product_name}
+            />
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={[styles.text, { fontWeight: '700' }]}>{printing.product_name}</Text>
+              <Text style={styles.muted}>
+                {printing.set_name} · {printing.set_code.toUpperCase()} {printing.collector_number}
+              </Text>
+            </View>
+          </View>
+          <Chips
+            items={printing.skus
+              .filter((s) => s.category === 'single' && s.is_active)
+              .map((s) => ({ key: s.id, label: `${s.finish ?? 'nonfoil'} · ${s.language}` }))}
+            selected={skuId}
+            onSelect={(id) => {
+              const sku = printing.skus.find((s) => s.id === id);
+              setSkuId(id);
+              if (sku) setPrefs((p) => ({ ...p, finish: sku.finish ?? 'nonfoil', language: sku.language }));
+            }}
+          />
+          <Chips
+            items={conditionList.map((c) => ({ key: String(c.id), label: c.code }))}
+            selected={String(prefs.condition)}
+            onSelect={(id) => setPrefs((p) => ({ ...p, condition: Number(id) }))}
+          />
+          {folderList.length > 0 && (
+            <Chips
+              items={[{ key: '', label: 'No folder' }, ...folderList.map((f) => ({ key: f.id, label: f.name }))]}
+              selected={prefs.folderId ?? ''}
+              onSelect={(id) => setPrefs((p) => ({ ...p, folderId: id || null }))}
+            />
+          )}
+          <Pressable style={styles.button} disabled={!!busy || !skuId} onPress={add} accessibilityRole="button">
+            <Text style={styles.buttonText}>Add to collection</Text>
+          </Pressable>
+          <Pressable style={[styles.button, styles.secondary]} disabled={!!busy} onPress={skip} accessibilityRole="button">
+            <Text style={styles.buttonText}>Skip, scan the next card</Text>
+          </Pressable>
+        </View>
       )}
 
       <View style={styles.row}>
@@ -275,76 +372,6 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
           <Text style={styles.buttonText}>Search</Text>
         </Pressable>
       </View>
-
-      {busy && <Text style={styles.muted}>{busy}…</Text>}
-      {message && <Text style={styles.error}>{message}</Text>}
-
-      {hits.length > 0 && (
-        <Chips
-          items={hits.map((h) => ({ key: h.product_id, label: h.canonical_name }))}
-          selected={null}
-          onSelect={pickCard}
-        />
-      )}
-
-      {choices.length > 1 && (
-        <Chips
-          items={choices.map((p) => ({ key: p.id, label: `${p.set_code.toUpperCase()} ${p.collector_number ?? ''}` }))}
-          selected={printing?.id ?? null}
-          onSelect={(id) => {
-            const found = choices.find((p) => p.id === id);
-            if (found) show(found, prefs);
-          }}
-        />
-      )}
-
-      {printing && (
-        <View style={{ gap: 10 }}>
-          <View style={styles.row}>
-            <Image
-              source={imageUrl(printing.images.front?.normal)}
-              style={{ width: 120, height: 168, borderRadius: 8, backgroundColor: colors.mauve }}
-              contentFit="cover"
-              accessibilityLabel={printing.product_name}
-            />
-            <View style={{ flex: 1, gap: 4 }}>
-              <Text style={[styles.text, { fontWeight: '700' }]}>{printing.product_name}</Text>
-              <Text style={styles.muted}>
-                {printing.set_name} · {printing.set_code.toUpperCase()} {printing.collector_number}
-              </Text>
-            </View>
-          </View>
-          <Chips
-            items={printing.skus
-              .filter((s) => s.category === 'single' && s.is_active)
-              .map((s) => ({ key: s.id, label: `${s.finish ?? 'nonfoil'} · ${s.language}` }))}
-            selected={skuId}
-            onSelect={(id) => {
-              const sku = printing.skus.find((s) => s.id === id);
-              setSkuId(id);
-              if (sku) setPrefs((p) => ({ ...p, finish: sku.finish ?? 'nonfoil', language: sku.language }));
-            }}
-          />
-          <Chips
-            items={conditionList.map((c) => ({ key: String(c.id), label: c.code }))}
-            selected={String(prefs.condition)}
-            onSelect={(id) => setPrefs((p) => ({ ...p, condition: Number(id) }))}
-          />
-          {folderList.length > 0 && (
-            <Chips
-              items={[{ key: '', label: 'No folder' }, ...folderList.map((f) => ({ key: f.id, label: f.name }))]}
-              selected={prefs.folderId ?? ''}
-              onSelect={(id) => setPrefs((p) => ({ ...p, folderId: id || null }))}
-            />
-          )}
-          <Pressable style={styles.button} disabled={!!busy || !skuId} onPress={add} accessibilityRole="button">
-            <Text style={styles.buttonText}>Add to collection</Text>
-          </Pressable>
-          <Pressable style={[styles.button, styles.secondary]} disabled={!!busy} onPress={skip} accessibilityRole="button">
-            <Text style={styles.buttonText}>Skip, scan the next card</Text>
-          </Pressable>
-        </View>
-      )}
 
       {added.map((entry) => (
         <View key={`${entry.item.id}-${added.indexOf(entry)}`} style={[styles.row, { justifyContent: 'space-between' }]}>
