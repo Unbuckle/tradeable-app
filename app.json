@@ -33,6 +33,12 @@
           "recordAudioAndroid": false
         }
       ]
-    ]
+    ],
+    "owner": "tradeable-expo-devs-team",
+    "extra": {
+      "eas": {
+        "projectId": "77816a87-f460-4516-83d5-a8ee31512738"
+      }
+    }
   }
 }
