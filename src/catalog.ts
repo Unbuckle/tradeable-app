@@ -56,10 +56,10 @@ export const conditions = () =>
     r.data.filter((c) => c.scale === 'card'),
   );
 
-export const addToCollection = (skuId: string, condition: number, folderId: string | null) =>
+export const addToCollection = (skuId: string, condition: number, folderId: string | null, quantity = 1) =>
   api<CollectionItem>('/collection/items', {
     method: 'POST',
-    body: JSON.stringify({ sku_id: skuId, condition, quantity: 1, folder_id: folderId }),
+    body: JSON.stringify({ sku_id: skuId, condition, quantity, folder_id: folderId }),
   });
 
 export const folders = () =>
@@ -75,15 +75,15 @@ export const searchCards = (name: string) =>
 export const printingsOfCard = (productId: string) =>
   api<{ data: Printing[] }>(`/catalog/products/${productId}/printings`).then((r) => r.data.reverse());
 
-/** Takes back one added copy: archives a new item, or lowers the count of the stack it joined. */
-export async function undoAdd(added: CollectionItem): Promise<unknown> {
+/** Takes back the added copies: archives a new item, or lowers the count of the stack it joined. */
+export async function undoAdd(added: CollectionItem, quantity = 1): Promise<unknown> {
   // Later scans may have joined the same stack, so act on its current count and version.
   const item = await api<CollectionItem>(`/collection/items/${added.id}`);
-  if (item.total_quantity <= 1) {
+  if (item.total_quantity <= quantity) {
     return api(`/collection/items/${item.id}?version=${item.version}`, { method: 'DELETE' });
   }
   return api(`/collection/items/${item.id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ version: item.version, total_quantity: item.total_quantity - 1 }),
+    body: JSON.stringify({ version: item.version, total_quantity: item.total_quantity - quantity }),
   });
 }

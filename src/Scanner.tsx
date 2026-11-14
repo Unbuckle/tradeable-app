@@ -20,6 +20,7 @@ import { colors, styles } from './theme';
 
 interface Added {
   item: CollectionItem;
+  quantity: number;
   undone: boolean;
 }
 
@@ -49,6 +50,7 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   const [seen, setSeen] = useState('');
   const [locked, setLocked] = useState(false); // one read waits for a second, agreeing one
   const [torch, setTorch] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   async function run(label: string, work: () => Promise<void>) {
     setBusy(label);
@@ -185,8 +187,9 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
   const add = () =>
     run('Adding', async () => {
       if (!skuId) return;
-      const item = await addToCollection(skuId, prefs.condition, prefs.folderId);
-      setAdded((list) => [{ item, undone: false }, ...list]);
+      const item = await addToCollection(skuId, prefs.condition, prefs.folderId, quantity);
+      setAdded((list) => [{ item, quantity, undone: false }, ...list]);
+      setQuantity(1);
       setPrinting(null);
       setChoices([]);
       setNumber('');
@@ -195,11 +198,11 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
 
   const undo = (entry: Added) =>
     run('Undoing', async () => {
-      await undoAdd(entry.item);
+      await undoAdd(entry.item, entry.quantity);
       setAdded((list) => list.map((e) => (e === entry ? { ...e, undone: true } : e)));
     });
 
-  const count = added.filter((e) => !e.undone).length;
+  const count = added.filter((e) => !e.undone).reduce((sum, e) => sum + e.quantity, 0);
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={[styles.pad, { paddingTop: 56 }]}>
@@ -291,17 +294,46 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
               </Text>
             </View>
           </View>
-          <Chips
-            items={printing.skus
-              .filter((s) => s.category === 'single' && s.is_active)
-              .map((s) => ({ key: s.id, label: `${s.finish ?? 'nonfoil'} · ${s.language}` }))}
-            selected={skuId}
-            onSelect={(id) => {
-              const sku = printing.skus.find((s) => s.id === id);
-              setSkuId(id);
-              if (sku) setPrefs((p) => ({ ...p, finish: sku.finish ?? 'nonfoil', language: sku.language }));
-            }}
-          />
+          {(() => {
+            const singles = printing.skus.filter((sku) => sku.category === 'single' && sku.is_active);
+            const unique = (values: string[]) => [...new Set(values)].map((v) => ({ key: v, label: v }));
+            const finishes = unique(singles.map((sku) => sku.finish ?? 'nonfoil'));
+            const languages = unique(singles.map((sku) => sku.language));
+            const current = singles.find((sku) => sku.id === skuId);
+            // Choosing a finish or language picks the closest SKU and keeps the choice for the next scans.
+            const choose = (change: Partial<Preferences>) => {
+              const next = { ...prefs, ...change };
+              setPrefs(next);
+              setSkuId(pickSku(printing.skus, next)?.id ?? null);
+            };
+            return (
+              <>
+                {finishes.length > 1 && (
+                  <Chips items={finishes} selected={current?.finish ?? 'nonfoil'} onSelect={(finish) => choose({ finish })} />
+                )}
+                {languages.length > 1 && (
+                  <Chips items={languages} selected={current?.language ?? null} onSelect={(language) => choose({ language })} />
+                )}
+              </>
+            );
+          })()}
+          <View style={styles.row}>
+            <Pressable
+              style={styles.chip}
+              disabled={quantity <= 1}
+              onPress={() => setQuantity((q) => q - 1)}
+              accessibilityRole="button"
+              accessibilityLabel="One fewer"
+            >
+              <Text style={styles.text}>−</Text>
+            </Pressable>
+            <Text style={styles.text} accessibilityLabel={`Quantity ${quantity}`}>
+              {quantity}
+            </Text>
+            <Pressable style={styles.chip} onPress={() => setQuantity((q) => q + 1)} accessibilityRole="button" accessibilityLabel="One more">
+              <Text style={styles.text}>+</Text>
+            </Pressable>
+          </View>
           <Chips
             items={conditionList.map((c) => ({ key: String(c.id), label: c.code }))}
             selected={String(prefs.condition)}
@@ -315,7 +347,7 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
             />
           )}
           <Pressable style={styles.button} disabled={!!busy || !skuId} onPress={add} accessibilityRole="button">
-            <Text style={styles.buttonText}>Add to collection</Text>
+            <Text style={styles.buttonText}>{quantity > 1 ? `Add ${quantity} to collection` : 'Add to collection'}</Text>
           </Pressable>
           <Pressable style={[styles.button, styles.secondary]} disabled={!!busy} onPress={skip} accessibilityRole="button">
             <Text style={styles.buttonText}>Skip, scan the next card</Text>
@@ -376,7 +408,7 @@ export function Scanner({ onSignedOut }: { onSignedOut: () => void }) {
       {added.map((entry) => (
         <View key={`${entry.item.id}-${added.indexOf(entry)}`} style={[styles.row, { justifyContent: 'space-between' }]}>
           <Text style={[styles.text, { flex: 1 }, entry.undone && { textDecorationLine: 'line-through', opacity: 0.5 }]}>
-            {entry.item.card ? `${entry.item.card.display_name} · ${entry.item.card.set_code.toUpperCase()} ${entry.item.card.collector_number ?? ''}` : 'Card'}
+            {entry.quantity > 1 ? `${entry.quantity}× ` : ''}{entry.item.card ? `${entry.item.card.display_name} · ${entry.item.card.set_code.toUpperCase()} ${entry.item.card.collector_number ?? ''}` : 'Card'}
           </Text>
           {!entry.undone && (
             <Pressable onPress={() => undo(entry)} disabled={!!busy} accessibilityRole="button">
