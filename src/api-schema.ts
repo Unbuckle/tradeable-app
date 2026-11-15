@@ -4,6 +4,482 @@
  */
 
 export interface paths {
+    "/api/v1/audit/admin/audit-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The security audit log
+         * @description Read-only, newest first. `actor_user_id` and `target_id` narrow it to one account or entity, `event_type` to names starting with it (`identity.` or `identity.user.moderated`). IP addresses and user agents stay out. Page with `cursor` (the `next_cursor` of the previous page); `offset` is deprecated and ignored when a cursor is given. `total` stops counting past about 10,000.
+         */
+        get: operations["audit.listAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/cohorts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Members of the staff, alpha and beta cohorts
+         * @description Everyone not listed is in GA.
+         */
+        get: operations["audit.listCohortMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/cohorts/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set a member's release cohort */
+        put: operations["audit.setCohort"];
+        post?: never;
+        /** Put a member back in GA */
+        delete: operations["audit.removeCohort"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/compliance-holds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compliance holds
+         * @description Newest first. `user_id` narrows it to one member, `active` to unreleased (true) or released (false) holds.
+         */
+        get: operations["audit.listComplianceHolds"];
+        put?: never;
+        /**
+         * Place a compliance hold on a member
+         * @description While any hold is unreleased, the member's account is not erased; erasure runs on the next daily sweep after the last release.
+         */
+        post: operations["audit.placeComplianceHold"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/compliance-holds/{hold_id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Release a compliance hold */
+        post: operations["audit.releaseComplianceHold"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/feature-flags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every feature flag with its file value and override
+         * @description A flag without an override has the value of this environment's flag file. An override applies within two seconds in every process.
+         */
+        get: operations["audit.listFeatureFlags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/feature-flags/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Override a feature flag
+         * @description `enabled` false switches the flag off for everyone. Enabled without rules, it is on for everyone; with rules, for whoever matches any rule (every field a rule sets must match). Cohorts reach narrower ones too (`beta` includes alpha and staff; `ga` is everyone), seller tiers reach higher ones. Send the `version` you read; leave it out only to create the first override.
+         */
+        put: operations["audit.setFeatureFlag"];
+        post?: never;
+        /**
+         * Remove a flag override
+         * @description The flag file applies again.
+         */
+        delete: operations["audit.clearFeatureFlag"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/moderation/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The moderation queue
+         * @description Oldest first. `status` narrows it, for example to `open`.
+         */
+        get: operations["audit.listReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/moderation/reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One report with its moderation log */
+        get: operations["audit.getReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Take a report into review, or hand it back
+         * @description `in_review` assigns the report to you; `open` returns it to the queue.
+         */
+        patch: operations["audit.assignReport"];
+        trace?: never;
+    };
+    "/api/v1/audit/admin/moderation/reports/{report_id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Act on a report
+         * @description Runs the action in the context that owns the content: `suspend_listing` (listings), `remove_content` (messages and comments), `restrict_user` or `suspend_user` (the member behind the content; suspending needs an admin), `warn` or `dismiss`. The reporter and the member are notified; the member never learns who reported.
+         */
+        post: operations["audit.takeModerationAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/dead-letters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pending dead letters
+         * @description Events a consumer gave up on and jobs that failed for good, oldest first. Event dead letters need `audit:dead_letter:manage`, job dead letters `audit:job:manage`.
+         */
+        get: operations["audit.listDeadLetters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/dead-letters/{kind}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One dead letter with its payload
+         * @description Jobs that carry a one-time secret show a placeholder instead of their payload.
+         */
+        get: operations["audit.getDeadLetter"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/dead-letters/{kind}/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss a dead letter without replaying it */
+        post: operations["audit.dismissDeadLetter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/dead-letters/{kind}/{id}/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Replay a dead letter
+         * @description Runs the consumer or job again. A consumer keeps its idempotency check, so an event it already handled is not applied twice. `failed` leaves the dead letter pending.
+         */
+        post: operations["audit.replayDeadLetter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/dead-letters/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Replay every matching dead letter
+         * @description One at a time, oldest first; each result is reported. Narrow it by kind, name or event type. Up to 500 dead letters of each kind; more than 20 are replayed in the background: the answer is 202, and `GET /api/v1/audit/admin/ops/dead-letters/replay/{replay_id}` shows each result as it is done.
+         */
+        post: operations["audit.replayDeadLetters"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/dead-letters/replay/{replay_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A bulk replay being run
+         * @description A replay answered with 202 by `POST /api/v1/audit/admin/ops/dead-letters/replay`: `replaying` while its job runs, with the results so far, then `done`, or `failed` after its last attempt. Needs the scope of each kind it covers.
+         */
+        get: operations["audit.getDeadLetterReplay"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/projections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Projections and their last rebuild */
+        get: operations["audit.listProjections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/projections/{projection}/rebuild": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rebuild a projection
+         * @description Queues the rebuild on the worker (ADR-122); `last_run` shows its progress. A request while a rebuild is waiting or running returns that rebuild.
+         */
+        post: operations["audit.rebuildProjection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/admin/ops/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Outbox lag, dead letters and queue depth */
+        get: operations["audit.opsSnapshot"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/admin/printings/{printing_id}/images/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace a printing's picture
+         * @description Stores the uploaded picture (JPEG, PNG or WebP, at most about 700 KB) with its WebP copies and shows it instead of the provider picture. The nightly image job never replaces a picture.
+         */
+        put: operations["catalog.adminReplacePrintingImage"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/admin/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Correct a product
+         * @description Changes the canonical name or the popularity rank. A field set here is kept against the provider sync from then on. The slug, which is the card page address, never changes.
+         */
+        patch: operations["catalog.adminEditProduct"];
+        trace?: never;
+    };
+    "/api/v1/catalog/admin/products/{product_id}/aliases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A product's aliases */
+        get: operations["catalog.adminListAliases"];
+        put?: never;
+        /**
+         * Add an alias
+         * @description Search and decklist imports find the product by it too.
+         */
+        post: operations["catalog.adminAddAlias"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/admin/products/{product_id}/aliases/{alias_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a staff alias
+         * @description Provider aliases cannot be removed: the next sync would bring them back.
+         */
+        delete: operations["catalog.adminRemoveAlias"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/admin/skus/{sku_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Deactivate or reactivate a SKU
+         * @description Kept against the provider sync from then on.
+         */
+        patch: operations["catalog.adminSetSkuActive"];
+        trace?: never;
+    };
     "/api/v1/catalog/games": {
         parameters: {
             query?: never;
@@ -64,6 +540,23 @@ export interface paths {
         };
         /** Get a set by its code, such as MH3 (any case) */
         get: operations["catalog.getSetByCode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/mana-symbols": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the mana symbol images */
+        get: operations["catalog.listManaSymbols"];
         put?: never;
         post?: never;
         delete?: never;
@@ -169,9 +662,29 @@ export interface paths {
         };
         /**
          * List a set's printings in collector-number order
-         * @description Cursor-paginated. A cursor stays valid while printings are added to the set: no printing is repeated or skipped.
+         * @description Cursor-paginated. A cursor stays valid while printings are added to the set: no printing is repeated or skipped. PERF-09c: the filters narrow the list, and `sort` (`number` or `name`) with `direction` orders it; a cursor only continues the order it came from.
          */
         get: operations["catalog.listSetPrintings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/sets/{set_id}/printings/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count a set's printings that pass the filters
+         * @description PERF-09c: the set page's "See all N cards" while a filter is on; the same filters as the list.
+         */
+        get: operations["catalog.countSetPrintings"];
         put?: never;
         post?: never;
         delete?: never;
@@ -211,6 +724,94 @@ export interface paths {
         get: operations["catalog.getSku"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/automation-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your automation rules
+         * @description In the order they are tried: sort_order, then age. For each new item (or hourly, for valuation rules) only the first enabled rule of the trigger whose conditions all hold acts, and only once per item.
+         */
+        get: operations["collection.listAutomationRules"];
+        put?: never;
+        /**
+         * Add an automation rule
+         * @description At most 50 rules each. Rules act on items added from now on, not on items you already have.
+         */
+        post: operations["collection.createAutomationRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/automation-rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change an automation rule
+         * @description Replaces every field; send the version you last read.
+         */
+        put: operations["collection.updateAutomationRule"];
+        post?: never;
+        /**
+         * Delete an automation rule
+         * @description Items it staged stay on the to-list queue.
+         */
+        delete: operations["collection.deleteAutomationRule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/automation-rules/{rule_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run a rule on the cards you already have
+         * @description Queues the rule over your collection (also when it is switched off) and says how many items it will act on. Rules keep their order: an item an earlier matching rule of the same trigger would take is left alone. A rule acts on an item once, so running it again changes nothing.
+         */
+        post: operations["collection.runAutomationRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/automation-rules/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Count and show the cards that match today
+         * @description How many items in your collection every condition holds for, before you save the rule, and the first 8 of them. Rule order is not applied; Run now reports what a saved rule will act on.
+         */
+        post: operations["collection.previewAutomationRule"];
         delete?: never;
         options?: never;
         head?: never;
@@ -257,6 +858,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/collection/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Export your collection as a CSV
+         * @description Your active items as a platform CSV (docs/formats/collection-csv.md) with the columns you pick, sorted by name. `item_ids` (a selection) wins over `filter` (the item list filters, such as one folder or singles only); with neither, the whole collection. Up to 1,000 rows come back `ready` with a link that works for 15 minutes. A bigger export comes back `queued`: it is written in the background and an inbox notification links to it. Read it again for a fresh link.
+         */
+        post: operations["integration.requestCollectionExport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/exports/{export_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of your collection exports
+         * @description Its status, and once ready a fresh download link (15 minutes).
+         */
+        get: operations["integration.getCollectionExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/collection/folders": {
         parameters: {
             query?: never;
@@ -293,13 +934,33 @@ export interface paths {
         post?: never;
         /**
          * Delete a folder
-         * @description Its items become unfiled, merging into matching unfiled stacks.
+         * @description Its items become unfiled, merging into matching unfiled stacks; folders inside it move up to where it was.
          */
         delete: operations["collection.deleteFolder"];
         options?: never;
         head?: never;
         /** Change a folder */
         patch: operations["collection.updateFolder"];
+        trace?: never;
+    };
+    "/api/v1/collection/folders/covers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The cover items of your folders
+         * @description PERF-09b: one call for a page of folder tiles. For each folder named, the item whose card art is the tile's cover: a stack of the folder's chosen printing (`cover_printing_id`) when one is inside, else the newest item. Empty folders and folders that are not yours are left out.
+         */
+        get: operations["collection.listFolderCovers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/collection/items": {
@@ -311,7 +972,7 @@ export interface paths {
         };
         /**
          * Your items
-         * @description Active items, newest first, cursor-paginated. Filters combine: `game`, `folder` (an id, or `unfiled`), `tag` (a name), `set` (a catalog set id), `condition`, and `q` (part of the card or product name). `view=inventory` lists what you could sell: items that are not hidden and have units free or on a listing.
+         * @description Active items, cursor-paginated, newest first unless `sort` (`added`, `name` or `quantity`) and `direction` (`asc` or `desc`, ties broken by age) say otherwise. Filters combine: `game`, `folder` (an id, or `unfiled`), `tag` (a name), `set` (a catalog set id), `scale` (`card` for singles, `sealed`), `condition`, and `q` (part of the card or product name). `folder`, `tag` and `condition` may repeat; an item then needs to match any one of the values. COL-15 card facts: `language`, `rarity`, `mana_value` (7 is 7 or more) and `type` (a word of the type line) match any value; `color` (W U B R G, C for colourless) needs every colour; `legal` a format the card is legal or restricted in. Sorts `paid` (price per copy), `value` (the market value of the stack, refreshed hourly) and `gain` (value minus cost, EUR costs only) put items without one last when descending. `view=inventory` lists what you could sell: items that are not hidden and have units free or on a listing.
          */
         get: operations["collection.listItems"];
         put?: never;
@@ -387,6 +1048,50 @@ export interface paths {
          */
         get: operations["collection.listLedger"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/items/{item_id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * An item's photos
+         * @description Photos of the exact copy (unique items only), in display order.
+         */
+        get: operations["collection.getItemPhotos"];
+        /**
+         * Replace an item's photos
+         * @description Up to 6 photos of a unique item, front and back, in display order. Each key is either one of your uploads from `POST /integration/uploads` (JPEG or PNG, at most 15 MB), stored without its camera data, turned upright and scaled to at most 1600 pixels, or the key of a photo the item already has. A photo left out is removed. A new listing of the item starts with the first photo.
+         */
+        put: operations["collection.setItemPhotos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/items/{item_id}/sale-mode": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose whether friends may also buy an item
+         * @description Matters in a trade binder, where only `trade_or_buy` items can be listed. Switching to `trade_only` ends the listings of the item; units already in carts stay held until checkout or expiry.
+         */
+        put: operations["collection.setItemSaleMode"];
         post?: never;
         delete?: never;
         options?: never;
@@ -474,6 +1179,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/collection/purchase-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether received orders join your collection on their own */
+        get: operations["collection.getPurchaseSettings"];
+        /**
+         * Turn adding received orders automatically on or off
+         * @description Applies to orders completed from now on; earlier ones stay to add by hand.
+         */
+        put: operations["collection.updatePurchaseSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/purchases/{seller_order_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Whether a received order is in your collection
+         * @description COL-12: a seller order you bought becomes a purchase once it is completed (received and settled).
+         */
+        get: operations["collection.getPurchase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/purchases/{seller_order_id}/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a received order to your collection
+         * @description Adds its cards with the price you paid per card (no share of shipping), dated when the order completed, in no folder. Adding again adds nothing.
+         */
+        post: operations["collection.addPurchase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/collection/sets/{set_id}/completion": {
         parameters: {
             query?: never;
@@ -486,6 +1252,26 @@ export interface paths {
          * @description Printings of the set you own at least one copy of, out of its single-card printings. Any finish, language or condition fills a printing; sealed products and accessories do not count.
          */
         get: operations["collection.getSetCompletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/sets/owned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * How many printings you own per set
+         * @description Every set you own at least one single card of, with the number of its printings you own (counted as in set completion). Sets you own nothing of are left out. Feeds the "You own" figure on set tiles.
+         */
+        get: operations["collection.listOwnedSets"];
         put?: never;
         post?: never;
         delete?: never;
@@ -514,6 +1300,46 @@ export interface paths {
         patch: operations["collection.updateSettings"];
         trace?: never;
     };
+    "/api/v1/collection/staged-listings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Items your rules staged for listing
+         * @description Newest first. An item leaves the queue when you dismiss it or it is no longer in your collection; listing it does not remove it.
+         */
+        get: operations["collection.listStagedListings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collection/staged-listings/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Take an item off the to-list queue
+         * @description The item itself stays in your collection.
+         */
+        delete: operations["collection.dismissStagedListing"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/collection/summary": {
         parameters: {
             query?: never;
@@ -523,7 +1349,7 @@ export interface paths {
         };
         /**
          * Your collection at a glance
-         * @description Visibility plus counts of active items, copies, distinct products, folders and tags.
+         * @description Visibility plus counts of active items (all, singles and sealed), copies, distinct products, folders and tags.
          */
         get: operations["collection.getSummary"];
         put?: never;
@@ -574,6 +1400,893 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/community/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Block a member
+         * @description Ends any friendship or request between you and hides everything of each from the other. Blocking twice is fine.
+         */
+        post: operations["community.blockMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/blocks/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Unblock a member
+         * @description Does not bring back a friendship the block ended. Unblocking someone not blocked is fine.
+         */
+        delete: operations["community.unblockMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Comments and reactions on a profile or showcase
+         * @description Oldest first. Works signed out for public things.
+         */
+        get: operations["community.listComments"];
+        put?: never;
+        /** Comment on a profile or showcase */
+        post: operations["community.addComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/comments/{comment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a comment
+         * @description Its author, the owner of the profile or showcase, or a moderator (audited) may remove it.
+         */
+        delete: operations["community.deleteComment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your conversations
+         * @description Most recent message first, each with the number of messages you have not read.
+         */
+        get: operations["community.listConversations"];
+        put?: never;
+        /**
+         * Open a conversation with a member or about an order
+         * @description With `user_id`, the one conversation between you and that member; with `seller_order_id`, the one between the buyer and the seller of that order. It is created the first time; you can start 20 a day.
+         */
+        post: operations["community.startConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Messages of a conversation
+         * @description Newest first.
+         */
+        get: operations["community.listMessages"];
+        put?: never;
+        /**
+         * Write in a conversation
+         * @description The others are notified unless they muted it. Members who blocked each other cannot write to each other.
+         */
+        post: operations["community.sendMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/conversations/{conversation_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark a conversation as read */
+        post: operations["community.markConversationRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/deck-stats/setting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether your profile shows your deck stats */
+        get: operations["community.getDeckStatsSetting"];
+        /** Show or hide your deck stats on your profile */
+        put: operations["community.setDeckStatsSetting"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your decklists */
+        get: operations["community.listMyDecklists"];
+        put?: never;
+        /**
+         * Import a decklist from text
+         * @description Paste a plain list ("4 Lightning Bolt"), an MTGA export, or a Moxfield or Archidekt text export. Each line is matched to a catalog card by name: resolved, ambiguous (pick one of the candidates) or unresolved. Private unless you choose otherwise.
+         */
+        post: operations["community.importDecklist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A decklist
+         * @description Shown to whom its owner chose; works signed out for public ones.
+         */
+        get: operations["community.getDecklist"];
+        put?: never;
+        post?: never;
+        /** Remove a decklist */
+        delete: operations["community.deleteDecklist"];
+        options?: never;
+        head?: never;
+        /**
+         * Rename a decklist or change who sees it
+         * @description COM-12: takes the decklist `version` you last read; a field left out stays as it is.
+         */
+        patch: operations["community.updateDecklist"];
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy a decklist to your own
+         * @description COM-12 "Copy to my decklists": a decklist you may see becomes a new one of yours with the same lines. The name is the original's plus "(copy)" when left out; the visibility your default.
+         */
+        post: operations["community.copyDecklist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add cards to one of your decklists
+         * @description COM-11: adds catalog cards (products) to a board of the deck, taking the decklist `version` you last read. A card already on that board gets the quantity added. Ownership still comes from your collection.
+         */
+        post: operations["community.addDecklistCards"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}/entries/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change a line of one of your decklists
+         * @description COM-12: sets the count (0 removes the line) or moves the line to another board, taking the decklist `version` you last read.
+         */
+        put: operations["community.updateDecklistEntry"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Pick the card for an ambiguous line
+         * @description Takes the decklist `version` you last read.
+         */
+        patch: operations["community.chooseDecklistEntry"];
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}/missing-to-cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy the cards you are missing
+         * @description Puts the cheapest in-stock offers of each missing card (any printing or condition) into your cart, holding them like any add-to-cart; your own listings are never picked. Greedy, cheapest first per card. The maybeboard and unresolved lines are left out; `missing` lists the copies no offer covered. Needs `marketplace:cart:manage` too.
+         */
+        post: operations["community.decklistMissingToCart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}/missing-to-wishlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Wish for the cards you are missing
+         * @description Adds a wish for each missing card (any printing), or raises the target of a wish you already have on that list. The maybeboard and unresolved lines are left out. `wishlist_id` names the list (WL-04); your first list when left out.
+         */
+        post: operations["community.decklistMissingToWishlist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/{decklist_id}/ownership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Which cards of a decklist you own
+         * @description Your own collection against the list ("82 / 100 owned"): any printing, condition or folder counts, and a card is not counted twice across boards. The maybeboard is left out of the totals; unresolved lines count as missing.
+         */
+        get: operations["community.getDecklistOwnership"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/from-cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a decklist from cards
+         * @description COM-11: a new decklist of these cards, for the collection's "New deck from these cards".
+         */
+        post: operations["community.createDecklistFromCards"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/from-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import a public Moxfield or Archidekt deck
+         * @description Reads a public deck once from moxfield.com or archidekt.com (no other site) and stores it like a pasted text export, with `source` and `source_url`. It is not kept in sync. The name defaults to the deck's own.
+         */
+        post: operations["community.importDecklistFromUrl"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your activity feed
+         * @description What you and your friends did: completed sets, portfolio milestones, published showcases and badges, newest first. A friend's private profile, a block, or a showcase that is gone or private hides the entry.
+         */
+        get: operations["community.getFeed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/friends/{user_id}/trade-binder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A friend's trade binder
+         * @description Items with units free to trade, in item id order. Anyone but a friend gets 404.
+         */
+        get: operations["community.listTradeBinder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/friendships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your friends and friend requests
+         * @description Friends and requests waiting for an answer, both ways, most recently changed first.
+         */
+        get: operations["community.listFriendships"];
+        put?: never;
+        /**
+         * Ask a member to be friends
+         * @description If that member already asked you, this accepts their request and answers `friends`. A declined request may be sent again.
+         */
+        post: operations["community.requestFriendship"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/friendships/{friendship_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unfriend, or withdraw or decline a request */
+        delete: operations["community.removeFriendship"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/friendships/{friendship_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept a friend request */
+        post: operations["community.acceptFriendship"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/friendships/{friendship_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decline a friend request
+         * @description The requester is not told and may ask again later.
+         */
+        post: operations["community.declineFriendship"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your community preferences
+         * @description What you share and with whom, what your feed shows, who may comment on your things, the default visibility of new decklists and whether your For sale tab shows. Defaults until you save.
+         */
+        get: operations["community.getMyPreferences"];
+        /**
+         * Save your community preferences
+         * @description Replaces all of them. Sharing applies to activity from now on; feed and comment settings apply at once. Badges are always public.
+         */
+        put: operations["community.updateMyPreferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Name members by user id
+         * @description How other pages name a member, such as a listing’s seller: the handle and display name always, like a storefront name; the avatar, country and badges only to whom the member shows their profile. Unknown and deleted accounts are left out; the rest keep the order asked.
+         */
+        get: operations["community.listMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/mutes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Members you muted
+         * @description Newest first. Erased accounts are left out.
+         */
+        get: operations["community.listMutes"];
+        put?: never;
+        /**
+         * Mute a member
+         * @description Their activity leaves your feed and their comments leave the pages you read. They are not told, and nothing else changes: unlike a block, they still see your things. Muting twice is fine.
+         */
+        post: operations["community.muteMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/mutes/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Unmute a member
+         * @description Unmuting someone not muted is fine.
+         */
+        delete: operations["community.unmuteMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/profiles/{handle}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A member's community profile
+         * @description Shown to whom the member chose in their profile settings (public, friends or only themselves), with their badges. Never contact or account data.
+         */
+        get: operations["community.getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/profiles/{handle}/deck-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A member's Commander deck stats
+         * @description Counted over all their Commander decks, private ones too, and shown to whoever may see the profile unless the member turned the stats off.
+         */
+        get: operations["community.getDeckStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/profiles/{handle}/decklists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A member's decklists
+         * @description The newest 100 decklists you may see. A member whose profile you may not see shows none.
+         */
+        get: operations["community.listMemberDecklists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/profiles/{handle}/showcases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A member's showcases
+         * @description The showcases you may see, newest first. A member whose profile you may not see shows none.
+         */
+        get: operations["community.listShowcases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/reactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * React to a profile or showcase
+         * @description Each kind once per member; reacting again changes nothing.
+         */
+        put: operations["community.addReaction"];
+        post?: never;
+        /** Take a reaction back */
+        delete: operations["community.removeReaction"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/showcases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish a showcase
+         * @description Shows one of your collection folders on your profile. Visibility defaults to public.
+         */
+        post: operations["community.createShowcase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/showcases/{showcase_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A showcase with its cards
+         * @description The cards are the folder's current items, read live from the collection, so moving a card in or out of the folder shows at once. The folder's own visibility applies too.
+         */
+        get: operations["community.getShowcase"];
+        put?: never;
+        post?: never;
+        /**
+         * Remove a showcase
+         * @description The folder and its cards stay in your collection.
+         */
+        delete: operations["community.deleteShowcase"];
+        options?: never;
+        head?: never;
+        /**
+         * Change a showcase
+         * @description Takes the `version` you last read; omitted fields stay as they are.
+         */
+        patch: operations["community.updateShowcase"];
+        trace?: never;
+    };
+    "/api/v1/community/trade-matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Friends you could trade with
+         * @description Friends whose friends-visible wishlist wants cards from your binder, or the other way round, most matches first. Updated as binders and wishlists change, and fully every night.
+         */
+        get: operations["community.listTradeMatches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your trades
+         * @description Proposals you sent or received, newest first.
+         */
+        get: operations["community.listTrades"];
+        put?: never;
+        /**
+         * Propose a trade to a friend
+         * @description Offer items from your trade binder for items from your friend's. The proposal is open for 7 days.
+         */
+        post: operations["community.proposeTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of your trades */
+        get: operations["community.getTrade"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept a proposal
+         * @description Then meet and both confirm the handshake within 7 days.
+         */
+        post: operations["community.acceptTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw a trade
+         * @description Either member may, until the handshake.
+         */
+        post: operations["community.cancelTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}/confirm-handshake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm the handshake
+         * @description Once both of you confirmed, every item moves to its new owner at once; if one cannot, the moved ones go back and the trade fails.
+         */
+        post: operations["community.confirmTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}/counter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer a proposal with new terms
+         * @description The proposal becomes `countered` and a new one, from you, goes back.
+         */
+        post: operations["community.counterTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a proposal */
+        post: operations["community.declineTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/.well-known/jwks.json": {
         parameters: {
             query?: never;
@@ -588,6 +2301,231 @@ export interface paths {
         get: operations["identity.jwks"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/erasure-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Erasure requests and how far each context has erased the member */
+        get: operations["identity.listErasures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every plan with its price and limit history */
+        get: operations["identity.listAdminPlans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/plans/{plan_code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a plan's name and description */
+        patch: operations["identity.updatePlanText"];
+        trace?: never;
+    };
+    "/api/v1/identity/admin/plans/{plan_code}/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set a feature or limit of a plan
+         * @description Adds a limit row for `key`; the old one stays as history. 0 removes a feature.
+         */
+        post: operations["identity.addPlanLimit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/plans/{plan_code}/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set a new price for a plan
+         * @description Adds a price row; the old one stays as history. New checkouts pay it from `effective_from`; running subscriptions keep the price they were bought at.
+         */
+        post: operations["identity.addPlanPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your staff roles, for the admin console
+         * @description For moderators and admins with two-step verification on; the admin console asks before it renders. Members get 404, as on every staff route.
+         */
+        get: operations["identity.getStaffSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find accounts
+         * @description `q` is an exact email address or the start of a handle; without it, the newest accounts.
+         */
+        get: operations["identity.searchUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One account with its seller account, holds and security events */
+        get: operations["identity.getAdminUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/users/{user_id}/mfa/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Turn off two-step verification for a member who lost it
+         * @description Admins only, with their own current two-step code in `X-MFA-Code`, after following `docs/runbooks/mfa-recovery.md`: the request came from the account’s email and the member’s ID matched its name. The member gets the usual “two-step verification is off” email and payouts pause for 48 hours.
+         */
+        post: operations["identity.resetUserMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/users/{user_id}/moderation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restrict, suspend or reactivate an account
+         * @description Moderators restrict; admins also suspend and reactivate. A suspension refuses sign-in and ends every session at once (the account lockout). The seller account and its listings follow.
+         */
+        post: operations["identity.moderateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/users/{user_id}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Grant or remove a staff role
+         * @description Admins only, with a current two-step code in `X-MFA-Code`. Removing a role ends the account’s sessions.
+         */
+        post: operations["identity.setStaffRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/admin/users/{user_id}/sessions/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign an account out everywhere */
+        post: operations["identity.revokeUserSessions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -706,6 +2644,30 @@ export interface paths {
         patch: operations["identity.updateAddress"];
         trace?: never;
     };
+    "/api/v1/identity/me/data-export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your latest data export
+         * @description When you last asked for your data, and a fresh download link while it has not expired.
+         */
+        get: operations["identity.getMyDataExport"];
+        put?: never;
+        /**
+         * Download your data
+         * @description Builds a ZIP of the personal data the platform holds about you, one JSON and one CSV file per table, and returns a download link valid for 7 days. A large export is prepared in the background instead: the answer is 202 with its id, and `GET me/data-export` shows it `building`, then `ready` with the link. Once a day; with two-step verification on, send a current code in `X-MFA-Code`.
+         */
+        post: operations["identity.exportMyData"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/me/erasure-request": {
         parameters: {
             query?: never;
@@ -725,6 +2687,26 @@ export interface paths {
          * @description Cancels the scheduled deletion of your account.
          */
         delete: operations["identity.cancelErasure"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/me/handle-availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Whether a handle is free
+         * @description Whether you could change your @handle to this one: free (your own counts as free), taken, reserved, or not a valid handle. The change itself still checks again.
+         */
+        get: operations["identity.checkHandle"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -810,6 +2792,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/me/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your plan
+         * @description The plan you are on and what it includes. Everyone is on the free plan until paid plans can be bought.
+         */
+        get: operations["identity.getMyPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/me/preferences": {
         parameters: {
             query?: never;
@@ -856,6 +2858,46 @@ export interface paths {
          * @description Changes the fields sent; `null` clears an optional one and `social_links` replaces the list. The @handle must be free and not reserved.
          */
         patch: operations["identity.updateProfile"];
+        trace?: never;
+    };
+    "/api/v1/identity/me/profile/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload a profile photo
+         * @description ONB-01b (ADR-165): an upload URL for a new profile photo (JPEG, PNG or WebP). PUT the file there, then call POST profile/photo/check. The photo stays private until it passes the check. Only plans with the `profile_photo_upload` feature.
+         */
+        post: operations["identity.startPhotoUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/me/profile/photo/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check the uploaded profile photo
+         * @description The upload finished: queues the explicit-content check. `photo_status` is `checking` until it is decided; a passed photo becomes `avatar_url`, a rejected one is never shown.
+         */
+        post: operations["identity.checkPhoto"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/identity/me/seller-account": {
@@ -926,6 +2968,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/me/seller-account/dac7": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your DAC7 status this year
+         * @description This year’s sales against the DAC7 limits as of the nightly computation, the reporting status, the data the report still needs, and when listing stops if it stays missing (SOS-03).
+         */
+        get: operations["identity.getDac7Status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/me/seller-account/onboarding-link": {
         parameters: {
             query?: never;
@@ -940,6 +3002,26 @@ export interface paths {
          * @description Creates your Stripe account the first time and returns a one-time link to its onboarding, where you confirm your identity, phone number and bank account.
          */
         post: operations["identity.createOnboardingLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/me/shell": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What the signed-in page frame needs
+         * @description Your profile, preferences, addresses and terms status in one call, so a page load needs one request instead of four (PERF-09). Each part is the same as its own endpoint; `terms` is `null` while the terms feature is off.
+         */
+        get: operations["identity.getShell"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -981,6 +3063,50 @@ export interface paths {
          * @description Stops the provider from signing you in. Refused when it is your only way to sign in (no password and no other provider). With two-step verification on, needs a code in `X-MFA-Code`.
          */
         delete: operations["identity.unlinkOAuthProvider"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/me/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your paid plan
+         * @description Your paid plan subscription that has not ended; `subscription` is null on the free plan.
+         */
+        get: operations["identity.getMySubscription"];
+        put?: never;
+        post?: never;
+        /**
+         * Cancel your plan
+         * @description Within 14 days of the start the plan ends at once and the payment is refunded in full (withdrawal). Later it runs to the end of the period already paid.
+         */
+        delete: operations["identity.cancelMySubscription"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/me/subscription/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy a plan
+         * @description Returns the payment provider's page for the plan at its current price; the plan starts once the payment is confirmed.
+         */
+        post: operations["identity.startPlanCheckout"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1039,7 +3165,7 @@ export interface paths {
         };
         /**
          * Finish signing in with a provider
-         * @description Called by the web page the provider redirects to, with its `code` and `state`. Signs in a linked account (with two-step verification on, the page sends the same request again with a code in `X-MFA-Code`) or creates one for a new, provider-verified email. A signed-in caller connects the provider to their own account instead, which with two-step verification on needs a code in `X-MFA-Code`. An email that belongs to an unlinked account is never linked automatically.
+         * @description Called by the web page the provider redirects to, with its `code` and `state`. Signs in a linked account (with two-step verification on, the page sends the same request again with a code in `X-MFA-Code`) or creates one for a new, provider-verified email. A signed-in caller connects the provider to their own account instead, which with two-step verification on needs a code in `X-MFA-Code`; while `identity.provider-linking` is off (SEC-08) that is refused. An email that belongs to an unlinked account is never linked automatically.
          */
         get: operations["identity.oauthCallback"];
         put?: never;
@@ -1104,6 +3230,26 @@ export interface paths {
          * @description Consumes the token from the reset email, sets the new password and signs the account out on every device.
          */
         post: operations["identity.confirmPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Member plans
+         * @description The free plan and the paid plans, with their current prices and what each includes. Prices and limits are data and can change; the response always shows the values in effect now.
+         */
+        get: operations["identity.listPlans"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1234,6 +3380,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/integration/admin/catalog-sync/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run the catalog sync now
+         * @description Queues the provider sync the schedule runs every night. It imports a version the platform does not have yet and does nothing otherwise, or while the `integration.catalog-sync` flag is off. Progress shows in the import monitor.
+         */
+        post: operations["integration.requestCatalogSync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integration/admin/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every import, newest first
+         * @description Members' imports and scheduled catalog syncs; `status` narrows it, for example to `failed`.
+         */
+        get: operations["integration.listImportsForStaff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integration/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Export your listings or inventory as a listing CSV
+         * @description `listings`: your listings that are not cancelled, as `update` rows. `inventory`: collection items with free units, as `create` rows without a price. Both import back as `listing_csv` (docs/formats/listing-csv.md). The link works for 15 minutes. A file of more than 1,000 rows is written in the background instead: the answer is 202 with its id, and `GET /api/v1/integration/exports/{id}` shows it `building`, then `ready` with the link.
+         */
+        post: operations["integration.exportSellerCsv"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integration/exports/{export_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A seller or failed-rows export being prepared
+         * @description An export answered with 202 by `POST /api/v1/integration/exports` or `GET …/failed-records.csv`: `building` while its job writes it, then `ready` with a fresh download link (15 minutes), or `failed`.
+         */
+        get: operations["integration.getFileExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/integration/imports": {
         parameters: {
             query?: never;
@@ -1331,6 +3557,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/integration/imports/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check an uploaded file before importing it
+         * @description COL-14: reads the file as POST imports would and answers per row whether it is ready, needs a printing picked or cannot be read, plus a CSV file's columns and condition words. Imports nothing. Send the member's choices back as options: `columns` (mapped files), `conditions` (word to grade 1 to 7) and `picks` (typed lists: line number to `set_code` and `collector_number`).
+         */
+        post: operations["integration.checkImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integration/imports/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your import that is still running
+         * @description A member runs one file import at a time. This answers the pending or running one, or `import: null` when a new import may start.
+         */
+        get: operations["integration.getOpenImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/integration/uploads": {
         parameters: {
             query?: never;
@@ -1411,6 +3677,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/cart/fill-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Fill the cart in the background
+         * @description For a long list of cards (more than 40 products): adds the cheapest in-stock offers of each product until its quantity is met, as "buy missing" does, in a background job. Poll the job for progress; added copies are held for 10 hours.
+         */
+        post: operations["marketplace.startCartFill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/cart/fill-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fill-cart job */
+        get: operations["marketplace.getCartFill"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/cart/items": {
         parameters: {
             query?: never;
@@ -1455,6 +3758,26 @@ export interface paths {
         patch: operations["marketplace.updateCartItem"];
         trace?: never;
     };
+    "/api/v1/marketplace/cart/optimize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Plan the cheapest purchase
+         * @description For a list of cards (a wishlist or the missing cards of a decklist), picks the offers that cost the least in total delivered to `country`: prices, postage and buyer protection per seller order, as the cart quote counts them. Up to 20 offers per card are considered, never your own. With `add_to_cart` the picks go into the cart and are held for 10 hours; what is already in the cart is not taken into account.
+         */
+        post: operations["marketplace.optimizePurchase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/cart/quote": {
         parameters: {
             query?: never;
@@ -1464,7 +3787,7 @@ export interface paths {
         };
         /**
          * Prices, postage and fees
-         * @description Per seller: the items, the postage options to `country` (the cheapest allowed one is used; tracked shipping is required from €25, below Silver tier, or for sellers with many unconfirmed parcels), the buyer protection fee and the total. Checkout charges the same. The payment handling fee is added at payment.
+         * @description Per seller: the items, the postage options to `country` (the cheapest allowed one is used; tracked shipping is required from €25, below Silver tier, or for sellers with many unconfirmed parcels), the buyer protection fee and the total. Checkout charges the same, including the service fee once per order (ADR-162).
          */
         get: operations["marketplace.getCartQuote"];
         put?: never;
@@ -1566,7 +3889,7 @@ export interface paths {
         put?: never;
         /**
          * Decide a dispute
-         * @description For moderators: `refunded` with `refund_cents` (up to the seller order's goods) refunds the buyer and gives the seller the rest; `released` gives the seller everything. Audited.
+         * @description For moderators: `refunded` with `refund_cents` (up to the seller order's goods) refunds the buyer and gives the seller the rest; `released` gives the seller everything. Needs a current two-step code in `X-MFA-Code`. Audited.
          */
         post: operations["marketplace.resolveDispute"];
         delete?: never;
@@ -1663,6 +3986,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/listings/{listing_id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set the photos of a listing
+         * @description Replaces the photos of a listing of a unique item (one physical card) with up to 8 of your uploads. Each photo is stored without its camera data (such as the location), turned upright and scaled to at most 1600 pixels.
+         */
+        put: operations["marketplace.setListingPhotos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/listings/{listing_id}/pricing-exclusion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Keep a listing out of the Pricing Bot
+         * @description Its rarity minimum still applies.
+         */
+        put: operations["marketplace.setListingPricingExclusion"];
+        post?: never;
+        /**
+         * Let the Pricing Bot price a listing again
+         * @description Undoes the exclusion.
+         */
+        delete: operations["marketplace.deleteListingPricingExclusion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/listings/{listing_id}/resume": {
         parameters: {
             query?: never;
@@ -1677,6 +4044,83 @@ export interface paths {
          * @description Puts a paused listing back on sale. Needs a seller account that can sell.
          */
         post: operations["marketplace.resumeListing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/listings/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * List many items at once
+         * @description Lists up to 1,000 of your collection items in the background, 50 at a time; poll GET listings/bulk/{job_id} for progress. Each item is listed as with POST listings. Items that are missing or refused, for example with too few free units, are skipped and listed in `failures`.
+         */
+        post: operations["marketplace.startBulkListing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/listings/bulk/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A bulk listing job and its progress
+         * @description Status, counts and the first failures.
+         */
+        get: operations["marketplace.getBulkListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your orders
+         * @description What you bought, newest first, with one seller order per seller; unpaid and cancelled orders too. Cursor-paginated.
+         */
+        get: operations["marketplace.listMyOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/orders/{order_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of your orders */
+        get: operations["marketplace.getMyOrder"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1743,6 +4187,182 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/pricing/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * See what a run would change
+         * @description Checks the first 1,000 active listings with nothing in a cart (by listing id; `capped` says there are more) and writes nothing; lists the first 500 changes. A run checks every listing.
+         */
+        post: operations["marketplace.previewPricing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/pricing/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your pricing rules
+         * @description In the order the bot tries them (priority, then id).
+         */
+        get: operations["marketplace.listPricingRules"];
+        put?: never;
+        /**
+         * Add a pricing rule
+         * @description Needs a seller account that can sell.
+         */
+        post: operations["marketplace.createPricingRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/pricing/rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change a pricing rule
+         * @description Replaces every field; send the version you read.
+         */
+        put: operations["marketplace.updatePricingRule"];
+        post?: never;
+        /**
+         * Remove a pricing rule
+         * @description Prices it set stay as they are.
+         */
+        delete: operations["marketplace.deletePricingRule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/pricing/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your recent Pricing Bot runs
+         * @description The last 30, newest first.
+         */
+        get: operations["marketplace.listPricingRuns"];
+        put?: never;
+        /**
+         * Run the Pricing Bot now (once a day)
+         * @description Queues the extra run every seller has each day (UTC).
+         */
+        post: operations["marketplace.startPricingRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/pricing/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your Pricing Bot settings
+         * @description Runs a day, their times and your minimum prices per rarity.
+         */
+        get: operations["marketplace.getPricingSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change runs a day or minimum prices
+         * @description No listing of yours goes below its rarity minimum, with or without a rule: new and changed prices are lifted to it, and the next run lifts the others.
+         */
+        patch: operations["marketplace.updatePricingSettings"];
+        trace?: never;
+    };
+    "/api/v1/marketplace/products/{product_id}/offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Offers for a card across its printings
+         * @description For the card's All offers page (FE-MKT-OFFERS): the listings of every printing, language and finish of a card that can be bought now, with the same filters and sorts as a SKU's offers. `price_facets` is always null.
+         */
+        get: operations["search.productOffers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller-orders/{seller_order_id}/invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * VAT invoice
+         * @description A professional seller's VAT invoice for a completed seller order (SOS-06), for its seller and its buyer: the number, the total and a 15-minute link to the PDF.
+         */
+        get: operations["marketplace.getInvoice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your seller dashboard
+         * @description Open orders per status, sales over the last 7 and 30 days (paid orders, without cancelled or refunded ones), your wallet, your listings per status, the listings running low, daily sales over 90 days and your best sellers of the last 30 days.
+         */
+        get: operations["marketplace.getSellerDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/seller/listings/{listing_id}/release-reservations": {
         parameters: {
             query?: never;
@@ -1790,7 +4410,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** One of your sales */
+        /**
+         * One of your sales
+         * @description With the shipping address and every status change, for packing, the label and tracking.
+         */
         get: operations["marketplace.getSellerOrder"];
         put?: never;
         post?: never;
@@ -1840,6 +4463,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/seller/orders/{seller_order_id}/lines/{line_id}/pick": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mark a line picked or as an issue
+         * @description While picking: `picked` once it is out of stock, `issue` with a reason when it cannot be (missing, wrong condition, finish or language, damaged), or `open` again. An order whose lines are all picked is ready to pack.
+         */
+        put: operations["marketplace.pickLine"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/seller/orders/{seller_order_id}/pack": {
         parameters: {
             query?: never;
@@ -1871,6 +4514,66 @@ export interface paths {
         get: operations["marketplace.getPackingSlip"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/orders/stages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your sales by stage
+         * @description How many of your orders are in each fulfilment stage, for the fulfilment center tabs.
+         */
+        get: operations["marketplace.countSellerOrderStages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/orders/start-picking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start picking
+         * @description Moves new (paid) orders to picking. Each order is started on its own; ones already being picked stay as they are.
+         */
+        post: operations["marketplace.startPicking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/orders/stop-picking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Put back to new
+         * @description Discards the pick list of these orders: they are new again and every card is open. Orders not being picked stay as they are.
+         */
+        post: operations["marketplace.stopPicking"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1941,6 +4644,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/sets/{set_code}/offer-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What a set has on sale
+         * @description For the set header (MD-07): active offers, distinct sellers and copies on sale of one set of one game, from the search projection.
+         */
+        get: operations["search.setOfferSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/skus/{sku_id}/offers": {
         parameters: {
             query?: never;
@@ -1950,7 +4673,7 @@ export interface paths {
         };
         /**
          * Offers for a card
-         * @description The listings of one SKU that can be bought now, cheapest first; at equal price sellers in `ship_to` come first. Served from the search projection, so a new listing shows within seconds.
+         * @description The listings of one SKU that can be bought now, cheapest first unless `sort` says otherwise; at equal price sellers in `ship_to` come first. The first page also carries the cheapest offer of each language and finish of the same printing. Served from the search projection, so a new listing shows within seconds.
          */
         get: operations["search.offers"];
         put?: never;
@@ -1970,7 +4693,7 @@ export interface paths {
         };
         /**
          * Your notifications
-         * @description Newest first, without archived items. Cursor-paginated; `unread_count` covers the whole inbox.
+         * @description Newest first, without archived items (or only them with `archived=true`). Cursor-paginated; `unread_count` covers the whole inbox.
          */
         get: operations["notification.listInbox"];
         put?: never;
@@ -2082,6 +4805,340 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/portfolio/market/best-sellers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A game's best-selling cards
+         * @description For the Landing page's Trending: the game's printings by copies sold over the last 14 days, most first; refunded orders do not count. Empty without sales.
+         */
+        get: operations["portfolio.gameBestSellers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/featured": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A trending card offered below its market price
+         * @description For the Home hero: the game's most sold SKU of the last 14 days (with enough sales) whose cheapest offer is below its 7-day average; `featured` is null when there is none.
+         */
+        get: operations["portfolio.featuredOffer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/movers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Biggest price movers of a game
+         * @description SKUs whose 7-day average rose or fell most against the week before, among SKUs with enough sales.
+         */
+        get: operations["portfolio.movers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/printing-prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Prices per printing of a set or a card
+         * @description For the set page's tiles, Price filter and sort, and the card page's Printings list (CAT-05b): each printing's cheapest offer and market price, the lowest over its languages and finishes. Give exactly one of `set_id` and `product_id`; printings without any price are left out.
+         */
+        get: operations["portfolio.printingPrices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/products/{product_id}/statistics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Price figures of a product
+         * @description The same figures over every SKU of the product (any language, finish or condition).
+         */
+        get: operations["portfolio.productStatistics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/sets/{set_id}/value": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A set's value and its 30-day change
+         * @description One copy of each printing at its cheapest valued SKU (7-day average, else lowest listing, else the reference price). The change compares the printings valued both now and 30 days ago (daily market averages).
+         */
+        get: operations["portfolio.setValue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/skus/{sku_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Price history of a SKU
+         * @description Daily points for 30d, 90d and 1y; `all` adds monthly points before the daily ones.
+         */
+        get: operations["portfolio.skuHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/skus/{sku_id}/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Latest sales of a SKU
+         * @description The newest sales counted in the figures, newest first; no buyer or seller is named.
+         */
+        get: operations["portfolio.skuSales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/skus/{sku_id}/statistics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Price figures of a SKU
+         * @description Lowest offer, last sale, averages, volume, trend and confidence in one segment (default global).
+         */
+        get: operations["portfolio.skuStatistics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/market/skus/statistics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Price figures of several SKUs
+         * @description PERF-09b: the figures of `/market/skus/{sku_id}/statistics` for up to 100 SKUs in one call, for lists that show a market value per row. Every SKU asked gets an entry, empty figures when it has none.
+         */
+        get: operations["portfolio.skusStatistics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What your cards are worth per folder, rarity or set
+         * @description Highest value first, with each slice's share. `key` is the folder id (null: unfiled), the rarity (`mythic`, `rare` …; `sealed`, `accessory` for products that are not cards, `unknown` without one) or the set id; sets also carry their name and code.
+         */
+        get: operations["portfolio.myBreakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/facts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fun facts about your collection
+         * @description For the collection value page. A fact your collection cannot answer is null.
+         */
+        get: operations["portfolio.myFacts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your collection value over time */
+        get: operations["portfolio.myHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/holdings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your cards by value or gain
+         * @description Highest first; cards without a value (or, for gain, without a cost in EUR; for change_7d, without a price 7 days ago) come last. With `item_ids`, only those collection items (one page, for the value column of the collection list).
+         */
+        get: operations["portfolio.myHoldings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/movers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your cards that rose or fell most
+         * @description Per SKU you own: its value now against the market's daily average `days` days ago; biggest change (in %) first. Cards without both prices are left out.
+         */
+        get: operations["portfolio.myMovers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/printings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What you own of a set or some cards, per printing
+         * @description For the set and artist pages (COL-13): copies owned, what they cost (EUR only) and are worth, per printing, with each stack for the "Bought" list. Give exactly one of `set_id` and `product_ids`; printings you do not own are left out.
+         */
+        get: operations["portfolio.myPrintings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/me/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What your collection is worth now */
+        get: operations["portfolio.mySummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/recognitions": {
         parameters: {
             query?: never;
@@ -2130,10 +5187,30 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Search the catalog
+         * Search the catalog, listings, your collection and friends’ trade binders
          * @description Best matches first, limited to one game unless `game=all`. Matches names, nicknames and translated names, tolerates small typos, and applies the filters typed in `q`.
          */
         get: operations["search.search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search/sets/{set_code}/deals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A set's deals
+         * @description A set page's Deals tab (PERF-19c, read when the tab opens): the set's own printings whose cheapest offer is below the card's market price, cheapest first. Looks at the set's 24 cheapest below-market cards.
+         */
+        get: operations["search.setDeals"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2162,6 +5239,210 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/search/zero-result-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Searches that found nothing last week
+         * @description Unmet demand for restocking: the last 7 days of searches with no result, most searched first, rebuilt each night. A term shows only when it was searched 5 or more times; the search log keeps no user id. Without `game_id`, every game (and searches across all games, `game_id` null).
+         */
+        get: operations["search.listZeroResultTerms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/admin/bug-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bug reports
+         * @description For staff: the newest reports first, optionally one status. Cursor-paginated.
+         */
+        get: operations["notification.listBugReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/admin/bug-reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A bug report
+         * @description For staff: the text, the page, the app version and when the attachment expires.
+         */
+        get: operations["notification.getBugReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Triage a bug report
+         * @description For staff: sets open, triaged or closed. Each change writes a security audit record.
+         */
+        patch: operations["notification.updateBugReport"];
+        trace?: never;
+    };
+    "/api/v1/support/admin/bug-reports/{report_id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A bug report's context, replay and screenshot
+         * @description For staff: the unzipped attachment, which the admin console replays with rrweb.
+         */
+        get: operations["notification.getBugReportAttachment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/bug-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a bug
+         * @description Stores the attachment (90 days) and queues the report: a job reads the attachment, files the report and emails the support mailbox with a link to the admin console. The request checks only the gzip header and the declared unzipped size (at most 30 MB); a report whose attachment then is not JSON of the expected shape is dropped. The browser sends a replay or screenshot only when the member ticked the box.
+         */
+        post: operations["notification.submitBugReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Contact customer support
+         * @description Emails the request to the support mailbox with its topic, subtopic, the account id and the app version, and a copy to the sender. A signed-in member's account address is used; a visitor gives `email`. No ticket is stored (OQ-17).
+         */
+        post: operations["notification.submitSupportRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/best-offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The cheapest offer of each of several wishes
+         * @description PERF-09b: one call for a page of wishes, in place of `/items/{item_id}/offers?limit=1` per wish. Wishes without an offer, and wishes that are not yours, are left out.
+         */
+        get: operations["wishlist.listBestOffers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/demand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What members wish for
+         * @description Anonymous wishlist demand for restocking, most wishers first, rebuilt each night: one row per product (`printing_id` null) and one per printing members named. A row shows only when 5 or more members wish for it, and the median maximum price only when 5 or more of them set one in EUR, so no single member can be picked out.
+         */
+        get: operations["wishlist.listDemand"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import a wishlist file
+         * @description WL-05: rows read from a CSV, matched by card name in the games given. Rows with no match are listed and skipped. The wishes start with alerts off, so an import uses none of your plan's price alerts. A list of the same name is reused; a card already on it is not added twice. Send `dry_run: true` first to show the check. A file of more than 250 rows is saved in the background: the answer is 202 with its id, and `GET /api/v1/wishlist/imports/{id}` shows the result once done.
+         */
+        post: operations["wishlist.importWishes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/imports/{import_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A wishlist import being saved
+         * @description An import answered with 202 by `POST /api/v1/wishlist/imports`: `importing` while its job saves the wishes, then `done` with the same result a smaller import answers with, or `failed`.
+         */
+        get: operations["wishlist.getImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/wishlist/items": {
         parameters: {
             query?: never;
@@ -2177,7 +5458,7 @@ export interface paths {
         put?: never;
         /**
          * Wish for a card or product
-         * @description Only `product_id` is required. Defaults: 1 copy, medium priority, digest alerts, private. Each constraint is checked against the catalog.
+         * @description Only `product_id` is required. Defaults: 1 copy, medium priority, digest alerts, private. Each constraint is checked against the catalog. When your plan's price-alert limit is reached, a wish without `alert_mode` is saved with alerts off.
          */
         post: operations["wishlist.createItem"];
         delete?: never;
@@ -2225,6 +5506,55 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your wishlists
+         * @description Oldest first; the first one is where wishes go when no list is named. A member without a list gets a private "Wishlist".
+         */
+        get: operations["wishlist.listLists"];
+        put?: never;
+        /**
+         * Start a wishlist
+         * @description Private unless `visibility` says otherwise.
+         */
+        post: operations["wishlist.createList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/lists/{wishlist_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A wishlist with its wishes
+         * @description Yours, a friend's friends or public list, or anyone's public list. Priority order.
+         */
+        get: operations["wishlist.getList"];
+        put?: never;
+        post?: never;
+        /** Remove a wishlist and its wishes */
+        delete: operations["wishlist.deleteList"];
+        options?: never;
+        head?: never;
+        /**
+         * Rename a wishlist or change who sees it
+         * @description A new visibility carries over to the list's wishes. `version` is the version you last read.
+         */
+        patch: operations["wishlist.updateList"];
         trace?: never;
     };
     "/health/live": {
@@ -2282,6 +5612,126 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        SetCohortRequest: {
+            /** @enum {string} */
+            cohort: "staff" | "alpha" | "beta";
+        };
+        PlaceComplianceHoldRequest: {
+            /** Format: uuid */
+            user_id: string;
+            /** @enum {string} */
+            hold_type: "legal" | "tax_retention" | "fraud_investigation";
+            reason: string;
+        };
+        SetFeatureFlagRequest: {
+            enabled: boolean;
+            /** @default [] */
+            rules: components["schemas"]["FeatureFlagRule"][];
+            version?: number;
+        };
+        FeatureFlagRule: {
+            user_ids?: string[] | null;
+            cohort?: ("staff" | "alpha" | "beta" | "ga") | null;
+            percentage?: number | null;
+            seller_tier?: ("bronze" | "silver" | "gold" | "platinum") | null;
+        };
+        AssignReportRequest: {
+            /** @enum {string} */
+            status: "open" | "in_review";
+        };
+        ModerationActionRequest: {
+            /** @enum {string} */
+            action: "warn" | "remove_content" | "suspend_listing" | "restrict_user" | "suspend_user" | "dismiss";
+            /** @description Why; kept in the moderation log. */
+            reason: string;
+        };
+        ReplayDeadLettersRequest: {
+            /**
+             * @description Both kinds when left out.
+             * @enum {string}
+             */
+            kind?: "event" | "job";
+            /** @description Consumer (`<module>.<name>`) or job name. */
+            name?: string;
+            event_type?: string;
+        };
+        AdminReplaceImageRequest: {
+            /** Format: base64 */
+            image_base64: string;
+        };
+        AdminEditProductRequest: {
+            canonical_name?: string;
+            popularity_rank?: number | null;
+        };
+        AdminAddAliasRequest: {
+            alias: string;
+            /** @enum {string} */
+            kind: "nickname" | "misspelling";
+        };
+        AdminSetSkuActiveRequest: {
+            is_active: boolean;
+        };
+        CollectionAutomationRuleInput: {
+            name: string;
+            /**
+             * @description on_import: a new item from a file or API import; on_acquire: any other new item (added by hand, scanned, bought, traded, given); on_valuation_change: checked hourly against the market value.
+             * @enum {string}
+             */
+            trigger: "on_import" | "on_acquire" | "on_valuation_change";
+            /** @default 0 */
+            sort_order: number;
+            /** @default true */
+            is_enabled: boolean;
+            /** @default false */
+            match_any: boolean;
+            /** @default [] */
+            conditions: components["schemas"]["CollectionAutomationCondition"][];
+            actions: components["schemas"]["CollectionAutomationAction"][];
+        };
+        /** @description category (card or sealed), game_id, set_id and acquisition_source take eq or ne and a text value; condition, quantity, acquisition_cents (per unit) and market_value_cents (per unit, EUR) take any operator and a whole number. colour takes includes or excludes and one of W, U, B, R, G or C (C: colourless, a card with no colours). type_line takes eq or ne and one card type word (type_line ne Land holds for every card that is not a land); rarity (e.g. mythic), language (e.g. en) and finish (nonfoil, foil or etched) take eq or ne and a lower-case code. A condition on a value the item does not have (no cost, no market price, a sealed product's colours) never holds. */
+        CollectionAutomationCondition: {
+            /** @enum {string} */
+            field: "category" | "game_id" | "set_id" | "acquisition_source" | "condition" | "quantity" | "acquisition_cents" | "market_value_cents" | "colour" | "type_line" | "rarity" | "language" | "finish";
+            /** @enum {string} */
+            operator: "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "includes" | "excludes";
+            value: string | number;
+        };
+        /** @description assign_folder moves the item into one of your folders (merging into a matching stack there); send_notification tells you in the inbox; stage_listing puts the item on your to-list queue (GET staged-listings). */
+        CollectionAutomationAction: {
+            /** @constant */
+            type: "assign_folder";
+            /** Format: uuid */
+            folder_id: string;
+        } | {
+            /** @constant */
+            type: "send_notification";
+        } | {
+            /** @constant */
+            type: "stage_listing";
+        };
+        CollectionAutomationRuleUpdate: {
+            name: string;
+            /**
+             * @description on_import: a new item from a file or API import; on_acquire: any other new item (added by hand, scanned, bought, traded, given); on_valuation_change: checked hourly against the market value.
+             * @enum {string}
+             */
+            trigger: "on_import" | "on_acquire" | "on_valuation_change";
+            /** @default 0 */
+            sort_order: number;
+            /** @default true */
+            is_enabled: boolean;
+            /** @default false */
+            match_any: boolean;
+            /** @default [] */
+            conditions: components["schemas"]["CollectionAutomationCondition"][];
+            actions: components["schemas"]["CollectionAutomationAction"][];
+            version: number;
+        };
+        CollectionAutomationPreviewInput: {
+            conditions: components["schemas"]["CollectionAutomationCondition"][];
+            /** @default false */
+            match_any: boolean;
+        };
         CollectionBulkOperationCreate: {
             /** @enum {string} */
             kind: "move" | "tag" | "notes" | "archive";
@@ -2295,12 +5745,45 @@ export interface components {
             /** @description notes: the new notes; null or empty clears them. */
             notes?: string | null;
         };
+        CollectionExportRequest: {
+            filter?: {
+                /** Format: uuid */
+                game_id?: string;
+                folder?: (string | "unfiled") | (string | "unfiled")[];
+                tag?: string | string[];
+                /** Format: uuid */
+                set_id?: string;
+                condition?: number | number[];
+                q?: string;
+                /** @enum {string} */
+                scale?: "card" | "sealed";
+                /** @description The Include choice: singles, sealed products and/or accessories. */
+                category?: ("single" | "sealed" | "accessory") | ("single" | "sealed" | "accessory")[];
+                language?: string | string[];
+                rarity?: string | string[];
+            };
+            item_ids?: string[];
+            /** @description In file order; every column when left out. The import needs set_code and collector_number. Only the platform CSV reads it. */
+            columns?: ("name" | "set_code" | "collector_number" | "language" | "finish" | "condition" | "quantity" | "purchase_price" | "currency" | "acquired_on" | "notes" | "folder" | "tags")[];
+            /**
+             * @description `platform_csv`: tradeable's own CSV (docs/formats/collection-csv.md). `manabox_csv`: ManaBox's collection CSV, single cards only. `text`: a `.txt` deck-builder list, one `<quantity> <name>` line per single card.
+             * @default platform_csv
+             * @enum {string}
+             */
+            format: "platform_csv" | "manabox_csv" | "text";
+        };
         CollectionFolderCreate: {
             name: string;
             /** @enum {string} */
             folder_type?: "standard" | "trade_binder";
             visibility?: ("private" | "friends" | "public") | null;
             sort_order?: number;
+            /** @description One of your folders to sit inside (at most 5 levels deep, never inside itself); null for the top. */
+            parent_folder_id?: string | null;
+            /** @description A printing of a card in the folder, whose art the tile shows; null for the newest card's. */
+            cover_printing_id?: string | null;
+            /** @description The game the binder is for; null shows it in every game. */
+            game_id?: string | null;
         };
         CollectionFolderUpdate: {
             name?: string;
@@ -2308,6 +5791,12 @@ export interface components {
             folder_type?: "standard" | "trade_binder";
             visibility?: ("private" | "friends" | "public") | null;
             sort_order?: number;
+            /** @description One of your folders to sit inside (at most 5 levels deep, never inside itself); null for the top. */
+            parent_folder_id?: string | null;
+            /** @description A printing of a card in the folder, whose art the tile shows; null for the newest card's. */
+            cover_printing_id?: string | null;
+            /** @description The game the binder is for; null shows it in every game. */
+            game_id?: string | null;
             version: number;
         };
         CollectionItemCreate: {
@@ -2325,6 +5814,7 @@ export interface components {
             serial_number?: string | null;
             is_signed?: boolean;
             is_altered?: boolean;
+            is_misprint?: boolean;
             provenance_notes?: string | null;
             grading?: components["schemas"]["CollectionGrading"] | null;
         };
@@ -2351,11 +5841,21 @@ export interface components {
             serial_number?: string | null;
             is_signed?: boolean;
             is_altered?: boolean;
+            is_misprint?: boolean;
             provenance_notes?: string | null;
         };
         CollectionItemGrade: {
             version: number;
             grading: components["schemas"]["CollectionGrading"];
+        };
+        CollectionItemPhotosBody: {
+            version: number;
+            photo_keys: string[];
+        };
+        CollectionItemSaleMode: {
+            version: number;
+            /** @enum {string} */
+            sale_mode: "trade_only" | "trade_or_buy";
         };
         CollectionItemSplit: {
             version: number;
@@ -2376,10 +5876,117 @@ export interface components {
             item_ids: string[];
             folder_id: string | null;
         };
+        CollectionPurchaseSettings: {
+            /** @description Add the cards of every order you receive to your collection without asking. */
+            auto_add: boolean;
+        };
         CollectionSettingsUpdate: {
             /** @enum {string} */
             visibility: "private" | "friends" | "public";
             version: number;
+        };
+        StartConversationRequest: {
+            /** Format: uuid */
+            user_id: string;
+        } | {
+            /** Format: uuid */
+            seller_order_id: string;
+        };
+        SendMessageRequest: {
+            body: string;
+        };
+        DeckStatsSetting: {
+            shown: boolean;
+        };
+        CommunityPreferences: {
+            share: {
+                /**
+                 * @description private means not shared
+                 * @enum {string}
+                 */
+                completed_set: "private" | "friends" | "public";
+                /**
+                 * @description private means not shared
+                 * @enum {string}
+                 */
+                reached_milestone: "private" | "friends" | "public";
+                /**
+                 * @description Also capped by each showcase's own visibility
+                 * @enum {string}
+                 */
+                published_showcase: "private" | "friends" | "public";
+                /**
+                 * @description private means not shared
+                 * @enum {string}
+                 */
+                listed_card: "private" | "friends" | "public";
+            };
+            feed: {
+                /** @description Friends' activity in your feed */
+                friends: boolean;
+                /** @description Shops you follow, once following exists; stored but not used yet */
+                followed_shops: boolean;
+                /** @description Activity types left out of your feed */
+                hidden_activity: ("completed_set" | "reached_milestone" | "published_showcase" | "listed_card" | "earned_badge")[];
+            };
+            comments: {
+                /** @enum {string} */
+                profile: "everyone" | "friends" | "nobody";
+                /** @enum {string} */
+                showcases: "everyone" | "friends" | "nobody";
+                /** @enum {string} */
+                decklists: "everyone" | "friends" | "nobody";
+            };
+            /** @enum {string} */
+            new_decklist_visibility: "private" | "friends" | "public";
+            /** @description Whether your For sale tab shows on your profile */
+            show_for_sale: boolean;
+        };
+        UpdatePlanTextRequest: {
+            /** @description The version you last read */
+            version: number;
+            name: string;
+            description: string;
+        };
+        AddPlanLimitRequest: {
+            key: string;
+            /** @description null is unlimited, 0 not included */
+            value: number | null;
+            /**
+             * @description When the change takes effect; now when null. Never in the past.
+             * @default null
+             */
+            effective_from: string | null;
+        };
+        AddPlanPriceRequest: {
+            /** @enum {string} */
+            interval: "month" | "year";
+            /** @description EUR cents, VAT included */
+            amount_cents: number;
+            /**
+             * @description When the change takes effect; now when null. Never in the past.
+             * @default null
+             */
+            effective_from: string | null;
+        };
+        ResetUserMfaBody: {
+            /** @constant */
+            identity_verified: true;
+        };
+        ModerateUserRequest: {
+            /** @enum {string} */
+            action: "restrict" | "suspend" | "reactivate";
+            /** @enum {string} */
+            reason_code: "fraud" | "abuse" | "spam" | "terms_violation" | "legal" | "other";
+            /** @description Why; kept in the audit log, never in events. */
+            reason: string;
+        };
+        StaffRoleRequest: {
+            /** @enum {string} */
+            role: "moderator" | "admin";
+            granted: boolean;
+            /** @description Why; kept in the audit log. The admin console always sends one. */
+            reason?: string;
         };
         ConfirmEmailRequest: {
             token: string;
@@ -2434,30 +6041,49 @@ export interface components {
             theme?: "system" | "light" | "dark";
             timezone?: string;
             default_game_id?: string | null;
+            /** @enum {string} */
+            account_type?: "collector" | "private_seller" | "professional_seller";
+            onboarding_step?: ("account" | "type" | "plan" | "games" | "collection" | "wishlist" | "profile" | "seller" | "done") | null;
+            onboarding_done?: boolean;
+            checklist_hidden?: boolean;
+            seller_reminder_after?: string | null;
         };
         ProfileUpdate: {
             handle?: string;
             display_name?: string;
+            /** @description Only null, which removes an uploaded photo. Members never set a picture address themselves (ONB-01): they pick `avatar_key`, and photos come through the upload flow. */
             avatar_url?: string | null;
+            avatar_key?: ("mascot-1" | "mascot-2" | "mascot-3" | "mascot-4" | "mascot-5" | "mascot-6") | null;
+            cover_printing_id?: string | null;
             biography?: string | null;
             country_code?: string | null;
             preferred_language?: string;
             favorite_game_ids?: string[];
+            /** @enum {string} */
+            profile_visibility?: "private" | "friends" | "public";
             social_links?: {
                 label: string;
                 /** Format: uri */
                 url: string;
             }[];
         };
+        ProfilePhotoUploadRequest: {
+            /** @enum {string} */
+            content_type: "image/jpeg" | "image/png" | "image/webp";
+        };
         SellerAccountUpdate: {
             /** @description true starts a vacation, false ends it. */
-            vacation: boolean;
+            vacation?: boolean;
             /** @description Shown to buyers; optional. */
             vacation_until?: string | null;
+            /** @description MKT-15: the smallest order you accept from one buyer, in EUR cents (at most 25.00); null or 0 removes it. Ignored while the minimum order feature is off. */
+            min_order_cents?: number | null;
         };
         OpenSellerAccountRequest: {
             /** @enum {string} */
             seller_type: "private" | "professional";
+            /** @description The version of the seller terms you accept. Required in practice: without the current version the request fails with ERR_TERMS_NOT_ACCEPTED (LEG-01). */
+            accepted_seller_terms?: string;
         };
         BusinessProfile: {
             legal_name: string;
@@ -2480,6 +6106,11 @@ export interface components {
         OnboardingLinkRequest: {
             /** @description Where the seller lives or the business is registered. */
             country: string;
+        };
+        StartPlanCheckoutRequest: {
+            plan_code: string;
+            /** @enum {string} */
+            interval: "month" | "year";
         };
         TermsAcceptanceRequest: {
             documents: {
@@ -2511,10 +6142,12 @@ export interface components {
                 terms: string;
                 privacy: string;
             };
+            turnstile_token?: string | null;
         };
         LoginRequest: {
             email: string;
             password: string;
+            turnstile_token?: string | null;
         };
         StartImportRequest: {
             /** @enum {string} */
@@ -2531,6 +6164,13 @@ export interface components {
             /** @enum {string} */
             content_type: "text/csv" | "application/json" | "text/plain" | "image/jpeg" | "image/png" | "image/webp" | "application/pdf";
         };
+        CartFillRequest: {
+            items: {
+                /** Format: uuid */
+                product_id: string;
+                quantity: number;
+            }[];
+        };
         AddCartItemRequest: {
             /** Format: uuid */
             listing_id: string;
@@ -2539,9 +6179,39 @@ export interface components {
         UpdateCartItemRequest: {
             quantity: number;
         };
+        OptimizePurchaseRequest: {
+            items: {
+                /** Format: uuid */
+                product_id: string;
+                quantity: number;
+                /** @description This card's worst acceptable condition (a wish's own); overrides `worst_condition`. */
+                worst_condition?: number;
+                /** @description Highest price per copy in EUR cents (a wish's max price). */
+                max_price_cents?: number;
+            }[];
+            /** @description ISO 3166-1 alpha-2 of the delivery address. */
+            country: string;
+            /**
+             * @description `cheapest`: the lowest total. `balanced`: each extra parcel must save more than €1.50. `fewest_parcels`: as few sellers as possible, then the lowest total.
+             * @default cheapest
+             * @enum {string}
+             */
+            priority: "cheapest" | "balanced" | "fewest_parcels";
+            /** @description Worst acceptable card condition, 1 (MT) to 7 (PO); sealed products are not filtered. */
+            worst_condition?: number;
+            /**
+             * @description Sellers to leave out.
+             * @default []
+             */
+            exclude_seller_ids: string[];
+            /** @default false */
+            add_to_cart: boolean;
+        };
         CheckoutRequest: {
             /** Format: uuid */
             address_id: string;
+            /** @description MKT-14: pay from your available seller balance first (flag `marketplace.pay-with-balance`); a balance that covers the order drops the service fee. */
+            pay_from_balance?: boolean;
         };
         PostDisputeMessageRequest: {
             body: string;
@@ -2573,6 +6243,23 @@ export interface components {
             /** @description The version you last read (ADR-115). */
             version: number;
         };
+        SetListingPhotosRequest: {
+            /** @description Keys from `POST /integration/uploads` (JPEG or PNG, at most 15 MB each), in display order. An empty list removes the photos. */
+            upload_keys: string[];
+            /** @description The version you last read (ADR-115). */
+            version: number;
+        };
+        BulkListingRequest: {
+            /** @constant */
+            currency: "EUR";
+            items: {
+                /** Format: uuid */
+                collection_item_id: string;
+                price_cents: number;
+                quantity: number;
+                notes?: string | null;
+            }[];
+        };
         OpenDisputeRequest: {
             /** @enum {string} */
             reason: "not_received" | "condition_mismatch" | "wrong_item" | "damaged" | "other";
@@ -2585,6 +6272,60 @@ export interface components {
             rating: number;
             comment?: string | null;
         };
+        PricingRuleInput: {
+            name: string;
+            /** @description Lower runs first; a listing follows the first enabled rule that matches it. */
+            priority: number;
+            /** @enum {string} */
+            strategy: "match_avg_7d" | "undercut_lowest" | "fixed_markup_on_cost";
+            /** @description Added to the base price in basis points, e.g. -200 is 2% below. */
+            offset_bps: number;
+            floor_cents: number | null;
+            ceiling_cents: number | null;
+            folder_id: string | null;
+            set_id: string | null;
+            rarity: ("common" | "uncommon" | "rare" | "mythic" | "basic_land" | "token") | null;
+            /** @description Matches conditions 1 (best) up to this one. */
+            max_condition: number | null;
+            /** @description Price band: the listing's current price at least this. */
+            min_price_cents: number | null;
+            max_price_cents: number | null;
+            is_enabled: boolean;
+        };
+        PricingRuleUpdate: {
+            name: string;
+            /** @description Lower runs first; a listing follows the first enabled rule that matches it. */
+            priority: number;
+            /** @enum {string} */
+            strategy: "match_avg_7d" | "undercut_lowest" | "fixed_markup_on_cost";
+            /** @description Added to the base price in basis points, e.g. -200 is 2% below. */
+            offset_bps: number;
+            floor_cents: number | null;
+            ceiling_cents: number | null;
+            folder_id: string | null;
+            set_id: string | null;
+            rarity: ("common" | "uncommon" | "rare" | "mythic" | "basic_land" | "token") | null;
+            /** @description Matches conditions 1 (best) up to this one. */
+            max_condition: number | null;
+            /** @description Price band: the listing's current price at least this. */
+            min_price_cents: number | null;
+            max_price_cents: number | null;
+            is_enabled: boolean;
+            version: number;
+        };
+        PricingSettingsUpdate: {
+            /** @description More than 1: professional sellers only. */
+            runs_per_day?: number;
+            /** @description null removes that minimum. */
+            minimums?: {
+                common?: number | null;
+                uncommon?: number | null;
+                rare?: number | null;
+                mythic?: number | null;
+                basic_land?: number | null;
+                token?: number | null;
+            };
+        };
         CancelSellerOrderRequest: {
             /** @enum {string} */
             reason: "out_of_stock" | "damaged" | "buyer_request" | "other";
@@ -2592,6 +6333,18 @@ export interface components {
         DispatchRequest: {
             carrier?: string | null;
             tracking_number?: string | null;
+        };
+        PickLineRequest: {
+            /** @enum {string} */
+            status: "picked" | "issue" | "open";
+            issue?: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
+            note?: string | null;
+        };
+        StartPickingRequest: {
+            seller_order_ids: string[];
+        };
+        StopPickingRequest: {
+            seller_order_ids: string[];
         };
         RequestPayoutRequest: {
             amount_cents: number;
@@ -2644,6 +6397,41 @@ export interface components {
             reason: string;
             details?: string | null;
         };
+        UpdateBugReportRequest: {
+            /** @enum {string} */
+            status: "open" | "triaged" | "closed";
+            version: number;
+        };
+        BugReportRequest: {
+            what_happened: string;
+            expected?: string;
+            /**
+             * Format: base64
+             * @description Gzipped JSON: `context`, `replay` (rrweb events or null) and `screenshot` (rrweb events or null).
+             */
+            attachment: string;
+        };
+        WishlistImport: {
+            /** @description The games to look the names up in, first match wins. */
+            game_ids: string[];
+            rows: {
+                line: number;
+                name: string;
+                set_code?: string | null;
+                collector_number?: string | null;
+                quantity?: number;
+                max_price_cents?: number | null;
+                currency?: string | null;
+                list?: string | null;
+            }[];
+            /**
+             * @description `list`: one wishlist per value of the list column; `one`: every row in a list named "Imported".
+             * @enum {string}
+             */
+            split: "list" | "one";
+            /** @description Match the rows and name the lists without saving anything. */
+            dry_run: boolean;
+        };
         WishlistItemCreate: {
             printing_id?: string | null;
             language_id?: number | null;
@@ -2664,6 +6452,11 @@ export interface components {
             notes?: string | null;
             /** Format: uuid */
             product_id: string;
+            /**
+             * Format: uuid
+             * @description The list to add to; your first list when left out.
+             */
+            wishlist_id?: string;
         };
         WishlistItemUpdate: {
             printing_id?: string | null;
@@ -2685,6 +6478,220 @@ export interface components {
             notes?: string | null;
             version: number;
         };
+        WishlistCreate: {
+            name: string;
+            /**
+             * @description Who may open the list: only you, your friends, or anyone. Wishes on a friends or public list count as friends-visible for trade matches.
+             * @enum {string}
+             */
+            visibility?: "private" | "friends" | "public";
+        };
+        WishlistUpdate: {
+            name?: string;
+            /**
+             * @description Who may open the list: only you, your friends, or anyone. Wishes on a friends or public list count as friends-visible for trade matches.
+             * @enum {string}
+             */
+            visibility?: "private" | "friends" | "public";
+            version: number;
+        };
+        AuditLogEntry: {
+            /** Format: uuid */
+            id: string;
+            event_type: string;
+            /** @enum {string} */
+            result: "success" | "denied";
+            actor_user_id: string | null;
+            target_type: string | null;
+            target_entity_id: string | null;
+            correlation_id: string;
+            details: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            occurred_at: string;
+        };
+        CohortMember: {
+            /** Format: uuid */
+            user_id: string;
+            /** @enum {string} */
+            cohort: "staff" | "alpha" | "beta";
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ComplianceHold: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            user_id: string;
+            /** Format: uuid */
+            placed_by_user_id: string;
+            /** @enum {string} */
+            hold_type: "legal" | "tax_retention" | "fraud_investigation";
+            reason: string;
+            /** Format: date-time */
+            placed_at: string;
+            released_at: string | null;
+        };
+        FeatureFlag: {
+            key: string;
+            description: string;
+            file_value: boolean;
+            override: {
+                enabled: boolean;
+                rules: {
+                    user_ids: string[] | null;
+                    cohort: ("staff" | "alpha" | "beta" | "ga") | null;
+                    percentage: number | null;
+                    seller_tier: ("bronze" | "silver" | "gold" | "platinum") | null;
+                }[];
+                version: number;
+                /** Format: date-time */
+                updated_at: string;
+                updated_by_user_id: string | null;
+            } | null;
+        };
+        QueuedModerationReport: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user";
+            /** Format: uuid */
+            target_id: string;
+            reason: string;
+            details: string | null;
+            /** @enum {string} */
+            status: "open" | "in_review" | "actioned" | "dismissed";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            reporter_user_id: string;
+            assigned_to_user_id: string | null;
+            resolution_note: string | null;
+        };
+        ModerationReportDetail: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user";
+            /** Format: uuid */
+            target_id: string;
+            reason: string;
+            details: string | null;
+            /** @enum {string} */
+            status: "open" | "in_review" | "actioned" | "dismissed";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            reporter_user_id: string;
+            assigned_to_user_id: string | null;
+            resolution_note: string | null;
+            /** @description The member behind the content; null when it no longer exists. */
+            target_user_id: string | null;
+            actions: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                moderator_user_id: string;
+                /** @enum {string} */
+                action: "warn" | "remove_content" | "suspend_listing" | "restrict_user" | "suspend_user" | "dismiss";
+                reason: string;
+                /** Format: date-time */
+                occurred_at: string;
+            }[];
+        };
+        DeadLetter: {
+            /** @enum {string} */
+            kind: "event" | "job";
+            /** Format: uuid */
+            id: string;
+            name: string;
+            event_type: string | null;
+            error: string;
+            attempts: number;
+            /** Format: date-time */
+            failed_at: string;
+        };
+        DeadLetterDetail: {
+            /** @enum {string} */
+            kind: "event" | "job";
+            /** Format: uuid */
+            id: string;
+            name: string;
+            event_type: string | null;
+            error: string;
+            attempts: number;
+            /** Format: date-time */
+            failed_at: string;
+            /** @description What the consumer or job received. */
+            payload: unknown;
+        };
+        DeadLetterReplay: {
+            /** @enum {string} */
+            kind: "event" | "job";
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            outcome: "replayed" | "failed" | "not_found";
+            error: string | null;
+        };
+        DeadLetterBulkReplay: {
+            /**
+             * Format: uuid
+             * @description Read it with `GET /api/v1/audit/admin/ops/dead-letters/replay/{replay_id}`
+             */
+            id: string;
+            /** @enum {string} */
+            status: "replaying" | "done" | "failed";
+            /** Format: date-time */
+            requested_at: string;
+            /** @description How many dead letters the replay covers */
+            letters: number;
+            /** @description The replays done so far, oldest letter first */
+            data: components["schemas"]["DeadLetterReplay"][];
+        };
+        ProjectionRebuild: {
+            projection: string;
+            last_run: components["schemas"]["ProjectionRun"] | null;
+        };
+        ProjectionRun: {
+            /** @enum {string} */
+            state: "created" | "retry" | "active" | "completed" | "cancelled" | "failed";
+            /** Format: date-time */
+            requested_at: string;
+            started_at: string | null;
+            completed_at: string | null;
+            error: string | null;
+        };
+        OpsSnapshot: {
+            outbox: {
+                /** @description Events the dispatcher has not published yet. */
+                pending: number;
+                oldest_pending_at: string | null;
+            };
+            dead_letters: {
+                events: number;
+                jobs: number;
+            };
+            queues: {
+                queue: string;
+                queued: number;
+                active: number;
+                failed: number;
+            }[];
+        };
+        ProductAlias: {
+            /** Format: uuid */
+            id: string;
+            alias: string;
+            /** @enum {string} */
+            kind: "nickname" | "translated_name" | "misspelling";
+            /**
+             * @description Provider aliases are replaced by every sync; staff aliases stay.
+             * @enum {string}
+             */
+            source: "provider" | "staff";
+        };
         CatalogGame: {
             /** Format: uuid */
             id: string;
@@ -2701,6 +6708,10 @@ export interface components {
             canonical_name: string;
             slug: string;
             oracle_ref: string | null;
+            /** @description SRCH-08: a sealed product's or accessory's kind as a lower-case code (`booster_box`, `sleeves`); null for cards. */
+            product_type: string | null;
+            /** @description The maker's name as printed, for accessories and sealed products; null for cards. */
+            brand: string | null;
             aliases: {
                 alias: string;
                 /** @enum {string} */
@@ -2753,7 +6764,28 @@ export interface components {
             parent_set_id: string | null;
             region_code: string | null;
             card_count: number | null;
+            /** @description The set symbol as an SVG from our own media path (never the publisher's); null while none is stored or publisher artwork is switched off. */
+            icon_url: string | null;
+            /** @description The set's artwork from our own media path: for now the art crop of its first mythic (else rare) card. Null while none is stored or publisher artwork is switched off. */
+            art_url: string | null;
+            /** @description The artist of `art_url`, to credit wherever the artwork is shown; null when `art_url` is. */
+            art_credit: string | null;
+            /** @description PERF-09c: `art_url` resized to the four WebP widths, for a `srcset`; null when `art_url` is. */
+            art_images: components["schemas"]["CatalogImageUrls"] | null;
             version: number;
+        };
+        /** @description One image as WebP, 146, 292, 488 and 745 px wide, served from our own media path (never the provider). */
+        CatalogImageUrls: {
+            small: string;
+            medium: string;
+            normal: string;
+            large: string;
+        };
+        CatalogManaSymbols: {
+            /** @description Each stored mana symbol as written inside the braces of a mana cost (`W`, `2`, `W/U`), to the address of its SVG on our own media path. Empty while publisher artwork is switched off. */
+            symbols: {
+                [key: string]: string;
+            };
         };
         CatalogPrintingDetail: {
             /** Format: uuid */
@@ -2766,6 +6798,8 @@ export interface components {
             set_id: string;
             set_code: string;
             set_name: string;
+            /** @description The set symbol as an SVG from our own media path (never the publisher's); null while none is stored or publisher artwork is switched off. */
+            set_icon_url: string | null;
             collector_number: string | null;
             rarity: string | null;
             artist: string | null;
@@ -2774,6 +6808,10 @@ export interface components {
             release_date: string | null;
             image_keys: components["schemas"]["CatalogImageKeys"];
             images: components["schemas"]["CatalogImages"];
+            /** @description The printing exists only in foil (or etched), such as a Surge Foil variant; tiles mark it. */
+            foil_only: boolean;
+            /** @description The named foil effect from MTGJSON's promo types (`surgefoil`, `galaxyfoil`, …) or `etched`; null for plain foil or none. */
+            foil_effect: string | null;
             version: number;
             skus: components["schemas"]["CatalogSku"][];
         };
@@ -2791,12 +6829,6 @@ export interface components {
             front?: components["schemas"]["CatalogImageUrls"];
             back?: components["schemas"]["CatalogImageUrls"];
             art_crop?: components["schemas"]["CatalogImageUrls"];
-        };
-        /** @description One image as WebP, 146, 488 and 745 px wide, served from our own media path (never the provider). */
-        CatalogImageUrls: {
-            small: string;
-            normal: string;
-            large: string;
         };
         CatalogSku: {
             /** Format: uuid */
@@ -2821,6 +6853,8 @@ export interface components {
             language: string;
             finish: string | null;
             treatment: string | null;
+            /** @description The printing's named foil effect (`surgefoil`, `etched`, …); applies to its foil SKUs. */
+            foil_effect: string | null;
             display_name: string;
             image_keys: components["schemas"]["CatalogImageKeys"];
             images: components["schemas"]["CatalogImages"];
@@ -2837,7 +6871,7 @@ export interface components {
             game_code: string | null;
             scale: ("card" | "sealed") | null;
         };
-        CatalogPrinting: {
+        CatalogSetPrinting: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -2848,6 +6882,8 @@ export interface components {
             set_id: string;
             set_code: string;
             set_name: string;
+            /** @description The set symbol as an SVG from our own media path (never the publisher's); null while none is stored or publisher artwork is switched off. */
+            set_icon_url: string | null;
             collector_number: string | null;
             rarity: string | null;
             artist: string | null;
@@ -2856,7 +6892,73 @@ export interface components {
             release_date: string | null;
             image_keys: components["schemas"]["CatalogImageKeys"];
             images: components["schemas"]["CatalogImages"];
+            /** @description The printing exists only in foil (or etched), such as a Surge Foil variant; tiles mark it. */
+            foil_only: boolean;
+            /** @description The named foil effect from MTGJSON's promo types (`surgefoil`, `galaxyfoil`, …) or `etched`; null for plain foil or none. */
+            foil_effect: string | null;
             version: number;
+            card: {
+                colors: string[];
+                mana_cost: string | null;
+                mana_value: number | null;
+                type_line: string;
+                oracle_text: string | null;
+                legalities: {
+                    [key: string]: string;
+                };
+            } | null;
+        };
+        CollectionAutomationRule: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /**
+             * @description on_import: a new item from a file or API import; on_acquire: any other new item (added by hand, scanned, bought, traded, given); on_valuation_change: checked hourly against the market value.
+             * @enum {string}
+             */
+            trigger: "on_import" | "on_acquire" | "on_valuation_change";
+            sort_order: number;
+            is_enabled: boolean;
+            match_any: boolean;
+            /**
+             * @deprecated
+             * @description Deprecated: use `all_conditions`. Leaves out conditions on colour, type_line, rarity, language and finish (COL-16), so never send it back as the full list.
+             */
+            conditions: components["schemas"]["CollectionAutomationConditionOutput"][];
+            all_conditions: components["schemas"]["CollectionAutomationRuleCondition"][];
+            actions: components["schemas"]["CollectionAutomationActionOutput"][];
+            version: number;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CollectionAutomationConditionOutput: {
+            /** @enum {string} */
+            field: "category" | "game_id" | "set_id" | "acquisition_source" | "condition" | "quantity" | "acquisition_cents" | "market_value_cents";
+            /** @enum {string} */
+            operator: "eq" | "ne" | "gt" | "gte" | "lt" | "lte";
+            value: string | number;
+        };
+        /** @description category (card or sealed), game_id, set_id and acquisition_source take eq or ne and a text value; condition, quantity, acquisition_cents (per unit) and market_value_cents (per unit, EUR) take any operator and a whole number. colour takes includes or excludes and one of W, U, B, R, G or C (C: colourless, a card with no colours). type_line takes eq or ne and one card type word (type_line ne Land holds for every card that is not a land); rarity (e.g. mythic), language (e.g. en) and finish (nonfoil, foil or etched) take eq or ne and a lower-case code. A condition on a value the item does not have (no cost, no market price, a sealed product's colours) never holds. Later releases may add fields and operators; skip a rule with one you do not know. */
+        CollectionAutomationRuleCondition: {
+            field: string;
+            operator: string;
+            value: string | number;
+        };
+        CollectionAutomationMatching: {
+            matching: number;
+        };
+        CollectionAutomationPreview: {
+            matching: number;
+            /** @description The first 8 matching items, oldest first, for the preview pictures. */
+            items: components["schemas"]["CollectionAutomationPreviewItem"][];
+        };
+        CollectionAutomationPreviewItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            sku_id: string;
+            display_name: string | null;
+            images: components["schemas"]["CatalogImages"] | null;
         };
         CollectionBulkOperation: {
             /** Format: uuid */
@@ -2878,6 +6980,15 @@ export interface components {
             started_at: string | null;
             completed_at: string | null;
         };
+        CollectionExport: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "queued" | "ready" | "failed";
+            url: string | null;
+            expires_at: string | null;
+            rows: number | null;
+        };
         CollectionFolder: {
             /** Format: uuid */
             id: string;
@@ -2887,6 +6998,12 @@ export interface components {
             /** @description null: the collection's visibility applies. */
             visibility: ("private" | "friends" | "public") | null;
             sort_order: number;
+            /** @description The folder it sits inside; null at the top. */
+            parent_folder_id: string | null;
+            /** @description The printing whose art the tile shows; null: the newest card's. */
+            cover_printing_id: string | null;
+            /** @description The game the binder is for; null shows it in every game. */
+            game_id: string | null;
             /** @description Active items in it; on reads only. */
             item_count?: number;
             version: number;
@@ -2909,10 +7026,15 @@ export interface components {
             total_quantity: number;
             /** @description Units held by marketplace listings. */
             allocated_quantity: number;
-            /** @description Units in buyers' carts. */
+            /** @description Units in buyers' carts and units held for accepted trades. */
             reserved_quantity: number;
             /** @description total - allocated - reserved (ADR-127). */
             available_quantity: number;
+            /**
+             * @description In a trade binder: `trade_only` cards cannot be listed, `trade_or_buy` ones friends may also buy.
+             * @enum {string}
+             */
+            sale_mode: "trade_only" | "trade_or_buy";
             acquisition_source: string;
             unit_cost_cents: number | null;
             currency: string | null;
@@ -2923,6 +7045,7 @@ export interface components {
             serial_number: string | null;
             is_signed: boolean;
             is_altered: boolean;
+            is_misprint: boolean;
             provenance_notes: string | null;
             tags: string[];
             /** @enum {string} */
@@ -2943,6 +7066,10 @@ export interface components {
             language: string;
             finish: string | null;
             treatment: string | null;
+            /** @description The named foil effect ("surge", "etched"), or null. */
+            foil_effect: string | null;
+            /** @description The set symbol's address; null while none is stored or publisher art is off. */
+            set_icon_url: string | null;
             /**
              * @deprecated
              * @description Deprecated: use `images`.
@@ -2965,6 +7092,27 @@ export interface components {
             /** Format: date-time */
             occurred_at: string;
         };
+        CollectionItemPhotos: {
+            /** Format: uuid */
+            item_id: string;
+            version: number;
+            /** @description In display order; send a `key` back to keep that photo. */
+            photos: {
+                key: string;
+                url: string;
+            }[];
+        };
+        CollectionPurchase: {
+            /** Format: uuid */
+            seller_order_id: string;
+            /**
+             * @description `pending` until you add the cards (or auto-add did).
+             * @enum {string}
+             */
+            status: "pending" | "added";
+            /** @description Copies in the order. */
+            cards: number;
+        };
         CollectionSetCompletion: {
             /** Format: uuid */
             set_id: string;
@@ -2977,12 +7125,38 @@ export interface components {
             /** @description When you first owned them all, even if you no longer do. */
             first_completed_at: string | null;
         };
+        CollectionOwnedSets: {
+            data: {
+                /** Format: uuid */
+                set_id: string;
+                /** @description Printings of the set you own at least one copy of. */
+                owned_printings: number;
+            }[];
+        };
         CollectionSettings: {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
             visibility: "private" | "friends" | "public";
             version: number;
+        };
+        CollectionStagedListing: {
+            /** Format: uuid */
+            item_id: string;
+            /** Format: uuid */
+            sku_id: string;
+            rule_id: string | null;
+            /** Format: date-time */
+            staged_at: string;
+            condition: number;
+            /** @description Copies of the item you can still list. */
+            quantity: number;
+            display_name: string | null;
+            set_code: string | null;
+            collector_number: string | null;
+            /** @description The binder the item sits in, if any. */
+            folder_id: string | null;
+            images: components["schemas"]["CatalogImages"] | null;
         };
         CollectionSummary: {
             collection: {
@@ -2992,10 +7166,21 @@ export interface components {
                 version: number;
             };
             items: number;
+            /** @description Items of single cards. */
+            singles: number;
+            /** @description Items of sealed products. */
+            sealed: number;
             copies: number;
             products: number;
             folders: number;
             tags: number;
+            /** @description Sold so far (MD-08): your sales in EUR that were not cancelled or refunded. Cost and profit count only the units with a cost recorded in EUR. */
+            sold: {
+                units: number;
+                proceeds_cents: number;
+                cost_cents: number;
+                profit_cents: number;
+            };
         };
         CollectionTag: {
             name: string;
@@ -3036,7 +7221,366 @@ export interface components {
             grading: components["schemas"]["CollectionGradingOutput"] | null;
             is_signed: boolean;
             is_altered: boolean;
+            is_misprint: boolean;
             card: components["schemas"]["CollectionItemCard"];
+        };
+        Comment: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            author_user_id: string;
+            handle: string | null;
+            display_name: string | null;
+            avatar_url: string | null;
+            body: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        ReactionSummary: {
+            counts: {
+                like: number;
+                love: number;
+                wow: number;
+            };
+            mine: ("like" | "love" | "wow")[];
+        };
+        Conversation: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "direct" | "order";
+            /** @description The seller order an order conversation is about. */
+            seller_order_id: string | null;
+            /** @description The other members, never you. */
+            members: {
+                /** Format: uuid */
+                user_id: string;
+                /** @description Null if the account was deleted. */
+                handle: string | null;
+                display_name: string | null;
+                avatar_url: string | null;
+            }[];
+            unread_count: number;
+            last_message_at: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        Message: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            conversation_id: string;
+            /** Format: uuid */
+            sender_user_id: string;
+            body: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        DecklistSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            owner_user_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @enum {string} */
+            source: "text" | "moxfield" | "archidekt";
+            source_url: string | null;
+            /** @enum {string} */
+            visibility: "private" | "friends" | "public";
+            /** Format: date-time */
+            imported_at: string;
+            version: number;
+        };
+        Decklist: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            owner_user_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @enum {string} */
+            source: "text" | "moxfield" | "archidekt";
+            source_url: string | null;
+            /** @enum {string} */
+            visibility: "private" | "friends" | "public";
+            /** Format: date-time */
+            imported_at: string;
+            version: number;
+            entries: {
+                /** Format: uuid */
+                id: string;
+                position: number;
+                quantity: number;
+                /** @enum {string} */
+                board: "main" | "side" | "commander" | "maybe";
+                card_name: string;
+                raw_line: string;
+                /** @enum {string} */
+                resolution: "resolved" | "ambiguous" | "unresolved";
+                product_id: string | null;
+                candidate_product_ids: string[];
+                /** @description COM-12: the card's facts for grouping by type, mana value or colour; null when unresolved. */
+                card: {
+                    type_line: string;
+                    mana_cost: string | null;
+                    mana_value: number | null;
+                    colors: string[];
+                } | null;
+                /** @description The card's pictures (its newest printing with one), for the grid and stacks views. */
+                images: components["schemas"]["CatalogImages"] | null;
+            }[];
+        };
+        DecklistCartFill: {
+            added: {
+                /** Format: uuid */
+                product_id: string;
+                /** Format: uuid */
+                listing_id: string;
+                quantity: number;
+            }[];
+            missing: {
+                /** Format: uuid */
+                product_id: string;
+                quantity: number;
+            }[];
+        };
+        DecklistOwnership: {
+            owned: number;
+            total: number;
+            lines: {
+                /** Format: uuid */
+                entry_id: string;
+                needed: number;
+                owned: number;
+                missing: number;
+                /** @description The cheapest offer of the line's card in EUR cents; null when none is for sale. */
+                unit_cents: number | null;
+            }[];
+            /** @description COM-12 cost to complete: the missing copies (maybeboard left out) from the cheapest offers, your own listings left out. */
+            missing_cost: {
+                cents: number;
+                /** @constant */
+                currency: "EUR";
+                /** @description Missing copies no offer covers (not in cents). */
+                unpriced: number;
+            };
+        };
+        FeedEntry: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            actor_user_id: string;
+            handle: string;
+            display_name: string;
+            avatar_url: string | null;
+            /** @enum {string} */
+            verb: "completed_set" | "reached_milestone" | "published_showcase" | "earned_badge" | "listed_card";
+            /** @enum {string} */
+            object_type: "set" | "showcase" | "badge" | "milestone";
+            object_id: string | null;
+            /** @description The badge or milestone code, or the showcase title. */
+            summary: string;
+            /** Format: date-time */
+            occurred_at: string;
+        };
+        TradeBinderEntry: {
+            /** Format: uuid */
+            item_id: string;
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            product_id: string;
+            /** Format: uuid */
+            game_id: string;
+            condition: number;
+            tradable_quantity: number;
+        };
+        Friendship: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: uuid
+             * @description The other member.
+             */
+            user_id: string;
+            /** @description Null if the account was deleted meanwhile. */
+            handle: string | null;
+            display_name: string | null;
+            avatar_url: string | null;
+            /**
+             * @description `incoming` and `outgoing` are requests waiting for an answer, sent to you or by you.
+             * @enum {string}
+             */
+            state: "friends" | "incoming" | "outgoing";
+            /** Format: date-time */
+            since: string;
+        };
+        CommunityMember: {
+            /** Format: uuid */
+            user_id: string;
+            handle: string;
+            display_name: string;
+            avatar_url: string | null;
+            country_code: string | null;
+            awarded_badges: {
+                /** @description The badge: top_seller, verified_store, alpha_supporter, vintage_collector. More will come; skip a code you do not know. */
+                code: string;
+                /** Format: date-time */
+                awarded_at: string;
+            }[];
+        };
+        CommunityMutes: {
+            items: components["schemas"]["CommunityMutedMember"][];
+        };
+        CommunityMutedMember: {
+            /** Format: uuid */
+            user_id: string;
+            handle: string | null;
+            display_name: string | null;
+            avatar_url: string | null;
+            /** Format: date-time */
+            muted_at: string;
+        };
+        CommunityProfile: {
+            /** Format: uuid */
+            user_id: string;
+            handle: string;
+            display_name: string;
+            avatar_url: string | null;
+            /** @description ONB-01: the printing whose card art is the cover. */
+            cover_printing_id: string | null;
+            bio: string | null;
+            country_code: string | null;
+            favorite_game_ids: string[];
+            /** @enum {string} */
+            visibility: "private" | "friends" | "public";
+            /**
+             * @deprecated
+             * @description Deprecated: only Top seller and Verified store. Use `awarded_badges`.
+             */
+            badges: {
+                /** @enum {string} */
+                code: "top_seller" | "verified_store";
+                /** Format: date-time */
+                awarded_at: string;
+            }[];
+            awarded_badges: {
+                /** @description The badge: top_seller, verified_store, alpha_supporter, vintage_collector. More will come; skip a code you do not know. */
+                code: string;
+                /** Format: date-time */
+                awarded_at: string;
+            }[];
+            /** @description Whether the For sale tab shows (COM-09) */
+            shows_for_sale: boolean;
+        };
+        DeckStats: {
+            /** @description Commander decks, those with a known commander */
+            deck_count: number;
+            /** @description How many decks play each colour; `c` counts colourless decks */
+            colours: {
+                w: number;
+                u: number;
+                b: number;
+                r: number;
+                g: number;
+                c: number;
+            };
+            /** @description Average EDHREC commander rank of the commanders: mainstream up to 100, popular up to 1,000, off-meta up to 5,000, brewer above. Null while no commander is ranked or `community.commander-originality` is off. */
+            originality: {
+                average_rank: number;
+                /** @enum {string} */
+                tier: "mainstream" | "popular" | "off_meta" | "brewer";
+                ranked_commanders: number;
+                /** @constant */
+                source: "edhrec";
+            } | null;
+        };
+        Showcase: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            owner_user_id: string;
+            /** Format: uuid */
+            folder_id: string;
+            title: string;
+            description: string | null;
+            /** @enum {string} */
+            visibility: "private" | "friends" | "public";
+            /** Format: date-time */
+            published_at: string;
+            version: number;
+        };
+        ShowcaseView: {
+            showcase: components["schemas"]["Showcase"];
+            folder: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                folder_type: "standard" | "trade_binder";
+                /** @enum {string} */
+                visibility: "private" | "friends" | "public";
+                item_count: number;
+            };
+            data: components["schemas"]["ShownCollectionItem"][];
+            page: {
+                limit: number;
+                next_cursor: string | null;
+            };
+        };
+        TradeMatch: {
+            /** Format: uuid */
+            user_id: string;
+            handle: string | null;
+            display_name: string | null;
+            avatar_url: string | null;
+            you_can_give: number;
+            they_can_give: number;
+            /** Format: date-time */
+            computed_at: string;
+        };
+        TradeProposal: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            proposer_user_id: string;
+            /** Format: uuid */
+            recipient_user_id: string;
+            /**
+             * @description `countered` proposals were answered with a new one (its `parent_proposal_id` points back). `executing` means both confirmed and the cards are changing hands.
+             * @enum {string}
+             */
+            status: "draft" | "submitted" | "countered" | "accepted" | "declined" | "cancelled" | "executing" | "completed" | "failed" | "expired";
+            /** @description Cash paid in person on top of the cards. */
+            balancing: {
+                cents: number;
+                currency: string;
+                /** Format: uuid */
+                payer_user_id: string;
+            } | null;
+            message: string | null;
+            proposer_confirmed_at: string | null;
+            recipient_confirmed_at: string | null;
+            parent_proposal_id: string | null;
+            /** Format: date-time */
+            expires_at: string;
+            /** Format: date-time */
+            created_at: string;
+            items: {
+                /** Format: uuid */
+                collection_item_id: string;
+                /** @enum {string} */
+                side: "offered" | "requested";
+                /** Format: uuid */
+                owner_user_id: string;
+                /** Format: uuid */
+                sku_id: string;
+                condition: number;
+                quantity: number;
+            }[];
         };
         JsonWebKeySet: {
             keys: ({
@@ -3045,6 +7589,114 @@ export interface components {
             } & {
                 [key: string]: unknown;
             })[];
+        };
+        AdminErasure: {
+            /** Format: uuid */
+            request_id: string;
+            /** Format: uuid */
+            user_id: string;
+            /** @enum {string} */
+            status: "pending" | "cancelled" | "executed";
+            /** Format: date-time */
+            requested_at: string;
+            /** Format: date-time */
+            execute_after: string;
+            executed_at: string | null;
+            /** @description Each context's erasure of the member; `processed_at` null means not yet. Null before the request ran. */
+            steps: {
+                consumer: string;
+                processed_at: string | null;
+            }[] | null;
+        };
+        AdminPlan: {
+            code: string;
+            name: string;
+            description: string;
+            is_public: boolean;
+            version: number;
+            /** @description Every price row, newest first; per interval, the newest one in effect counts. */
+            prices: {
+                /** @enum {string} */
+                interval: "month" | "year";
+                amount_cents: number;
+                currency: string;
+                /** Format: date-time */
+                effective_from: string;
+                created_by: string | null;
+            }[];
+            /** @description Every limit row by key, newest first; null is unlimited, 1 an included feature. */
+            limits: {
+                key: string;
+                value: number | null;
+                /** Format: date-time */
+                effective_from: string;
+                created_by: string | null;
+            }[];
+        };
+        StaffSession: {
+            /** Format: uuid */
+            user_id: string;
+            roles: ("moderator" | "admin")[];
+        };
+        AdminUser: {
+            /** Format: uuid */
+            user_id: string;
+            handle: string;
+            email: string;
+            /** @enum {string} */
+            status: "active" | "suspended" | "pending_verification" | "tombstoned" | "restricted";
+            email_verified: boolean;
+            roles: ("collector" | "pro_seller" | "moderator" | "admin")[];
+            /** Format: date-time */
+            created_at: string;
+        };
+        AdminUserDetail: {
+            /** Format: uuid */
+            user_id: string;
+            handle: string;
+            email: string;
+            /** @enum {string} */
+            status: "active" | "suspended" | "pending_verification" | "tombstoned" | "restricted";
+            email_verified: boolean;
+            roles: ("collector" | "pro_seller" | "moderator" | "admin")[];
+            /** Format: date-time */
+            created_at: string;
+            seller: {
+                /** Format: uuid */
+                seller_account_id: string;
+                /** @enum {string} */
+                seller_type: "private" | "professional";
+                /** @enum {string} */
+                seller_state: "active" | "vacation" | "restricted" | "under_review" | "suspended";
+                /** @enum {string} */
+                trust_tier: "bronze" | "silver" | "gold" | "platinum";
+                trust_score: number;
+                /** @enum {string} */
+                payout_status: "not_started" | "pending" | "enabled" | "restricted";
+                can_sell: boolean;
+            } | null;
+            /** @description A legal, tax or fraud hold keeps the account from being erased. */
+            under_hold: boolean;
+            live_sessions: number;
+            security_events: {
+                /** Format: uuid */
+                id: string;
+                event_type: string;
+                /** @enum {string} */
+                result: "success" | "denied";
+                actor_user_id: string | null;
+                /** Format: date-time */
+                occurred_at: string;
+                details: {
+                    [key: string]: unknown;
+                };
+            }[];
+        };
+        ResetUserMfa: {
+            factors_removed: number;
+        };
+        RevokedSessions: {
+            sessions: number;
         };
         Account: {
             /** Format: uuid */
@@ -3086,6 +7738,41 @@ export interface components {
             /** Format: uuid */
             id: string;
         };
+        DataExportRequest: {
+            /** Format: date-time */
+            requested_at: string;
+            /** @enum {string} */
+            status: "building" | "ready" | "expired";
+            /** @description A fresh signed link while the export is ready */
+            url: string | null;
+            expires_at: string | null;
+            files: number | null;
+        };
+        DataExport: {
+            /**
+             * Format: uri
+             * @description Signed download link of the ZIP
+             */
+            url: string;
+            /** Format: date-time */
+            expires_at: string;
+            files: number;
+        };
+        DataExportQueued: {
+            /**
+             * Format: uuid
+             * @description The export, built by a background job
+             */
+            id: string;
+            /** @constant */
+            status: "building";
+            /** Format: date-time */
+            requested_at: string;
+        };
+        HandleCheck: {
+            available: boolean;
+            reason: ("taken" | "reserved" | "invalid") | null;
+        };
         MfaFactorList: {
             items: {
                 /** Format: uuid */
@@ -3107,28 +7794,67 @@ export interface components {
         RecoveryCodes: {
             recovery_codes: string[];
         };
+        Plan: {
+            code: string;
+            name: string;
+            description: string;
+            prices: {
+                /** @enum {string} */
+                interval: "month" | "year";
+                amount_cents: number;
+                currency: string;
+            }[];
+            /** @description Feature and limit values: null is unlimited, 1 an included feature, else the limit. A key not listed is not included. */
+            limits: {
+                [key: string]: number | null;
+            };
+        };
         Preferences: {
             display_currency: string;
             /** @enum {string} */
             theme: "system" | "light" | "dark";
             timezone: string;
             default_game_id: string | null;
+            /** @enum {string} */
+            account_type: "collector" | "private_seller" | "professional_seller";
+            onboarding_step: ("account" | "type" | "plan" | "games" | "collection" | "wishlist" | "profile" | "seller" | "done") | null;
+            onboarding_done: boolean;
+            checklist_hidden: boolean;
+            seller_reminder_after: string | null;
         };
         Profile: {
             /** Format: uuid */
             user_id: string;
             handle: string;
             display_name: string;
+            /** @description The picture shown: an uploaded photo, else the picked pre-made avatar (ONB-01). */
             avatar_url: string | null;
+            /** @description ONB-01: the picked pre-made avatar. */
+            avatar_key: string | null;
+            /** @description ONB-01: the printing whose card art is the cover. */
+            cover_printing_id: string | null;
             biography: string | null;
             country_code: string | null;
             preferred_language: string;
             favorite_game_ids: string[];
+            /** @enum {string} */
+            profile_visibility: "private" | "friends" | "public";
             social_links: {
                 label: string;
                 /** Format: uri */
                 url: string;
             }[];
+            /** @description ONB-01b: your latest uploaded photo while it has not passed its check: `uploading`, `checking`, `rejected` (explicit content) or `failed` (could not be checked, try again). Null when none is waiting; a passed photo is `avatar_url`. */
+            photo_status: ("uploading" | "checking" | "rejected" | "failed") | null;
+        };
+        ProfilePhotoUpload: {
+            /**
+             * Format: uri
+             * @description PUT the photo here with the same Content-Type, at most 5 MB.
+             */
+            upload_url: string;
+            /** Format: date-time */
+            expires_at: string;
         };
         SellerAccount: {
             /** Format: uuid */
@@ -3150,7 +7876,35 @@ export interface components {
             has_payment_account: boolean;
             vat_validated: boolean;
             vacation_until: string | null;
+            min_order_cents: number | null;
             activated_at: string | null;
+        };
+        Dac7Status: {
+            year: number;
+            /**
+             * @description `monitoring`: 80 % of a limit reached. `info_requested`: the year is reportable and data is missing. `complete`: everything the report needs is there.
+             * @enum {string}
+             */
+            reporting_status: "not_required" | "monitoring" | "info_requested" | "complete" | "reported";
+            /** @description Paid sales this year, as of `computed_at`. */
+            relevant_activities: number;
+            /** @description What those sales earned you, in EUR cents. */
+            consideration_cents: number;
+            /** @description A year is reported from either figure (30 sales or 2,000 EUR). */
+            limits: {
+                relevant_activities: number;
+                consideration_cents: number;
+            };
+            /** @description Either figure has reached 80 % of its limit. */
+            nears_limit: boolean;
+            /** @description What the report would still need from you; name, address and bank come from Stripe. */
+            missing: ("tax_residency_country" | "tax_identifier" | "date_of_birth" | "business_profile" | "identity_verification")[];
+            info_requested_at: string | null;
+            /** @description Listing stops after this while data is missing. */
+            data_due_by: string | null;
+            listing_blocked: boolean;
+            /** @description The nightly computation; null before the first one. */
+            computed_at: string | null;
         };
         OnboardingLink: {
             /**
@@ -3160,6 +7914,21 @@ export interface components {
             url: string;
             /** Format: date-time */
             expires_at: string;
+        };
+        ShellBootstrap: {
+            profile: components["schemas"]["Profile"];
+            preferences: components["schemas"]["Preferences"];
+            addresses: components["schemas"]["AddressList"];
+            terms: components["schemas"]["TermsStatus"] | null;
+        };
+        TermsStatus: {
+            items: {
+                /** @enum {string} */
+                document: "terms" | "privacy";
+                current_version: string;
+                accepted_version: string | null;
+                needs_acceptance: boolean;
+            }[];
         };
         SignInMethods: {
             has_password: boolean;
@@ -3171,14 +7940,18 @@ export interface components {
             }[];
             available: ("google" | "apple" | "discord")[];
         };
-        TermsStatus: {
-            items: {
-                /** @enum {string} */
-                document: "terms" | "privacy";
-                current_version: string;
-                accepted_version: string | null;
-                needs_acceptance: boolean;
-            }[];
+        Subscription: {
+            plan_code: string;
+            /** @enum {string} */
+            interval: "month" | "year";
+            /** @description The payment provider status, e.g. active, past_due */
+            status: string;
+            current_period_end: string | null;
+            cancel_at_period_end: boolean;
+            /** Format: date-time */
+            started_at: string;
+            /** @description Until when cancelling refunds the payment in full (14-day withdrawal right) */
+            withdrawable_until: string | null;
         };
         OAuthAuthorization: {
             /** Format: uri */
@@ -3217,6 +7990,68 @@ export interface components {
             /** Format: date-time */
             refresh_token_expires_at: string;
         };
+        CatalogSyncRequested: {
+            provider: string;
+        };
+        MonitoredImportJob: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "catalog_sync" | "collection_import" | "listing_bulk" | "decklist";
+            provider: string;
+            /** @enum {string} */
+            trigger: "manual_upload" | "scheduled_cron" | "webhook";
+            /** @enum {string} */
+            status: "pending" | "processing" | "completed" | "partial_failure" | "failed" | "cancelled";
+            total_records: number;
+            /** @description Records with an outcome, including skipped and failed. */
+            processed_records: number;
+            failed_records: number;
+            skipped_records: number;
+            started_at: string | null;
+            completed_at: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** @description Stock imports (SOS-07), on a single import only: how many rows had each outcome (new, quantity, price, both, unchanged, paused, delisted). */
+            outcomes?: {
+                [key: string]: number;
+            };
+            /** @description Null for scheduled syncs. */
+            initiated_by_user_id: string | null;
+        };
+        SellerExport: {
+            /** @enum {string} */
+            kind: "listings" | "inventory";
+            url: string;
+            /** Format: date-time */
+            expires_at: string;
+            rows: number;
+        };
+        FileExportQueued: {
+            /**
+             * Format: uuid
+             * @description The export; read it with `GET /api/v1/integration/exports/{id}`
+             */
+            id: string;
+            /** @constant */
+            status: "building";
+            /** Format: date-time */
+            requested_at: string;
+        };
+        FileExport: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "listings" | "inventory" | "failed_rows";
+            /** @enum {string} */
+            status: "building" | "ready" | "failed";
+            /** Format: date-time */
+            requested_at: string;
+            /** @description Set once ready; works for 15 minutes */
+            url: string | null;
+            expires_at: string | null;
+            rows: number | null;
+        };
         ImportJob: {
             /** Format: uuid */
             id: string;
@@ -3236,6 +8071,10 @@ export interface components {
             completed_at: string | null;
             /** Format: date-time */
             created_at: string;
+            /** @description Stock imports (SOS-07), on a single import only: how many rows had each outcome (new, quantity, price, both, unchanged, paused, delisted). */
+            outcomes?: {
+                [key: string]: number;
+            };
         };
         ImportRecord: {
             /** Format: uuid */
@@ -3246,8 +8085,82 @@ export interface components {
             internal_entity_id: string | null;
             error_code: string | null;
             error_message: string | null;
+            outcome: string | null;
+            /** @description The card and the change, for example `Sol Ring · 5 × 1.00 → 9 × 1.00 EUR`. */
+            note: string | null;
             /** Format: date-time */
             processed_at: string;
+        };
+        ImportCheck: {
+            /** @description CSV files only. */
+            columns: {
+                header: string;
+                samples: string[];
+                /** @description The field the column is read as; null: ignored. */
+                field: string | null;
+            }[] | null;
+            /** @description The words of the condition column, most used first, with the grade each reads as. */
+            condition_words: {
+                word: string;
+                rows: number;
+                condition: number | null;
+            }[] | null;
+            /** @description The binders the file's cards sit in (ManaBox's Binder Name), in file order; lists are left out. Send `binders: true` in the import's options to recreate them as folders. null: the file names none. */
+            binders: {
+                name: string;
+                rows: number;
+            }[] | null;
+            counts: {
+                all: number;
+                ready: number;
+                pick: number;
+                bad: number;
+            };
+            rows: components["schemas"]["CheckedImportRow"][];
+            /** @description Only the first 5,000 rows were checked. */
+            truncated: boolean;
+            /** @description Why the file cannot be imported at all; null when it can. */
+            file_problem: string | null;
+        };
+        CheckedImportRow: {
+            line: number;
+            /**
+             * @description `ready`: the card was found; `pick`: the line names no printing, pick one of `printings`; `bad`: see `problem`.
+             * @enum {string}
+             */
+            status: "ready" | "pick" | "bad";
+            /** @description The line as typed, or the CSV row's cells joined with ' · '. */
+            text: string;
+            card: {
+                name: string | null;
+                set_code: string | null;
+                collector_number: string | null;
+                language: string;
+                finish: string;
+                condition: number;
+                quantity: number;
+                unit_cost: {
+                    cents: string;
+                    currency: string;
+                } | null;
+            } | null;
+            sku_id: string | null;
+            printings: {
+                /** Format: uuid */
+                printing_id: string;
+                product_name: string;
+                set_code: string;
+                set_name: string;
+                collector_number: string;
+                release_date: string | null;
+            }[];
+            problem: {
+                code: string;
+                message: string;
+            } | null;
+        };
+        OpenImport: {
+            import: components["schemas"]["ImportJob"] | null;
         };
         ImportUpload: {
             storage_key: string;
@@ -3339,6 +8252,8 @@ export interface components {
             condition: number;
             /** @enum {string} */
             condition_scale: "card" | "sealed";
+            /** @description Photos of the card (listings of unique items only), in display order. */
+            photo_urls: string[];
             /** @enum {string} */
             status: "draft" | "active" | "paused" | "sold_out" | "cancelled" | "suspended";
             version: number;
@@ -3346,6 +8261,102 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+            /** @description What is on sale, from the catalog. Reads only; command answers carry `null`. */
+            card: {
+                /** @description "Lightning Bolt (MH3 302)". */
+                display_name: string;
+                product_name: string;
+                game_code: string;
+                set_code: string;
+                set_name: string;
+                collector_number: string | null;
+                language: string;
+                finish: string | null;
+                images: components["schemas"]["CatalogImages"];
+            } | null;
+        };
+        CartFillJob: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "pending" | "processing" | "completed";
+            total_items: number;
+            /** @description Products worked through so far. */
+            processed_items: number;
+            added: {
+                /** Format: uuid */
+                product_id: string;
+                /** Format: uuid */
+                listing_id: string;
+                quantity: number;
+            }[];
+            /** @description Copies no offer covered. */
+            missing: {
+                /** Format: uuid */
+                product_id: string;
+                quantity: number;
+            }[];
+            completed_at: string | null;
+        };
+        PurchasePlan: {
+            /** @constant */
+            currency: "EUR";
+            /**
+             * @description `exact` when the search proved the plan cheapest (up to 12 copies), `heuristic` otherwise.
+             * @enum {string}
+             */
+            method: "exact" | "heuristic";
+            sellers: {
+                /** Format: uuid */
+                seller_user_id: string;
+                lines: {
+                    /** Format: uuid */
+                    listing_id: string;
+                    /** Format: uuid */
+                    product_id: string;
+                    condition: number;
+                    /** @enum {string} */
+                    condition_scale: "card" | "sealed";
+                    quantity: number;
+                    unit_price_cents: number;
+                    line_total_cents: number;
+                }[];
+                items_subtotal_cents: number;
+                selected_shipping: components["schemas"]["ShippingOption"] | null;
+                buyer_protection_fee_cents: number;
+                total_cents: number;
+            }[];
+            items_subtotal_cents: number;
+            shipping_total_cents: number;
+            buyer_protection_total_cents: number;
+            /** @description ADR-162: the service fee, once per order (payment). */
+            service_fee_cents: number;
+            /** @description Buyer protection plus the service fee: everything the buyer pays on top of items and postage. */
+            buyer_fee_cents: number;
+            total_cents: number;
+            /** @description Copies no offer covers, or that no seller ships to the country. */
+            missing: {
+                /** Format: uuid */
+                product_id: string;
+                quantity: number;
+            }[];
+            /** @description With `add_to_cart`: picks that sold meanwhile and are not in the cart. */
+            not_added: {
+                /** Format: uuid */
+                listing_id: string;
+                quantity: number;
+            }[];
+        };
+        ShippingOption: {
+            /** @enum {string} */
+            format: "letter" | "large_letter" | "parcel";
+            tracked: boolean;
+            carrier: string;
+            price_cents: number;
+            packaging_fee_cents: number;
+            total_cents: number;
+            /** @description The rate is a starting estimate, not a carrier price (OQ-07). */
+            placeholder: boolean;
         };
         CartQuote: {
             /** @constant */
@@ -3373,35 +8384,34 @@ export interface components {
                 selected_shipping: components["schemas"]["ShippingOption"] | null;
                 /** @description Why this seller cannot ship to the country; null when it can. */
                 problem: ("no_ship_from" | "unknown_weight" | "unsupported_destination" | "no_fitting_rate" | "empty_shipment") | null;
+                /** @description MKT-15: how much more (items only) the buyer must add from this seller to reach the seller's minimum order; null when reached. */
+                min_order_shortfall_cents: number | null;
                 buyer_protection_fee_cents: number;
                 total_cents: number;
             }[];
             items_subtotal_cents: number;
             shipping_total_cents: number;
             buyer_protection_total_cents: number;
+            /** @description ADR-162: the service fee, once per order (payment). */
+            service_fee_cents: number;
+            /** @description Buyer protection plus the service fee: everything the buyer pays on top of items and postage. */
+            buyer_fee_cents: number;
             total_cents: number;
-            /** @description False when an order cannot ship; checkout refuses such a cart. */
+            /** @description False when an order cannot ship or is below the seller's minimum; checkout refuses such a cart. */
             complete: boolean;
             /** @description Items left out of the totals. */
             unavailable: components["schemas"]["CartItem"][];
         };
-        ShippingOption: {
-            /** @enum {string} */
-            format: "letter" | "large_letter" | "parcel";
-            tracked: boolean;
-            carrier: string;
-            price_cents: number;
-            packaging_fee_cents: number;
-            total_cents: number;
-            /** @description The rate is a starting estimate, not a carrier price (OQ-07). */
-            placeholder: boolean;
-        };
         Checkout: {
             /** Format: uuid */
             order_id: string;
-            /** @description For the payment form; never store it. */
+            /** @description For the payment form; never store it. Empty when the balance paid the whole order (kept a string so older clients still parse it). */
             client_secret: string;
             total_cents: number;
+            /** @description Buyer protection plus the service fee, part of the total. */
+            buyer_fee_cents: number;
+            /** @description MKT-14: paid from your seller balance, part of the total. */
+            wallet_paid_cents: number;
             /** @constant */
             currency: "EUR";
             /** Format: date-time */
@@ -3442,6 +8452,86 @@ export interface components {
             /** Format: date-time */
             created_at: string;
         };
+        BulkListingJob: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "pending" | "processing" | "completed" | "partial_failure" | "failed";
+            total_items: number;
+            /** @description Items done so far, failed ones included. */
+            processed_items: number;
+            failed_items: number;
+            /** @description The first 100 items that could not be listed, with why. */
+            failures: {
+                /** Format: uuid */
+                collection_item_id: string;
+                code: string;
+            }[];
+            started_at: string | null;
+            completed_at: string | null;
+        };
+        BuyerOrder: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "pending_payment" | "paid" | "in_fulfillment" | "completed" | "cancelled" | "partially_refunded" | "refunded";
+            currency: string;
+            items_subtotal_cents: number;
+            shipping_cents: number;
+            buyer_protection_fee_cents: number;
+            service_fee_cents: number;
+            buyer_fee_cents: number;
+            /** @description MKT-14: paid from your seller balance. */
+            wallet_paid_cents: number;
+            total_cents: number;
+            /** Format: date-time */
+            placed_at: string;
+            paid_at: string | null;
+            seller_orders: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                status: "to_pack" | "packed" | "dispatched" | "in_transit" | "delivered" | "received" | "completed" | "cancelled" | "in_dispute" | "resolved_refunded" | "resolved_released" | "awaiting_payment";
+                /** @description Must be dispatched with a tracking number. */
+                is_tracked: boolean;
+                carrier: string | null;
+                tracking_number: string | null;
+                currency: string;
+                items_subtotal_cents: number;
+                shipping_cents: number;
+                packaging_fee_cents: number;
+                ship_to_country: string;
+                /** Format: date-time */
+                placed_at: string;
+                dispatched_at: string | null;
+                delivered_at: string | null;
+                received_at: string | null;
+                /** @description Counts as received then, 60 days after dispatch. */
+                auto_confirm_at: string | null;
+                /** @description Non-delivery claims open then, 30 days after dispatch. */
+                claim_opens_at: string | null;
+                /** @description Disputes close then, 90 days after delivery or receipt. */
+                claim_closes_at: string | null;
+                /** @enum {string} */
+                shipping_format: "letter" | "large_letter" | "parcel";
+                /** @description The latest dispute on it, open or decided; null if none. */
+                dispute_id: string | null;
+                lines: {
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    listing_id: string;
+                    /** Format: uuid */
+                    sku_id: string;
+                    title: string;
+                    condition: number;
+                    unit_price_cents: number;
+                    quantity: number;
+                }[];
+                /** Format: uuid */
+                seller_user_id: string;
+            }[];
+        };
         Feedback: {
             rating: number;
             comment: string | null;
@@ -3449,6 +8539,220 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+        };
+        PricingPreview: {
+            listings_checked: number;
+            /** @description More listings than the preview checks: it checked the first 1,000, by listing id */
+            capped: boolean;
+            change_count: number;
+            changes: {
+                /** Format: uuid */
+                listing_id: string;
+                /**
+                 * Format: uuid
+                 * @description The listed SKU, to name the card.
+                 */
+                sku_id: string;
+                from_cents: number;
+                to_cents: number;
+                /** @description null: only the minimum lifted the price. */
+                rule_id: string | null;
+                /** @description A floor, ceiling or minimum changed the rule's price. */
+                limited: boolean;
+            }[];
+            /** @description Listings left alone, by reason. */
+            skipped: {
+                [key: string]: number;
+            };
+        };
+        PricingRule: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @description Lower runs first; a listing follows the first enabled rule that matches it. */
+            priority: number;
+            /** @enum {string} */
+            strategy: "match_avg_7d" | "undercut_lowest" | "fixed_markup_on_cost";
+            /** @description Added to the base price in basis points, e.g. -200 is 2% below. */
+            offset_bps: number;
+            floor_cents: number | null;
+            ceiling_cents: number | null;
+            folder_id: string | null;
+            set_id: string | null;
+            rarity: ("common" | "uncommon" | "rare" | "mythic" | "basic_land" | "token") | null;
+            /** @description Matches conditions 1 (best) up to this one. */
+            max_condition: number | null;
+            /** @description Price band: the listing's current price at least this. */
+            min_price_cents: number | null;
+            max_price_cents: number | null;
+            is_enabled: boolean;
+            /** @constant */
+            currency: "EUR";
+            last_run_at: string | null;
+            version: number;
+        };
+        PricingRun: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            run_date: string;
+            /** @description Quarter hour of the day (UTC); -1 for the manual run. */
+            slot: number;
+            listings_checked: number;
+            listings_changed: number;
+            /** @description Listings left alone, by reason. */
+            skipped: {
+                [key: string]: number;
+            };
+            /** Format: date-time */
+            started_at: string;
+            completed_at: string | null;
+        };
+        PricingSettings: {
+            runs_per_day: number;
+            /** @description UTC start times (HH:MM) of the daily runs. */
+            run_times: string[];
+            /** @description Minimum price per rarity; rarities without one are left out. */
+            minimums: {
+                common?: number;
+                uncommon?: number;
+                rare?: number;
+                mythic?: number;
+                basic_land?: number;
+                token?: number;
+            };
+        };
+        OffersPage: {
+            data: components["schemas"]["Offer"][];
+            /** @description On the first page only (no `cursor`); null on later pages. */
+            price_facets: components["schemas"]["OfferPriceFacet"][] | null;
+            next_cursor: string | null;
+        };
+        Offer: {
+            /** Format: uuid */
+            listing_id: string;
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            product_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @description The card page's slug. */
+            slug: string | null;
+            set_code: string;
+            /** Format: uuid */
+            seller_user_id: string;
+            seller_country: string | null;
+            /** @enum {string} */
+            seller_type: "private" | "professional";
+            /** @description The seller’s trust score, 0 to 1000 (0 before their first order). */
+            seller_trust_score: number;
+            price: {
+                cents: number;
+                currency: string;
+            };
+            /** @description ADR-128 grade, 1 best: card MT…PO, sealed scale apart. */
+            condition: number;
+            /** @enum {string} */
+            condition_scale: "card" | "sealed";
+            language: string;
+            finish: string | null;
+            is_foil: boolean;
+            is_signed: boolean;
+            is_altered: boolean;
+            quantity_available: number;
+            /** @description The listed printing; null for a sealed product. */
+            printing_id: string | null;
+            /** @description The cheapest postage for one copy to `ship_to`; only with `sort=price_shipping`, and null when the seller cannot ship there. */
+            shipping: {
+                cents: number;
+                currency: string;
+            } | null;
+        };
+        OfferPriceFacet: {
+            /** Format: uuid */
+            sku_id: string;
+            language: string;
+            finish: string | null;
+            lowest_price: {
+                cents: number;
+                currency: string;
+            };
+            /** @description Active offers of this SKU. */
+            offers: number;
+        };
+        Invoice: {
+            number: string;
+            /** Format: date-time */
+            issued_at: string;
+            total_cents: number;
+            currency: string;
+            /** Format: uri */
+            url: string;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        SellerDashboard: {
+            /** @description Paid orders not settled yet, per status; statuses without orders are left out. */
+            open_orders: {
+                [key: string]: number;
+            };
+            sales_7d: {
+                orders: number;
+                units: number;
+                /** @description Items subtotal, before commission and postage. */
+                article_value_cents: number;
+                /** @constant */
+                currency: "EUR";
+            };
+            sales_30d: {
+                orders: number;
+                units: number;
+                /** @description Items subtotal, before commission and postage. */
+                article_value_cents: number;
+                /** @constant */
+                currency: "EUR";
+            };
+            wallet: components["schemas"]["Wallet"];
+            /** @description Your listings per status; statuses without listings are left out. */
+            listings: {
+                [key: string]: number;
+            };
+            /** @description Up to 20 active listings with 2 units or fewer on sale, fewest first. */
+            low_stock: {
+                /** Format: uuid */
+                listing_id: string;
+                /** Format: uuid */
+                sku_id: string;
+                quantity_listed: number;
+                price_cents: number;
+                currency: string;
+            }[];
+            /** @description Paid sales per UTC day over the last 90 days, oldest first; days without sales are left out. */
+            sales_daily: {
+                /** Format: date */
+                day: string;
+                orders: number;
+                article_value_cents: number;
+                commission_cents: number;
+            }[];
+            /** @description Up to 4 products sold most over the last 30 days, by units. */
+            best_sellers: {
+                /** Format: uuid */
+                sku_id: string;
+                title: string;
+                units: number;
+                value_cents: number;
+            }[];
+        };
+        Wallet: {
+            /** @constant */
+            currency: "EUR";
+            pending_cents: number;
+            available_cents: number;
+            frozen_cents: number;
+            minimum_payout_cents: number;
         };
         ReleasedReservations: {
             released: number;
@@ -3483,6 +8787,17 @@ export interface components {
             claim_opens_at: string | null;
             /** @description Disputes close then, 90 days after delivery or receipt. */
             claim_closes_at: string | null;
+            /** @enum {string} */
+            shipping_format: "letter" | "large_letter" | "parcel";
+            /** @description When you started picking it (to_pack only). */
+            picking_started_at: string | null;
+            /**
+             * @description Where it is in the fulfilment center: new (paid), picking, issues, picked (ready to pack), packed, sent, or closed.
+             * @enum {string}
+             */
+            stage: "new" | "picking" | "issues" | "picked" | "packed" | "sent" | "cancelled" | "in_dispute" | "resolved";
+            /** @description The latest dispute on it, open or decided; null if none. */
+            dispute_id: string | null;
             lines: {
                 /** Format: uuid */
                 id: string;
@@ -3494,15 +8809,114 @@ export interface components {
                 condition: number;
                 unit_price_cents: number;
                 quantity: number;
+                pick_status: ("picked" | "issue") | null;
+                pick_issue: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
+                pick_note: string | null;
+                /** @description The printing sold, from the catalog. */
+                card: {
+                    /** @description "Lightning Bolt (MH3 302)". */
+                    display_name: string;
+                    product_name: string;
+                    game_code: string;
+                    set_code: string;
+                    set_name: string;
+                    collector_number: string | null;
+                    language: string;
+                    finish: string | null;
+                    images: components["schemas"]["CatalogImages"];
+                } | null;
             }[];
         };
-        Wallet: {
-            /** @constant */
-            currency: "EUR";
-            pending_cents: number;
-            available_cents: number;
-            frozen_cents: number;
-            minimum_payout_cents: number;
+        SellerOrderDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            order_id: string;
+            /** Format: uuid */
+            buyer_user_id: string;
+            /** @enum {string} */
+            status: "to_pack" | "packed" | "dispatched" | "in_transit" | "delivered" | "received" | "completed" | "cancelled" | "in_dispute" | "resolved_refunded" | "resolved_released";
+            /** @description Must be dispatched with a tracking number. */
+            is_tracked: boolean;
+            carrier: string | null;
+            tracking_number: string | null;
+            currency: string;
+            items_subtotal_cents: number;
+            shipping_cents: number;
+            packaging_fee_cents: number;
+            commission_cents: number;
+            ship_to_country: string;
+            /** Format: date-time */
+            placed_at: string;
+            dispatched_at: string | null;
+            delivered_at: string | null;
+            received_at: string | null;
+            /** @description Counts as received then, 60 days after dispatch. */
+            auto_confirm_at: string | null;
+            /** @description Non-delivery claims open then, 30 days after dispatch. */
+            claim_opens_at: string | null;
+            /** @description Disputes close then, 90 days after delivery or receipt. */
+            claim_closes_at: string | null;
+            /** @enum {string} */
+            shipping_format: "letter" | "large_letter" | "parcel";
+            /** @description When you started picking it (to_pack only). */
+            picking_started_at: string | null;
+            /**
+             * @description Where it is in the fulfilment center: new (paid), picking, issues, picked (ready to pack), packed, sent, or closed.
+             * @enum {string}
+             */
+            stage: "new" | "picking" | "issues" | "picked" | "packed" | "sent" | "cancelled" | "in_dispute" | "resolved";
+            /** @description The latest dispute on it, open or decided; null if none. */
+            dispute_id: string | null;
+            lines: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                listing_id: string;
+                /** Format: uuid */
+                sku_id: string;
+                title: string;
+                condition: number;
+                unit_price_cents: number;
+                quantity: number;
+                pick_status: ("picked" | "issue") | null;
+                pick_issue: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
+                pick_note: string | null;
+                /** @description The printing sold, from the catalog. */
+                card: {
+                    /** @description "Lightning Bolt (MH3 302)". */
+                    display_name: string;
+                    product_name: string;
+                    game_code: string;
+                    set_code: string;
+                    set_name: string;
+                    collector_number: string | null;
+                    language: string;
+                    finish: string | null;
+                    images: components["schemas"]["CatalogImages"];
+                } | null;
+            }[];
+            ship_to: {
+                name: string;
+                line1: string;
+                line2: string | null;
+                postal_code: string;
+                city: string;
+                country_code: string;
+                phone: string | null;
+            };
+            /** @description Every status change, oldest first (with carrier scans once tracking is connected). */
+            history: {
+                /** @enum {string} */
+                status: "to_pack" | "packed" | "dispatched" | "in_transit" | "delivered" | "received" | "completed" | "cancelled" | "in_dispute" | "resolved_refunded" | "resolved_released" | "awaiting_payment";
+                /** @enum {string} */
+                source: "seller" | "buyer" | "carrier" | "system" | "moderator";
+                /** Format: date-time */
+                at: string;
+            }[];
+        };
+        SellerOrderStageCounts: {
+            [key: string]: number;
         };
         Payout: {
             /** Format: uuid */
@@ -3528,40 +8942,10 @@ export interface components {
                 created_at: string;
             }[];
         };
-        OffersPage: {
-            data: components["schemas"]["ListingHit"][];
-            next_cursor: string | null;
-        };
-        ListingHit: {
-            /** Format: uuid */
-            listing_id: string;
-            /** Format: uuid */
-            sku_id: string;
-            /** Format: uuid */
-            product_id: string;
-            /** Format: uuid */
-            game_id: string;
-            name: string;
-            /** @description The card page's slug. */
-            slug: string | null;
-            set_code: string;
-            /** Format: uuid */
-            seller_user_id: string;
-            seller_country: string | null;
-            /** @enum {string} */
-            seller_type: "private" | "professional";
-            price: {
-                cents: number;
-                currency: string;
-            };
-            /** @description ADR-128 grade, 1 best: card MT…PO, sealed scale apart. */
-            condition: number;
-            /** @enum {string} */
-            condition_scale: "card" | "sealed";
-            language: string;
-            finish: string | null;
-            is_foil: boolean;
-            quantity_available: number;
+        SetOfferSummary: {
+            offers: number;
+            sellers: number;
+            copies: number;
         };
         NotificationInbox: {
             data: components["schemas"]["Notification"][];
@@ -3603,6 +8987,262 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        BestSeller: {
+            /** Format: uuid */
+            printing_id: string;
+            /** Format: uuid */
+            product_id: string;
+            name: string;
+            set_code: string;
+            collector_number: string | null;
+            units_sold: number;
+            /** @description Copies sold in the 14 days before the last 14, for the change on Trending. */
+            units_sold_before: number;
+            /** @description The market price of the SKUs sold (lowest listing without sales); null without either. */
+            market_cents: number | null;
+        };
+        FeaturedOffer: {
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            printing_id: string;
+            /** Format: uuid */
+            product_id: string;
+            name: string;
+            set_code: string;
+            collector_number: string | null;
+            lowest_listing_cents: number;
+            /** @description The 7-day average. */
+            market_cents: number;
+        } | null;
+        MarketMover: {
+            /** Format: uuid */
+            sku_id: string;
+            avg_7d_cents: number;
+            trend_7d_bps: number;
+            volume_7d: number;
+        };
+        PrintingPrice: {
+            /** Format: uuid */
+            printing_id: string;
+            lowest_listing_cents: number | null;
+            /** @description 7-day average, else lowest listing, else the reference price. */
+            market_cents: number | null;
+        };
+        MarketStatistics: {
+            /**
+             * Format: uuid
+             * @description The SKU, or the product for product statistics.
+             */
+            id: string;
+            /** @enum {string} */
+            segment: "global" | "professional" | "private";
+            lowest_listing_cents: number | null;
+            active_listing_count: number;
+            active_quantity: number;
+            last_sale_cents: number | null;
+            last_sale_at: string | null;
+            avg_1d_cents: number | null;
+            avg_7d_cents: number | null;
+            avg_30d_cents: number | null;
+            volume_7d: number;
+            volume_30d: number;
+            /** @description Change of the 7-day average, in 1/100 %. */
+            trend_7d_bps: number | null;
+            confidence_score: number;
+            algorithm_version: string;
+            /** Format: date-time */
+            computed_at: string;
+        };
+        SetValue: {
+            /** Format: uuid */
+            set_id: string;
+            value_cents: number | null;
+            change_30d_cents: number | null;
+            /** @description In 1/100 %. */
+            change_30d_bps: number | null;
+            valued_printings: number;
+            printings: number;
+            /** @description The value every 5 days over the last 30, oldest first; days without data are left out. */
+            history: {
+                /** Format: date */
+                date: string;
+                value_cents: number;
+            }[];
+        };
+        PricePoint: {
+            /** Format: date */
+            period_start: string;
+            /** @enum {string} */
+            resolution: "day" | "week" | "month";
+            avg_cents: number | null;
+            median_cents: number | null;
+            volume: number;
+            lowest_listing_cents: number | null;
+            active_listings: number;
+            /** @description First sold price of the period (candles). */
+            open_cents: number | null;
+            /** @description Last sold price of the period. */
+            close_cents: number | null;
+            high_cents: number | null;
+            low_cents: number | null;
+        };
+        /** @description One sale on tradeable. Buyer and seller are never named (G-13). */
+        MarketSale: {
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: date-time */
+            occurred_at: string;
+            condition: number;
+            quantity: number;
+            unit_price_cents: number;
+        };
+        ValueBreakdown: {
+            total_value_cents: number;
+            data: {
+                key: string | null;
+                name: string | null;
+                code: string | null;
+                value_cents: number;
+                quantity: number;
+                /** @description In 1/100 % of the total. */
+                share_bps: number;
+            }[];
+        };
+        CollectionFacts: {
+            cards: number;
+            unique_printings: number;
+            foils: number;
+            languages: string[];
+            oldest: {
+                /** Format: uuid */
+                sku_id: string;
+                name: string;
+                set_name: string;
+                set_code: string;
+                release_date: string;
+            } | null;
+            most_valuable: {
+                /** Format: uuid */
+                sku_id: string;
+                name: string;
+                set_name: string;
+                set_code: string;
+                unit_value_cents: number;
+            } | null;
+            best_buy: {
+                /** Format: uuid */
+                sku_id: string;
+                name: string;
+                set_name: string;
+                set_code: string;
+                gain_cents: number;
+                unit_cost_cents: number;
+            } | null;
+            most_collected_set: {
+                /** Format: uuid */
+                set_id: string;
+                name: string;
+                code: string;
+                /** @description Distinct printings of the set you own. */
+                owned: number;
+                card_count: number | null;
+            } | null;
+            /** @description The highest share owned, among sets of 10 cards or more. */
+            closest_set: {
+                /** Format: uuid */
+                set_id: string;
+                name: string;
+                code: string;
+                /** @description Distinct printings of the set you own. */
+                owned: number;
+                card_count: number | null;
+            } | null;
+            mythics: {
+                count: number;
+                value_cents: number;
+            };
+        };
+        PortfolioHistoryPoint: {
+            /** Format: date */
+            date: string;
+            total_market_value_cents: number;
+            total_cost_basis_cents: number;
+            total_item_count: number;
+        };
+        HoldingValue: {
+            /** Format: uuid */
+            item_id: string;
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            product_id: string;
+            condition: number;
+            quantity: number;
+            unit_value_cents: number | null;
+            value_cents: number | null;
+            /**
+             * @deprecated
+             * @description Deprecated: use `valuation_method`. A holding valued at a reference price reads `unvalued` here.
+             * @enum {string}
+             */
+            method: "sku_avg_7d" | "product_avg_7d" | "lowest_listing" | "unvalued";
+            /** @description How the value was found: sku_avg_7d, product_avg_7d, lowest_listing, reference, unvalued. Treat an unknown method as unvalued. */
+            valuation_method: string;
+            reference_source: string | null;
+            acquisition_cents: number | null;
+            gain_cents: number | null;
+            /** @description How the value moved over 7 days: value now minus the daily average of the SKU's latest market snapshot 7 or more days old, times the copies; null without both. */
+            change_7d_cents: number | null;
+        };
+        HoldingMover: {
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            printing_id: string;
+            /** Format: uuid */
+            product_id: string;
+            name: string;
+            set_code: string;
+            collector_number: string | null;
+            quantity: number;
+            unit_value_cents: number;
+            unit_change_cents: number;
+            /** @description In 1/100 %. */
+            change_bps: number;
+        };
+        PrintingHolding: {
+            /** Format: uuid */
+            printing_id: string;
+            quantity: number;
+            cost_cents: number | null;
+            value_cents: number | null;
+            gain_cents: number | null;
+            copies: {
+                /** Format: uuid */
+                item_id: string;
+                condition: number;
+                language: string;
+                finish: string | null;
+                quantity: number;
+                unit_cost_cents: number | null;
+            }[];
+        };
+        PortfolioSummary: {
+            total_market_value_cents: number;
+            /** @description Only costs recorded in EUR count for now. */
+            total_cost_basis_cents: number;
+            total_item_count: number;
+            unique_sku_count: number;
+            /** @description Holdings per valuation method. */
+            valued_by: {
+                [key: string]: number;
+            };
+            /** @description The sources of the reference prices counted in reference_valued_count. */
+            reference_sources: string[];
+            /** @description Holdings valued at an external reference price (MD-06); not counted in valued_by. */
+            reference_valued_count: number;
+        };
         CardRecognition: {
             /** @description Most likely first; empty when nothing is close enough. */
             candidates: {
@@ -3637,6 +9277,10 @@ export interface components {
                 catalog: components["schemas"]["SearchCatalogHit"][];
                 /** @description Listings on sale, cheapest first: paged for `scope=marketplace`, the first ones for `all`. */
                 listings: components["schemas"]["ListingHit"][];
+                /** @description Your own items by card name: paged for `scope=collection`, the first ones for `all`. */
+                collection: components["schemas"]["SearchCollectionHit"][];
+                /** @description Items in your friends’ trade binders by card name: paged for `scope=community`, the first ones for `all`. */
+                community_trade: components["schemas"]["SearchTradeHit"][];
             };
             facets: {
                 catalog: {
@@ -3647,7 +9291,20 @@ export interface components {
                             count: number;
                         }[];
                     };
+                    /** @description Counts of sealed products and accessories by product type, brand and language. */
+                    product_counts: {
+                        [key: string]: {
+                            value: string;
+                            count: number;
+                        }[];
+                    };
                 };
+            } | null;
+            /** @description SRCH-06: how many hits each other scope has for this query, for the "Also see" chips. Only on the first page of `scope=all`; a section the caller cannot see (signed out, or its flag off) is null. */
+            totals: {
+                listings: number | null;
+                collection: number | null;
+                community_trade: number | null;
             } | null;
             next_cursor: string | null;
         };
@@ -3667,12 +9324,131 @@ export interface components {
             set_codes: string[];
             printings_count: number;
             latest_release_date: string | null;
+            /** @description The cheapest offer; null without offers. */
             min_price: {
                 cents: number;
                 currency: string;
             } | null;
+            /** @description Active listings of the card. */
+            offers_count: number;
+            /** @description The cheapest SKU's global 7-day average in EUR cents; null without sales. */
+            market_cents: number | null;
+            /** @description The cheapest offer is below the market price. */
+            below_market: boolean;
+            /** @description Every version of the card is foil (or etched). */
+            foil_only: boolean;
             /** @description The nickname or translated name the query matched, such as "Bob" for Dark Confidant. */
             matched_alias: string | null;
+        };
+        ListingHit: {
+            /** Format: uuid */
+            listing_id: string;
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            product_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @description The card page's slug. */
+            slug: string | null;
+            set_code: string;
+            /** Format: uuid */
+            seller_user_id: string;
+            seller_country: string | null;
+            /** @enum {string} */
+            seller_type: "private" | "professional";
+            /** @description The seller’s trust score, 0 to 1000 (0 before their first order). */
+            seller_trust_score: number;
+            price: {
+                cents: number;
+                currency: string;
+            };
+            /** @description ADR-128 grade, 1 best: card MT…PO, sealed scale apart. */
+            condition: number;
+            /** @enum {string} */
+            condition_scale: "card" | "sealed";
+            language: string;
+            finish: string | null;
+            is_foil: boolean;
+            is_signed: boolean;
+            is_altered: boolean;
+            quantity_available: number;
+            /** @description The listed printing; null for a sealed product. */
+            printing_id: string | null;
+        };
+        SearchCollectionHit: {
+            /** Format: uuid */
+            item_id: string;
+            /** Format: uuid */
+            product_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @description The card page's slug. */
+            slug: string | null;
+            /** @description ADR-128 grade, 1 best. */
+            condition: number;
+            folder_id: string | null;
+            folder_name: string | null;
+            quantity: number;
+        };
+        SearchTradeHit: {
+            /** Format: uuid */
+            item_id: string;
+            /** Format: uuid */
+            product_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @description The card page's slug. */
+            slug: string | null;
+            /** @description ADR-128 grade, 1 best. */
+            condition: number;
+            /** Format: uuid */
+            owner_user_id: string;
+            /** Format: uuid */
+            folder_id: string;
+            folder_name: string;
+            /** @description Units free to trade. */
+            tradable_quantity: number;
+        };
+        SetDeal: {
+            printing: components["schemas"]["CatalogPrinting"];
+            offers: {
+                offers: number;
+                lowest_price: {
+                    cents: number;
+                    currency: string;
+                };
+            };
+        };
+        CatalogPrinting: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            product_id: string;
+            product_name: string;
+            product_slug: string;
+            /** Format: uuid */
+            set_id: string;
+            set_code: string;
+            set_name: string;
+            /** @description The set symbol as an SVG from our own media path (never the publisher's); null while none is stored or publisher artwork is switched off. */
+            set_icon_url: string | null;
+            collector_number: string | null;
+            rarity: string | null;
+            artist: string | null;
+            /** @description Flavour text; two-faced cards join their faces with "\n//\n" (an empty part for a face without one). */
+            flavor_text: string | null;
+            release_date: string | null;
+            image_keys: components["schemas"]["CatalogImageKeys"];
+            images: components["schemas"]["CatalogImages"];
+            /** @description The printing exists only in foil (or etched), such as a Surge Foil variant; tiles mark it. */
+            foil_only: boolean;
+            /** @description The named foil effect from MTGJSON's promo types (`surgefoil`, `galaxyfoil`, …) or `etched`; null for plain foil or none. */
+            foil_effect: string | null;
+            version: number;
         };
         SearchSuggestions: {
             data: {
@@ -3684,6 +9460,156 @@ export interface components {
                 category: "single" | "sealed" | "accessory";
                 matched_alias: string | null;
             }[];
+        };
+        ZeroResultTerm: {
+            /** @description Null for searches across all games. */
+            game_id: string | null;
+            /** @description Lower case, without accents, single spaces. */
+            term: string;
+            /** @description Searches in the last 7 days; always 5 or more. */
+            searches_7d: number;
+            /** Format: date-time */
+            last_seen_at: string;
+        };
+        BugReportSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            user_id: string;
+            route: string;
+            what_happened: string;
+            has_replay: boolean;
+            has_screenshot: boolean;
+            /** @enum {string} */
+            status: "open" | "triaged" | "closed";
+            /** Format: date-time */
+            created_at: string;
+        };
+        BugReport: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            user_id: string;
+            route: string;
+            what_happened: string;
+            has_replay: boolean;
+            has_screenshot: boolean;
+            /** @enum {string} */
+            status: "open" | "triaged" | "closed";
+            /** Format: date-time */
+            created_at: string;
+            app_version: string;
+            expected: string | null;
+            /**
+             * Format: date-time
+             * @description The uploads bucket deletes the attachment then.
+             */
+            attachment_expires_at: string;
+            version: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        BugReportAttachment: {
+            /** @description Null once the 90-day lifecycle rule has deleted the file. */
+            attachment: {
+                context: {
+                    [key: string]: unknown;
+                };
+                replay: unknown[] | null;
+                screenshot: unknown[] | null;
+            } | null;
+        };
+        BugReportAccepted: {
+            /** Format: uuid */
+            report_id: string;
+        };
+        SupportRequestAccepted: {
+            /** Format: uuid */
+            request_id: string;
+        };
+        WishBestOffer: {
+            /** Format: uuid */
+            listing_id: string;
+            /** Format: uuid */
+            sku_id: string;
+            /** Format: uuid */
+            printing_id: string;
+            language_id: number | null;
+            finish_id: number | null;
+            treatment_id: number | null;
+            condition: number;
+            price_cents: number;
+            currency: string;
+            quantity: number;
+            /** Format: uuid */
+            seller_user_id: string;
+            /** Format: uuid */
+            item_id: string;
+        };
+        WishlistDemand: {
+            /** Format: uuid */
+            game_id: string;
+            /** Format: uuid */
+            product_id: string;
+            /** @description Null for the row counting every wish for the product. */
+            printing_id: string | null;
+            product: {
+                name: string;
+                /** @description The card page is `/{game_code}/cards/{slug}`. */
+                slug: string;
+                game_code: string;
+            } | null;
+            printing: {
+                set_code: string;
+                set_name: string;
+                collector_number: string | null;
+            } | null;
+            /** @description Distinct members; always 5 or more. */
+            wishers_count: number;
+            total_target_quantity: number;
+            median_max_price_cents: number | null;
+            currency: string | null;
+            /** Format: date-time */
+            computed_at: string;
+        };
+        WishlistImportResult: {
+            rows: {
+                line: number;
+                /** @enum {string} */
+                status: "ready" | "not_found";
+                product_id: string | null;
+                /** @description The catalog's name for the match. */
+                name: string | null;
+                list: string;
+            }[];
+            lists: {
+                name: string;
+                count: number;
+                created: boolean;
+            }[];
+            /** @description Wishes saved; 0 on a dry run. */
+            added: number;
+        };
+        WishlistImportQueued: {
+            /**
+             * Format: uuid
+             * @description The import; read it with `GET /api/v1/wishlist/imports/{id}`
+             */
+            id: string;
+            /** @constant */
+            status: "importing";
+            /** Format: date-time */
+            requested_at: string;
+        };
+        WishlistImportStatus: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "importing" | "done" | "failed";
+            /** Format: date-time */
+            requested_at: string;
+            /** @description Set once done: the same answer as a smaller import */
+            result: components["schemas"]["WishlistImportResult"] | null;
         };
         WishlistListItem: {
             printing_id: string | null;
@@ -3705,6 +9631,8 @@ export interface components {
             notes: string | null;
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            wishlist_id: string;
             /** Format: uuid */
             game_id: string;
             /** Format: uuid */
@@ -3744,6 +9672,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
+            wishlist_id: string;
+            /** Format: uuid */
             game_id: string;
             /** Format: uuid */
             product_id: string;
@@ -3766,6 +9696,20 @@ export interface components {
             /** Format: uuid */
             seller_user_id: string;
         };
+        Wishlist: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            user_id: string;
+            name: string;
+            /**
+             * @description Who may open the list: only you, your friends, or anyone. Wishes on a friends or public list count as friends-visible for trade matches.
+             * @enum {string}
+             */
+            visibility: "private" | "friends" | "public";
+            item_count: number;
+            version: number;
+        };
         HealthReport: {
             /** @enum {string} */
             status: "ok" | "unavailable";
@@ -3775,7 +9719,7 @@ export interface components {
         };
         /** @description RFC 7807 problem details */
         ProblemDetails: {
-            /** @example https://api.nexus.tcg/errors/inventory-exceeded */
+            /** @example https://api.tradeable.cards/errors/inventory-exceeded */
             type: string;
             /** @example Inventory Unavailable */
             title: string;
@@ -3796,6 +9740,19 @@ export interface components {
             /** @example 2026-09-03T14:10:00Z */
             timestamp: string;
         };
+        /** @description assign_folder moves the item into one of your folders (merging into a matching stack there); send_notification tells you in the inbox; stage_listing puts the item on your to-list queue (GET staged-listings). */
+        CollectionAutomationActionOutput: {
+            /** @constant */
+            type: "assign_folder";
+            /** Format: uuid */
+            folder_id: string;
+        } | {
+            /** @constant */
+            type: "send_notification";
+        } | {
+            /** @constant */
+            type: "stage_listing";
+        };
         CollectionGradingOutput: {
             /** @enum {string} */
             company: "PSA" | "BGS" | "CGC" | "SGC";
@@ -3805,6 +9762,57 @@ export interface components {
             edges: number | null;
             surface: number | null;
             cert_number: string | null;
+        };
+        CollectionPurchaseSettingsOutput: {
+            /** @description Add the cards of every order you receive to your collection without asking. */
+            auto_add: boolean;
+        };
+        DeckStatsSettingOutput: {
+            shown: boolean;
+        };
+        CommunityPreferencesOutput: {
+            share: {
+                /**
+                 * @description private means not shared
+                 * @enum {string}
+                 */
+                completed_set: "private" | "friends" | "public";
+                /**
+                 * @description private means not shared
+                 * @enum {string}
+                 */
+                reached_milestone: "private" | "friends" | "public";
+                /**
+                 * @description Also capped by each showcase's own visibility
+                 * @enum {string}
+                 */
+                published_showcase: "private" | "friends" | "public";
+                /**
+                 * @description private means not shared
+                 * @enum {string}
+                 */
+                listed_card: "private" | "friends" | "public";
+            };
+            feed: {
+                /** @description Friends' activity in your feed */
+                friends: boolean;
+                /** @description Shops you follow, once following exists; stored but not used yet */
+                followed_shops: boolean;
+                /** @description Activity types left out of your feed */
+                hidden_activity: ("completed_set" | "reached_milestone" | "published_showcase" | "listed_card" | "earned_badge")[];
+            };
+            comments: {
+                /** @enum {string} */
+                profile: "everyone" | "friends" | "nobody";
+                /** @enum {string} */
+                showcases: "everyone" | "friends" | "nobody";
+                /** @enum {string} */
+                decklists: "everyone" | "friends" | "nobody";
+            };
+            /** @enum {string} */
+            new_decklist_visibility: "private" | "friends" | "public";
+            /** @description Whether your For sale tab shows on your profile */
+            show_for_sale: boolean;
         };
         NotificationRoutingOutput: {
             orders: components["schemas"]["NotificationCategoryRouteOutput"];
@@ -3830,6 +9838,2638 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "audit.listAuditLogs": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                cursor?: string;
+                actor_user_id?: string;
+                target_id?: string;
+                event_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of records */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuditLogEntry"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.listCohortMembers": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                cohort?: "staff" | "alpha" | "beta";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of members */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CohortMember"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.setCohort": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetCohortRequest"];
+            };
+        };
+        responses: {
+            /** @description Set */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.removeCohort": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The member is in no cohort */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.listComplianceHolds": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                user_id?: string;
+                active?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of holds */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ComplianceHold"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.placeComplianceHold": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlaceComplianceHoldRequest"];
+            };
+        };
+        responses: {
+            /** @description The hold */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceHold"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.releaseComplianceHold": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                hold_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The released hold */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceHold"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such hold */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The hold was already released (ERR_HOLD_ALREADY_RELEASED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.listFeatureFlags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The flags, in registry order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FeatureFlag"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.setFeatureFlag": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetFeatureFlagRequest"];
+            };
+        };
+        responses: {
+            /** @description The flag */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeatureFlag"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such flag */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The override changed since you read it */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.clearFeatureFlag": {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such flag, or it has no override */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The override changed since you read it */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.listReports": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                status?: "open" | "in_review" | "actioned" | "dismissed";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of reports */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["QueuedModerationReport"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.getReport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The report */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModerationReportDetail"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such report, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.assignReport": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignReportRequest"];
+            };
+        };
+        responses: {
+            /** @description The report */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueuedModerationReport"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such report, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The report is closed (ERR_REPORT_CLOSED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.takeModerationAction": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModerationActionRequest"];
+            };
+        };
+        responses: {
+            /** @description The report after the action */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModerationReportDetail"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Your role cannot take this action (ERR_FORBIDDEN) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such report, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The report was dismissed or already acted on */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.listDeadLetters": {
+        parameters: {
+            query?: {
+                /** @description Both kinds when left out. */
+                kind?: "event" | "job";
+                /** @description Consumer (`<module>.<name>`) or job name. */
+                name?: string;
+                event_type?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The dead letters */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeadLetter"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.getDeadLetter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "event" | "job";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The dead letter */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterDetail"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No pending dead letter with that id, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.dismissDeadLetter": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                kind: "event" | "job";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dismissed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No pending dead letter with that id, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.replayDeadLetter": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                kind: "event" | "job";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description What the replay did */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterReplay"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No pending dead letter with that id, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.replayDeadLetters": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplayDeadLettersRequest"];
+            };
+        };
+        responses: {
+            /** @description Each replay */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeadLetterReplay"][];
+                    };
+                };
+            };
+            /** @description More than 20 dead letters match: a job replays them; `GET /api/v1/audit/admin/ops/dead-letters/replay/{replay_id}` shows the replay `replaying`, then `done` with each result (PERF-20e) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterBulkReplay"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.getDeadLetterReplay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                replay_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The replay */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterBulkReplay"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such replay, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.listProjections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The projections */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectionRebuild"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.rebuildProjection": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                projection: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The rebuild is queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectionRebuild"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such projection */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "audit.opsSnapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The gauges */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsSnapshot"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminReplacePrintingImage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                printing_id: string;
+                kind: "front" | "back" | "art_crop";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminReplaceImageRequest"];
+            };
+        };
+        responses: {
+            /** @description Replaced */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not a supported image */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminEditProduct": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminEditProductRequest"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminListAliases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The aliases */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductAlias"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminAddAlias": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminAddAliasRequest"];
+            };
+        };
+        responses: {
+            /** @description The alias */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductAlias"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The product already has this alias (ERR_ALIAS_EXISTS) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminRemoveAlias": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                product_id: string;
+                alias_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminSetSkuActive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                sku_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminSetSkuActiveRequest"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "catalog.listGames": {
         parameters: {
             query?: never;
@@ -4045,6 +12685,57 @@ export interface operations {
                 };
             };
             /** @description No active game has this code, or the game has no such set */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.listManaSymbols": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The stored mana symbols */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogManaSymbols"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4394,6 +13085,23 @@ export interface operations {
             query?: {
                 limit?: number;
                 cursor?: string;
+                /** @description Part of the name, or the exact collector number. */
+                q?: string;
+                rarity?: string;
+                artist?: string;
+                /** @description Colours; `C` is colourless. Read as `color_mode` says. */
+                color?: ("W" | "U" | "B" | "R" | "G" | "C") | ("W" | "U" | "B" | "R" | "G" | "C")[];
+                color_mode?: "including" | "exactly" | "at_most";
+                /** @description Any one of these; 7 means 7 or more. */
+                mana_value?: number | number[];
+                /** @description A word of the type line (any one). */
+                type?: string | string[];
+                /** @description Words the rules text must all contain. */
+                text?: string;
+                /** @description Legal or restricted in this format. */
+                format?: string;
+                sort?: "number" | "name";
+                direction?: "asc" | "desc";
             };
             header?: never;
             path: {
@@ -4403,7 +13111,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A page of printings */
+            /** @description A page of printings, each with its card facts */
             200: {
                 headers: {
                     /** @description Requests allowed in the window */
@@ -4414,11 +13122,91 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["CatalogPrinting"][];
+                        data: components["schemas"]["CatalogSetPrinting"][];
                         page: {
                             limit: number;
                             next_cursor: string | null;
                         };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No set has this id */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.countSetPrintings": {
+        parameters: {
+            query?: {
+                /** @description Part of the name, or the exact collector number. */
+                q?: string;
+                rarity?: string;
+                artist?: string;
+                /** @description Colours; `C` is colourless. Read as `color_mode` says. */
+                color?: ("W" | "U" | "B" | "R" | "G" | "C") | ("W" | "U" | "B" | "R" | "G" | "C")[];
+                color_mode?: "including" | "exactly" | "at_most";
+                /** @description Any one of these; 7 means 7 or more. */
+                mana_value?: number | number[];
+                /** @description A word of the type line (any one). */
+                type?: string | string[];
+                /** @description Words the rules text must all contain. */
+                text?: string;
+                /** @description Legal or restricted in this format. */
+                format?: string;
+            };
+            header?: never;
+            path: {
+                set_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The count */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
                     };
                 };
             };
@@ -4587,6 +13375,566 @@ export interface operations {
             };
         };
     };
+    "collection.listAutomationRules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The rules */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CollectionAutomationRule"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.createAutomationRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionAutomationRuleInput"];
+            };
+        };
+        responses: {
+            /** @description The rule */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAutomationRule"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description An assign_folder action names a folder that is not yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You already have 50 rules (ERR_COLLECTION_TOO_MANY_RULES) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.updateAutomationRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionAutomationRuleUpdate"];
+            };
+        };
+        responses: {
+            /** @description The rule */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAutomationRule"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such rule, or an assign_folder action names a folder that is not yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description It changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.deleteAutomationRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such rule of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.runAutomationRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAutomationMatching"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such rule of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.previewAutomationRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionAutomationPreviewInput"];
+            };
+        };
+        responses: {
+            /** @description The count and the first matches */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAutomationPreview"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "collection.startBulkOperation": {
         parameters: {
             query?: never;
@@ -4594,7 +13942,7 @@ export interface operations {
                 /** @description Client-generated UUID that makes retries safe; responses are replayed for 24 hours */
                 "Idempotency-Key": string;
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -4790,6 +14138,189 @@ export interface operations {
             };
         };
     };
+    "integration.requestCollectionExport": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionExportRequest"];
+            };
+        };
+        responses: {
+            /** @description The export */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionExport"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "integration.getCollectionExport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The export */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionExport"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such export of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "collection.listFolders": {
         parameters: {
             query?: never;
@@ -4866,7 +14397,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -4917,7 +14448,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            /** @description parent_folder_id names no folder of yours (ERR_NOT_FOUND) */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4926,7 +14457,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description You have a folder with this name (ERR_COLLECTION_FOLDER_NAME_TAKEN) */
+            /** @description You have a folder with this name (ERR_COLLECTION_FOLDER_NAME_TAKEN), or your plan's binder limit is reached (ERR_PLAN_LIMIT_BINDERS, `details.limit`) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4980,7 +14511,7 @@ export interface operations {
             };
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 folder_id: string;
@@ -5066,7 +14597,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 folder_id: string;
@@ -5175,18 +14706,112 @@ export interface operations {
             };
         };
     };
+    "collection.listFolderCovers": {
+        parameters: {
+            query: {
+                /** @description Comma-separated folder ids, at most 100. */
+                folder_ids: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One item per folder that has one */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["CollectionItem"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "collection.listItems": {
         parameters: {
             query?: {
                 limit?: number;
                 cursor?: string;
                 game?: string;
-                folder?: string | "unfiled";
-                tag?: string;
+                folder?: (string | "unfiled") | (string | "unfiled")[];
+                tag?: string | string[];
                 set?: string;
-                condition?: number;
+                condition?: number | number[];
                 q?: string;
                 view?: "collection" | "inventory";
+                scale?: "card" | "sealed";
+                /** @description Product categories; sealed products and accessories share the sealed condition scale. */
+                category?: ("single" | "sealed" | "accessory") | ("single" | "sealed" | "accessory")[];
+                sort?: "added" | "name" | "quantity" | "paid" | "value" | "gain";
+                direction?: "asc" | "desc";
+                language?: string | string[];
+                rarity?: string | string[];
+                color?: ("W" | "U" | "B" | "R" | "G" | "C") | ("W" | "U" | "B" | "R" | "G" | "C")[];
+                mana_value?: number | number[];
+                type?: string | string[];
+                legal?: string;
             };
             header?: never;
             path?: never;
@@ -5274,7 +14899,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -5468,7 +15093,7 @@ export interface operations {
             };
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -5563,7 +15188,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -5686,7 +15311,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -5893,12 +15518,338 @@ export interface operations {
             };
         };
     };
+    "collection.getItemPhotos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The photos */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionItemPhotos"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such item of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.setItemPhotos": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionItemPhotosBody"];
+            };
+        };
+        responses: {
+            /** @description The photos */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionItemPhotos"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such item of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description It changed since you read it (ERR_CONCURRENT_MODIFICATION); read it again */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The collection rules refuse it, for example fewer free units than asked or units held by a listing (ERR_COLLECTION_*) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.setItemSaleMode": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionItemSaleMode"];
+            };
+        };
+        responses: {
+            /** @description The item */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionItem"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such item of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description It changed since you read it (ERR_CONCURRENT_MODIFICATION); read it again */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The collection rules refuse it, for example fewer free units than asked or units held by a listing (ERR_COLLECTION_*) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "collection.splitItem": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -6024,7 +15975,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -6138,7 +16089,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -6250,7 +16201,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -6323,6 +16274,350 @@ export interface operations {
             };
             /** @description The request body must be application/json */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.getPurchaseSettings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The setting */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionPurchaseSettingsOutput"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.updatePurchaseSettings": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionPurchaseSettings"];
+            };
+        };
+        responses: {
+            /** @description The new setting */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionPurchaseSettingsOutput"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.getPurchase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seller_order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The purchase */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionPurchase"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No received order of yours with this id, or it is not completed yet (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.addPurchase": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                seller_order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The purchase, now added */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionPurchase"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No received order of yours with this id, or it is not completed yet (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A card is no longer in the catalog (ERR_SKU_INACTIVE) */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6430,12 +16725,81 @@ export interface operations {
             };
         };
     };
+    "collection.listOwnedSets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your sets */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionOwnedSets"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "collection.updateSettings": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -6515,6 +16879,170 @@ export interface operations {
             };
             /** @description The request body must be application/json */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.listStagedListings": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of staged items */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CollectionStagedListing"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.dismissStagedListing": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed from the queue */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The item is not on your queue (ERR_NOT_FOUND) */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6748,6 +17276,5327 @@ export interface operations {
             };
         };
     };
+    "community.blockMember": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Blocked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description You named yourself (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.unblockMember": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unblocked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listComments": {
+        parameters: {
+            query: {
+                limit?: number;
+                cursor?: string;
+                /** @description A profile is named by its member's user id; a showcase or decklist by its id. */
+                target_type: "profile" | "showcase" | "decklist";
+                target_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of comments, with the target's reactions */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Comment"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                        reactions: components["schemas"]["ReactionSummary"];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such target, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.addComment": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description A profile is named by its member's user id; a showcase or decklist by its id.
+                     * @enum {string}
+                     */
+                    target_type: "profile" | "showcase" | "decklist";
+                    /** Format: uuid */
+                    target_id: string;
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The comment */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Comment"];
+                };
+            };
+            /** @description Empty or too long (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such target, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.deleteComment": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                comment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not your comment or your thing (ERR_FORBIDDEN) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such comment (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listConversations": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of conversations */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Conversation"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.startConversation": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartConversationRequest"];
+            };
+        };
+        responses: {
+            /** @description The conversation */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"];
+                };
+            };
+            /** @description You named yourself (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member, or no such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You blocked this member (ERR_MEMBER_BLOCKED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You started 20 conversations in the last day (ERR_RATE_LIMITED) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listMessages": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of messages */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Message"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such conversation of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.sendMessage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description The message */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such conversation of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description One of you blocked the other (ERR_MEMBER_BLOCKED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.markConversationRead": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Read */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such conversation of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getDeckStatsSetting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your setting */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeckStatsSettingOutput"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.setDeckStatsSetting": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeckStatsSetting"];
+            };
+        };
+        responses: {
+            /** @description Your setting */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeckStatsSettingOutput"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listMyDecklists": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of decklists, newest first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DecklistSummary"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.importDecklist": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    game_id: string;
+                    name: string;
+                    text: string;
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description No cards found, too many lines, or a bad count (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getDecklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The decklist */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.deleteDecklist": {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.updateDecklist": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                    version: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description The name is not valid (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.copyDecklist": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                };
+            };
+        };
+        responses: {
+            /** @description Your new decklist */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.addDecklistCards": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cards: {
+                        /** Format: uuid */
+                        product_id: string;
+                        quantity: number;
+                    }[];
+                    /**
+                     * @description The board the cards go on; main when left out.
+                     * @enum {string}
+                     */
+                    board?: "main" | "side" | "commander" | "maybe";
+                    version: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description A card of another game or unknown, or more than 600 lines (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.updateDecklistEntry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    quantity?: number;
+                    /** @enum {string} */
+                    board?: "main" | "side" | "commander" | "maybe";
+                    version: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist of yours, or line (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.chooseDecklistEntry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    product_id: string;
+                    version: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description Not one of the line's candidates (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist of yours, or line (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.decklistMissingToCart": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description What went into the cart, and what is still missing */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecklistCartFill"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.decklistMissingToWishlist": {
+        parameters: {
+            query?: {
+                wishlist_id?: string;
+            };
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description How many cards were wished for */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        wished: number;
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist or wishlist of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getDecklistOwnership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                decklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The diff, one line per decklist entry */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecklistOwnership"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such decklist, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.createDecklistFromCards": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    game_id: string;
+                    name: string;
+                    cards: {
+                        /** Format: uuid */
+                        product_id: string;
+                        quantity: number;
+                    }[];
+                    /**
+                     * @description The board the cards go on; main when left out.
+                     * @enum {string}
+                     */
+                    board?: "main" | "side" | "commander" | "maybe";
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description A card of another game or unknown (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.importDecklistFromUrl": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    game_id: string;
+                    /** Format: uri */
+                    url: string;
+                    name?: string;
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                };
+            };
+        };
+        responses: {
+            /** @description The decklist */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decklist"];
+                };
+            };
+            /** @description Not a Moxfield or Archidekt deck URL, a private or missing deck, or a list the parser rejects (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The deck site did not answer; try again (ERR_SERVICE_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getFeed": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of entries */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FeedEntry"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listTradeBinder": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of binder items */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TradeBinderEntry"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not a friend of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listFriendships": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of friendships */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Friendship"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.requestFriendship": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The request, or the friendship it completed */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Friendship"];
+                };
+            };
+            /** @description You asked yourself (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You are friends already or your request is waiting (ERR_FRIENDSHIP_EXISTS), or you blocked this member (ERR_MEMBER_BLOCKED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.removeFriendship": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                friendship_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such friendship or request of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.acceptFriendship": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                friendship_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The friendship */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Friendship"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No request waiting for your answer (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.declineFriendship": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                friendship_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Declined */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No request waiting for your answer (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getMyPreferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your preferences */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityPreferencesOutput"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.updateMyPreferences": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommunityPreferences"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityPreferencesOutput"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listMembers": {
+        parameters: {
+            query: {
+                /** @description Comma-separated user ids, at most 50. */
+                ids: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The members */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["CommunityMember"][];
+                    };
+                };
+            };
+            /** @description No ids, too many, or one is not a UUID (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listMutes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The members you muted */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityMutes"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.muteMember": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Muted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description You named yourself (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.unmuteMember": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unmuted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getProfile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The profile */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityProfile"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member, or you may not see the profile (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getDeckStats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The stats */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeckStats"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member, you may not see the profile, or the member hides deck stats (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listMemberDecklists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The decklists, newest first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["DecklistSummary"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member, or you may not see the profile (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listShowcases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The showcases */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Showcase"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such member, or you may not see the profile (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.addReaction": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description A profile is named by its member's user id; a showcase or decklist by its id.
+                     * @enum {string}
+                     */
+                    target_type: "profile" | "showcase" | "decklist";
+                    /** Format: uuid */
+                    target_id: string;
+                    /** @enum {string} */
+                    kind: "like" | "love" | "wow";
+                };
+            };
+        };
+        responses: {
+            /** @description The target's reactions */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReactionSummary"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such target, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.removeReaction": {
+        parameters: {
+            query: {
+                /** @description A profile is named by its member's user id; a showcase or decklist by its id. */
+                target_type: "profile" | "showcase" | "decklist";
+                target_id: string;
+                kind: "like" | "love" | "wow";
+            };
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The target's reactions */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReactionSummary"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such target, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.createShowcase": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    folder_id: string;
+                    title: string;
+                    description?: string | null;
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                };
+            };
+        };
+        responses: {
+            /** @description Published */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Showcase"];
+                };
+            };
+            /** @description Invalid title or description (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such folder of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getShowcase": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                showcase_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The showcase, its folder and a page of the items */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShowcaseView"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such showcase, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.deleteShowcase": {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                showcase_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such showcase of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.updateShowcase": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                showcase_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title?: string;
+                    description?: string | null;
+                    /** @enum {string} */
+                    visibility?: "private" | "friends" | "public";
+                    version: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Changed */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Showcase"];
+                };
+            };
+            /** @description Invalid title or description (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such showcase of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listTradeMatches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your matches */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["TradeMatch"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.listTrades": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of trades */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TradeProposal"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.proposeTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    offered: {
+                        /** Format: uuid */
+                        item_id: string;
+                        quantity: number;
+                    }[];
+                    requested: {
+                        /** Format: uuid */
+                        item_id: string;
+                        quantity: number;
+                    }[];
+                    balancing?: {
+                        cents: number;
+                        currency: string;
+                        /** @enum {string} */
+                        payer: "me" | "friend";
+                    } | null;
+                    message?: string | null;
+                    /** Format: uuid */
+                    recipient_user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The proposal */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description No items, an item twice, or an item on the wrong side (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not friends, or a professional seller takes part (ERR_TRADE_NOT_ALLOWED) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description An item is not in the trade binder, or not that many (ERR_TRADE_ITEM_UNAVAILABLE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.getTrade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The trade */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.acceptTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The trade */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The trade is no longer open (ERR_TRADE_NOT_OPEN) or waits for your friend (ERR_TRADE_NOT_YOUR_TURN) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.cancelTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The trade */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The trade is no longer open (ERR_TRADE_NOT_OPEN) or waits for your friend (ERR_TRADE_NOT_YOUR_TURN) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.confirmTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The trade */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The trade is no longer open (ERR_TRADE_NOT_OPEN) or waits for your friend (ERR_TRADE_NOT_YOUR_TURN) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.counterTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    offered: {
+                        /** Format: uuid */
+                        item_id: string;
+                        quantity: number;
+                    }[];
+                    requested: {
+                        /** Format: uuid */
+                        item_id: string;
+                        quantity: number;
+                    }[];
+                    balancing?: {
+                        cents: number;
+                        currency: string;
+                        /** @enum {string} */
+                        payer: "me" | "friend";
+                    } | null;
+                    message?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description The new proposal */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description No items, an item twice, or an item on the wrong side (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not friends, or a professional seller takes part (ERR_TRADE_NOT_ALLOWED) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description An item is not in the trade binder, or not that many (ERR_TRADE_ITEM_UNAVAILABLE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.declineTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The trade */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The trade is no longer open (ERR_TRADE_NOT_OPEN) or waits for your friend (ERR_TRADE_NOT_YOUR_TURN) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.jwks": {
         parameters: {
             query?: never;
@@ -6768,6 +22617,1153 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["JsonWebKeySet"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.listErasures": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                status?: "pending" | "cancelled" | "executed";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of erasure requests */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AdminErasure"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.listAdminPlans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The plans */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AdminPlan"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.updatePlanText": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                plan_code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlanTextRequest"];
+            };
+        };
+        responses: {
+            /** @description The plan after the change */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPlan"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such plan, or you are not an admin */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The plan changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A value is out of range, or the change starts in the past */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.addPlanLimit": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                plan_code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPlanLimitRequest"];
+            };
+        };
+        responses: {
+            /** @description The plan after the change */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPlan"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such plan, or you are not an admin */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A value is out of range, or the change starts in the past */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.addPlanPrice": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                plan_code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPlanPriceRequest"];
+            };
+        };
+        responses: {
+            /** @description The plan after the change */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPlan"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such plan, or you are not an admin */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A value is out of range, or the change starts in the past */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.getStaffSession": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your staff roles */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSession"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Two-step verification is off (ERR_MFA_ENROLLMENT_REQUIRED) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.searchUsers": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of accounts */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AdminUser"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.getAdminUser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The account */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetail"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such account, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.resetUserMfa": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetUserMfaBody"];
+            };
+        };
+        responses: {
+            /** @description How many factors were removed */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResetUserMfa"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A current two-step code is needed in `X-MFA-Code` (ERR_MFA_REQUIRED) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Staff cannot act on their own account, and only admins on staff (ERR_FORBIDDEN) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such account, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.moderateUser": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModerateUserRequest"];
+            };
+        };
+        responses: {
+            /** @description The account after the change */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Staff cannot act on their own account, and only admins on staff (ERR_FORBIDDEN) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such account, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.setStaffRole": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description The account after the change */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A current two-step code is needed in `X-MFA-Code` (ERR_MFA_REQUIRED) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Staff cannot act on their own account, and only admins on staff (ERR_FORBIDDEN) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such account, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.revokeUserSessions": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description How many sessions ended */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokedSessions"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Staff cannot act on their own account, and only admins on staff (ERR_FORBIDDEN) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such account, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description Rate limit exceeded; see Retry-After */
@@ -6989,7 +23985,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -7070,7 +24066,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -7260,7 +24256,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -7372,7 +24368,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 address_id: string;
@@ -7449,7 +24445,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 address_id: string;
@@ -7549,6 +24545,174 @@ export interface operations {
             };
         };
     };
+    "identity.getMyDataExport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The latest export */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExportRequest"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You have not asked for your data yet */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.exportMyData": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The download link */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExport"];
+                };
+            };
+            /** @description A large export is being prepared (PERF-20a) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExportQueued"];
+                };
+            };
+            /** @description Two-step verification is on: send a current code in `X-MFA-Code` (ERR_MFA_REQUIRED), or the code was wrong (ERR_MFA_CODE_INVALID) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You already downloaded your data today (ERR_DATA_EXPORT_DAILY_LIMIT) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.getErasureRequest": {
         parameters: {
             query?: never;
@@ -7623,7 +24787,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -7656,6 +24820,86 @@ export interface operations {
                 };
             };
             /** @description Nothing is scheduled (ERR_ERASURE_REQUEST_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.checkHandle": {
+        parameters: {
+            query: {
+                handle: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The answer */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HandleCheck"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7758,7 +25002,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 factor_id: string;
@@ -7844,7 +25088,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -7965,7 +25209,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8072,6 +25316,75 @@ export interface operations {
             };
         };
     };
+    "identity.getMyPlan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your plan */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.getPreferences": {
         parameters: {
             query?: never;
@@ -8146,7 +25459,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8318,7 +25631,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8425,6 +25738,181 @@ export interface operations {
             };
         };
     };
+    "identity.startPhotoUpload": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfilePhotoUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Where to upload the photo */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfilePhotoUpload"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Your plan does not include uploading a photo */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.checkPhoto": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The check was queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Profile"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.getSellerAccount": {
         parameters: {
             query?: never;
@@ -8499,7 +25987,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8586,6 +26074,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description The current version of the seller terms must be accepted (ERR_TERMS_NOT_ACCEPTED) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description Rate limit exceeded; see Retry-After */
             429: {
                 headers: {
@@ -8611,7 +26108,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8723,7 +26220,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8826,7 +26323,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8918,12 +26415,81 @@ export interface operations {
             };
         };
     };
+    "identity.getDac7Status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The status */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dac7Status"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You have no seller account (ERR_SELLER_ACCOUNT_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.createOnboardingLink": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -8994,6 +26560,75 @@ export interface operations {
             };
             /** @description The request body must be application/json */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.getShell": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The page frame data */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShellBootstrap"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9095,7 +26730,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 provider: "google" | "apple" | "discord";
@@ -9185,6 +26820,267 @@ export interface operations {
             };
         };
     };
+    "identity.getMySubscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your subscription */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        subscription: components["schemas"]["Subscription"] | null;
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.cancelMySubscription": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The cancelled subscription */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        withdrawn: boolean;
+                        subscription: components["schemas"]["Subscription"];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You have no paid plan */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "identity.startPlanCheckout": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartPlanCheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description The payment page */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uri */
+                        url: string;
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You already have a plan; cancel it first (ERR_PLAN_ALREADY_ACTIVE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.listTermsStatus": {
         parameters: {
             query?: never;
@@ -9259,7 +27155,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -9476,7 +27372,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Sign-up is invitation-only and this email address is not invited (ERR_NOT_INVITED) */
+            /** @description Sign-up is invitation-only and this email address is not invited (ERR_NOT_INVITED), or a signed-in caller tried to connect a provider while that is switched off (ERR_OAUTH_LINKING_DISABLED) */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9771,6 +27667,59 @@ export interface operations {
             };
         };
     };
+    "identity.listPlans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The plans in display order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Plan"][];
+                    };
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.register": {
         parameters: {
             query?: never;
@@ -9806,7 +27755,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Sign-up is invitation-only and this email address is not invited (ERR_NOT_INVITED) */
+            /** @description The Turnstile bot check is missing or failed (ERR_HUMAN_CHECK_FAILED) */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9824,7 +27773,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The email (ERR_EMAIL_TAKEN) or handle (ERR_HANDLE_TAKEN) is taken */
+            /** @description The handle is taken (ERR_HANDLE_TAKEN). A taken email is answered like a new sign-up and its owner gets an email instead (SEC-09). */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10002,7 +27951,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The account is suspended (ERR_ACCOUNT_SUSPENDED) */
+            /** @description The account is suspended (ERR_ACCOUNT_SUSPENDED), or the Turnstile bot check is missing or failed (ERR_HUMAN_CHECK_FAILED) */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10072,7 +28021,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 session_id: string;
@@ -10236,7 +28185,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -10297,6 +28246,373 @@ export interface operations {
             };
         };
     };
+    "integration.requestCatalogSync": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sync is queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogSyncRequested"];
+                };
+            };
+            /** @description The provider has no catalog sync */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "integration.listImportsForStaff": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                status?: "pending" | "processing" | "completed" | "partial_failure" | "failed" | "cancelled";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of imports */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MonitoredImportJob"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "integration.exportSellerCsv": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "listings" | "inventory";
+                };
+            };
+        };
+        responses: {
+            /** @description Where to download the file */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerExport"];
+                };
+            };
+            /** @description A big export is being prepared (PERF-20b) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileExportQueued"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "integration.getFileExport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The export */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileExport"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such export of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "integration.startImport": {
         parameters: {
             query?: never;
@@ -10304,7 +28620,7 @@ export interface operations {
                 /** @description Client-generated UUID that makes retries safe; responses are replayed for 24 hours */
                 "Idempotency-Key": string;
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -10364,7 +28680,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Conflict with the current state, or an Idempotency-Key was reused */
+            /** @description You already have an import that has not finished (ERR_IMPORT_IN_PROGRESS) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10505,7 +28821,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 import_id: string;
@@ -10616,6 +28932,15 @@ export interface operations {
                     "text/csv": string;
                 };
             };
+            /** @description More than 1,000 failed rows: a job writes the file; `GET /api/v1/integration/exports/{id}` shows it `building`, then `ready` with a link (PERF-20b) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileExportQueued"];
+                };
+            };
             /** @description The request is malformed or failed validation */
             400: {
                 headers: {
@@ -10678,6 +29003,7 @@ export interface operations {
                 limit?: number;
                 cursor?: string;
                 status?: "success" | "skipped" | "failed";
+                outcome?: string;
             };
             header?: never;
             path: {
@@ -10762,12 +29088,184 @@ export interface operations {
             };
         };
     };
+    "integration.checkImport": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartImportRequest"];
+            };
+        };
+        responses: {
+            /** @description The checked rows */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportCheck"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No uploaded file has this key */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "integration.getOpenImport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The running import, if any */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpenImport"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "integration.createUpload": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -10820,6 +29318,15 @@ export interface operations {
             };
             /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You already have an import that has not finished (ERR_IMPORT_IN_PROGRESS) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11077,12 +29584,195 @@ export interface operations {
             };
         };
     };
+    "marketplace.startCartFill": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartFillRequest"];
+            };
+        };
+        responses: {
+            /** @description The job was queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartFillJob"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getCartFill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The job and what it added so far */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartFillJob"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such job (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.addCartItem": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -11203,7 +29893,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 cart_item_id: string;
@@ -11280,7 +29970,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 cart_item_id: string;
@@ -11344,6 +30034,109 @@ export interface operations {
             };
             /** @description Too few units left, or not on sale (ERR_INVENTORY_EXCEEDED, ERR_LISTING_UNAVAILABLE) */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.optimizePurchase": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OptimizePurchaseRequest"];
+            };
+        };
+        responses: {
+            /** @description The plan */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchasePlan"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11477,7 +30270,7 @@ export interface operations {
                 /** @description Client-generated UUID that makes retries safe; responses are replayed for 24 hours */
                 "Idempotency-Key": string;
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -11537,7 +30330,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description An item is no longer available, or this checkout ended (ERR_INVENTORY_EXCEEDED, ERR_LISTING_UNAVAILABLE, ERR_CHECKOUT_CLOSED) */
+            /** @description An item is no longer available, this checkout ended, or your balance changed (ERR_INVENTORY_EXCEEDED, ERR_LISTING_UNAVAILABLE, ERR_CHECKOUT_CLOSED, ERR_INSUFFICIENT_FUNDS) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -11564,7 +30357,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The cart is empty, or a seller cannot ship there (ERR_CART_EMPTY, ERR_SHIPPING_UNAVAILABLE) */
+            /** @description The cart is empty, a seller cannot ship there, or a seller's minimum order is not reached; `details.sellers` names each with the missing cents (ERR_CART_EMPTY, ERR_SHIPPING_UNAVAILABLE, ERR_MIN_ORDER_NOT_MET); or paying from the balance is not possible or failed (ERR_BALANCE_UNAVAILABLE, ERR_BALANCE_DEBIT_FAILED) */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -11687,7 +30480,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 dispute_id: string;
@@ -11779,7 +30572,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 dispute_id: string;
@@ -11893,7 +30686,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 dispute_id: string;
@@ -11928,7 +30721,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Authentication is required or the token is invalid */
+            /** @description Send a current code in `X-MFA-Code` (ERR_MFA_REQUIRED), or the code was wrong (ERR_MFA_CODE_INVALID) */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11937,7 +30730,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The caller lacks the required scope, or CSRF validation failed */
+            /** @description Turn on two-step verification first (ERR_MFA_ENROLLMENT_REQUIRED) */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12080,7 +30873,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -12254,7 +31047,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 listing_id: string;
@@ -12377,7 +31170,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 listing_id: string;
@@ -12460,7 +31253,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 listing_id: string;
@@ -12520,6 +31313,274 @@ export interface operations {
             };
             /** @description Not possible in its current status (ERR_LISTING_STATE) */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.setListingPhotos": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                listing_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetListingPhotosRequest"];
+            };
+        };
+        responses: {
+            /** @description The listing */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Listing"];
+                };
+            };
+            /** @description Not your upload, unreadable, too large, or not a unique item (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such listing (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description It changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.setListingPricingExclusion": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                listing_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Excluded */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such listing of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.deleteListingPricingExclusion": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                listing_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Included */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such listing of yours (ERR_NOT_FOUND) */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12552,7 +31613,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 listing_id: string;
@@ -12639,12 +31700,382 @@ export interface operations {
             };
         };
     };
+    "marketplace.startBulkListing": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Client-generated UUID that makes retries safe; responses are replayed for 24 hours */
+                "Idempotency-Key": string;
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkListingRequest"];
+            };
+        };
+        responses: {
+            /** @description The job was queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkListingJob"];
+                };
+            };
+            /** @description Invalid fields or an item named twice (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No seller account (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict with the current state, or an Idempotency-Key was reused */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getBulkListing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The job */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkListingJob"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such job of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.listMyOrders": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of orders */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BuyerOrder"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getMyOrder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BuyerOrder"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.confirmReceipt": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 order_id: string;
@@ -12731,7 +32162,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 order_id: string;
@@ -12846,7 +32277,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 order_id: string;
@@ -12956,12 +32387,1013 @@ export interface operations {
             };
         };
     };
+    "marketplace.previewPricing": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The preview */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingPreview"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.listPricingRules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The rules */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["PricingRule"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.createPricingRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingRuleInput"];
+            };
+        };
+        responses: {
+            /** @description The new rule */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingRule"];
+                };
+            };
+            /** @description Invalid fields (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No seller account (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.updatePricingRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingRuleUpdate"];
+            };
+        };
+        responses: {
+            /** @description The rule */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingRule"];
+                };
+            };
+            /** @description Invalid fields (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such rule of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description It changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.deletePricingRule": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such rule of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.listPricingRuns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The runs */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["PricingRun"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.startPricingRun": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingRun"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Today's extra run was already used (ERR_PRICING_MANUAL_RUN_USED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getPricingSettings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The settings */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingSettings"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.updatePricingSettings": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description The settings */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingSettings"];
+                };
+            };
+            /** @description Invalid fields (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description More than 1 run a day needs a professional seller account (ERR_PRICING_RUNS_PROFESSIONAL) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "search.productOffers": {
+        parameters: {
+            query?: {
+                /** @description This grade or better (card scale). */
+                condition?: "MT" | "NM" | "EX" | "GD" | "LP" | "PL" | "PO";
+                language?: string;
+                finish?: string;
+                seller_country?: string;
+                ship_to?: string;
+                seller_type?: "private" | "professional";
+                /** @description `true` only signed copies, `false` none. */
+                signed?: "true" | "false";
+                /** @description `true` only altered copies, `false` none. */
+                altered?: "true" | "false";
+                /** @description Only offers with at least this many copies. */
+                min_quantity?: number;
+                /** @description `price` cheapest first; `price_shipping` cheapest with postage to `ship_to` (required), over the 200 cheapest offers; `condition` best first, then price; `seller_rating` highest trust score first, then price. */
+                sort?: "price" | "price_shipping" | "condition" | "seller_rating";
+                limit?: number;
+                cursor?: string;
+                /** @description Only offers of this printing. */
+                printing_id?: string;
+            };
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of offers */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OffersPage"];
+                };
+            };
+            /** @description A malformed cursor, or `sort=price_shipping` without `ship_to` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getInvoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seller_order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The invoice */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invoice"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No invoice for this order of yours yet (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getSellerDashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The dashboard */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerDashboard"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You have no seller account (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.releaseReservations": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 listing_id: string;
@@ -13045,6 +33477,8 @@ export interface operations {
                 limit?: number;
                 cursor?: string;
                 status?: "to_pack" | "packed" | "dispatched" | "in_transit" | "delivered" | "received" | "completed" | "cancelled" | "in_dispute" | "resolved_refunded" | "resolved_released";
+                /** @description `shipping` is picked, packed and sent together. */
+                stage?: "new" | "picking" | "issues" | "picked" | "packed" | "sent" | "cancelled" | "in_dispute" | "resolved" | "shipping";
             };
             header?: never;
             path?: never;
@@ -13148,7 +33582,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SellerOrder"];
+                    "application/json": components["schemas"]["SellerOrderDetails"];
                 };
             };
             /** @description The request is malformed or failed validation */
@@ -13212,7 +33646,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 seller_order_id: string;
@@ -13326,7 +33760,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 seller_order_id: string;
@@ -13435,12 +33869,127 @@ export interface operations {
             };
         };
     };
+    "marketplace.pickLine": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                seller_order_id: string;
+                line_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PickLineRequest"];
+            };
+        };
+        responses: {
+            /** @description The seller order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOrder"];
+                };
+            };
+            /** @description An issue without its reason (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not possible in its current status (ERR_SELLER_ORDER_STATE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.packSellerOrder": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 seller_order_id: string;
@@ -13580,6 +34129,303 @@ export interface operations {
             };
             /** @description No such order of yours (ERR_NOT_FOUND) */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.countSellerOrderStages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Counts by stage */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOrderStageCounts"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.startPicking": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartPickingRequest"];
+            };
+        };
+        responses: {
+            /** @description The orders as they are now */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["SellerOrder"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not possible in its current status (ERR_SELLER_ORDER_STATE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.stopPicking": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StopPickingRequest"];
+            };
+        };
+        responses: {
+            /** @description The orders as they are now */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["SellerOrder"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not possible in its current status (ERR_SELLER_ORDER_STATE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -13770,7 +34616,7 @@ export interface operations {
                 /** @description Client-generated UUID that makes retries safe; responses are replayed for 24 hours */
                 "Idempotency-Key": string;
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -13830,7 +34676,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description More than your available balance (ERR_INSUFFICIENT_FUNDS), or the payment onboarding is not finished (ERR_PAYOUTS_NOT_ENABLED) */
+            /** @description More than your available balance (ERR_INSUFFICIENT_FUNDS), or the payment onboarding is not finished (ERR_PAYOUTS_NOT_ENABLED), or a sign-in change was made in the last 48 hours (ERR_PAYOUT_COOLING_OFF) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -13957,6 +34803,70 @@ export interface operations {
             };
         };
     };
+    "search.setOfferSummary": {
+        parameters: {
+            query?: {
+                game?: string;
+            };
+            header?: never;
+            path: {
+                set_code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The counts; zeros when nothing is on sale */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SetOfferSummary"];
+                };
+            };
+            /** @description Unknown game */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "search.offers": {
         parameters: {
             query?: {
@@ -13966,6 +34876,15 @@ export interface operations {
                 finish?: string;
                 seller_country?: string;
                 ship_to?: string;
+                seller_type?: "private" | "professional";
+                /** @description `true` only signed copies, `false` none. */
+                signed?: "true" | "false";
+                /** @description `true` only altered copies, `false` none. */
+                altered?: "true" | "false";
+                /** @description Only offers with at least this many copies. */
+                min_quantity?: number;
+                /** @description `price` cheapest first; `price_shipping` cheapest with postage to `ship_to` (required), over the 200 cheapest offers; `condition` best first, then price; `seller_rating` highest trust score first, then price. */
+                sort?: "price" | "price_shipping" | "condition" | "seller_rating";
                 limit?: number;
                 cursor?: string;
             };
@@ -13990,7 +34909,7 @@ export interface operations {
                     "application/json": components["schemas"]["OffersPage"];
                 };
             };
-            /** @description A malformed cursor */
+            /** @description A malformed cursor, or `sort=price_shipping` without `ship_to` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14035,6 +34954,8 @@ export interface operations {
                 cursor?: string;
                 /** @description true lists unread items only. */
                 unread?: "true" | "false";
+                /** @description true lists archived items instead. */
+                archived?: "true" | "false";
             };
             header?: never;
             path?: never;
@@ -14116,7 +35037,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 notification_id: string;
@@ -14193,7 +35114,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 notification_id: string;
@@ -14339,7 +35260,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -14442,7 +35363,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -14572,12 +35493,1379 @@ export interface operations {
             };
         };
     };
+    "portfolio.gameBestSellers": {
+        parameters: {
+            query: {
+                game_id: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Best sellers, most copies first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BestSeller"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.featuredOffer": {
+        parameters: {
+            query: {
+                game: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The featured card, or null */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        featured: components["schemas"]["FeaturedOffer"];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.movers": {
+        parameters: {
+            query: {
+                game: string;
+                period?: "7d";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gainers and losers, biggest change first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        gainers: components["schemas"]["MarketMover"][];
+                        losers: components["schemas"]["MarketMover"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.printingPrices": {
+        parameters: {
+            query?: {
+                set_id?: string;
+                product_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Prices per printing */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PrintingPrice"][];
+                    };
+                };
+            };
+            /** @description Neither or both of set_id and product_id */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.productStatistics": {
+        parameters: {
+            query?: {
+                segment?: "global" | "professional" | "private";
+            };
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The figures */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketStatistics"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.setValue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                set_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The value; null figures when nothing in the set has a price yet */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SetValue"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.skuHistory": {
+        parameters: {
+            query?: {
+                segment?: "global" | "professional" | "private";
+                range?: "7d" | "30d" | "90d" | "180d" | "1y" | "all";
+                /** @description With `all`, every printing of the product; `product_id` is then needed. */
+                printings?: "this" | "all";
+                product_id?: string;
+                /** @description With `nm`, only sales in MT or NM count. */
+                condition?: "all" | "nm";
+            };
+            header?: never;
+            path: {
+                sku_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Points, oldest first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["PricePoint"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.skuSales": {
+        parameters: {
+            query?: {
+                segment?: "global" | "professional" | "private";
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                sku_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sales, newest first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["MarketSale"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.skuStatistics": {
+        parameters: {
+            query?: {
+                segment?: "global" | "professional" | "private";
+            };
+            header?: never;
+            path: {
+                sku_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The figures */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketStatistics"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.skusStatistics": {
+        parameters: {
+            query: {
+                segment?: "global" | "professional" | "private";
+                /** @description Comma-separated SKU ids, at most 100. */
+                sku_ids: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The figures, one entry per SKU */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["MarketStatistics"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.myBreakdown": {
+        parameters: {
+            query: {
+                by: "folder" | "rarity" | "set";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The breakdown */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValueBreakdown"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.myFacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The facts */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionFacts"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.myHistory": {
+        parameters: {
+            query?: {
+                range?: "7d" | "30d" | "90d" | "180d" | "1y" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Nightly values, oldest first */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["PortfolioHistoryPoint"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.myHoldings": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+                sort?: "value" | "gain" | "change_7d";
+                /** @description Comma-separated collection item ids, at most 100. */
+                item_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of holdings */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HoldingValue"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.myMovers": {
+        parameters: {
+            query?: {
+                days?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Risers and fallers */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        risers: components["schemas"]["HoldingMover"][];
+                        fallers: components["schemas"]["HoldingMover"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.myPrintings": {
+        parameters: {
+            query?: {
+                set_id?: string;
+                /** @description Comma-separated product ids, at most 100. */
+                product_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Holdings per printing */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PrintingHolding"][];
+                    };
+                };
+            };
+            /** @description Neither or both of set_id and product_ids */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "portfolio.mySummary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your totals */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortfolioSummary"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Market data cannot be read right now; hide the charts and retry later (ERR_MARKET_DATA_UNAVAILABLE) */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "collection.recognizeCard": {
         parameters: {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -14680,7 +36968,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -14787,9 +37075,18 @@ export interface operations {
                 artist?: string;
                 /** @description The active game: a game code such as `mtg`, a game id, or `all` to search every game. `game:` typed in `q` wins. */
                 game?: string;
-                scope?: "all" | "catalog" | "marketplace";
-                /** @description Comma-separated facets to count: colors, mana_value, rarity, set, format, category. First page only. */
+                /** @description `all` pages the catalog and adds the first listings and, when signed in, the first of your items and of your friends’ trade binders. `collection` and `community` need a signed-in caller. */
+                scope?: "all" | "catalog" | "marketplace" | "collection" | "community";
+                /** @description Comma-separated facets to count: colors, mana_value, rarity, set, format, category, product_type, brand, language. First page only. */
                 facets?: string;
+                /** @description How catalog rows are ordered: `relevance` (best match), `name`, or `price` (the lowest listing; cards without one come last). Sections other than the catalog keep their own order. */
+                sort?: "relevance" | "name" | "price";
+                /** @description Catalog rows: `true` keeps only cards with at least one offer. Browse sends it by default. */
+                with_offers?: "true" | "false";
+                /** @description Catalog rows: `true` keeps only cards whose cheapest offer is below the card's market price. */
+                below_market?: "true" | "false";
+                /** @description Defaults to `desc` for `relevance` and `asc` for `name` and `price`. */
+                order?: "asc" | "desc";
                 limit?: number;
                 cursor?: string;
             };
@@ -14812,7 +37109,82 @@ export interface operations {
                     "application/json": components["schemas"]["SearchResponse"];
                 };
             };
-            /** @description Unknown game, or a malformed cursor */
+            /** @description Unknown game or scope, or a malformed cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The collection or community scope without a signed-in caller */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "search.setDeals": {
+        parameters: {
+            query?: {
+                game?: string;
+            };
+            header?: never;
+            path: {
+                set_code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deals; empty when none */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SetDeal"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14914,11 +37286,1047 @@ export interface operations {
             };
         };
     };
+    "search.listZeroResultTerms": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                game_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of terms */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ZeroResultTerm"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "notification.listBugReports": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+                status?: "open" | "triaged" | "closed";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of reports */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BugReportSummary"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "notification.getBugReport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The report */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BugReport"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such bug report (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "notification.updateBugReport": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBugReportRequest"];
+            };
+        };
+        responses: {
+            /** @description The report */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BugReport"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such bug report (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Changed by someone else (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "notification.getBugReportAttachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The attachment */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BugReportAttachment"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such bug report (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "notification.submitBugReport": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BugReportRequest"];
+            };
+        };
+        responses: {
+            /** @description The report is queued; it shows in the admin console once its attachment is read */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BugReportAccepted"];
+                };
+            };
+            /** @description The attachment is not gzipped, or declares more than 30 MB unzipped */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "notification.submitSupportRequest": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    topic: "account" | "orders" | "selling" | "disputes" | "collection" | "safety" | "privacy" | "other";
+                    subtopic: string;
+                    message: string;
+                    name?: string;
+                    /**
+                     * Format: email
+                     * @description Required when not signed in.
+                     */
+                    email?: string;
+                    order_number?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The request is on its way */
+            202: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportRequestAccepted"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.listBestOffers": {
+        parameters: {
+            query: {
+                /** @description Comma-separated wish ids, at most 100. */
+                item_ids: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One offer per wish that has one */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["WishBestOffer"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.listDemand": {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                game_id?: string;
+                product_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of demand */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WishlistDemand"][];
+                        page: {
+                            limit: number;
+                            offset: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.importWishes": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WishlistImport"];
+            };
+        };
+        responses: {
+            /** @description The rows and lists */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WishlistImportResult"];
+                };
+            };
+            /** @description More than 250 rows to save: a job saves them; `GET /api/v1/wishlist/imports/{id}` shows the import `importing`, then `done` with the result (PERF-20c) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WishlistImportQueued"];
+                };
+            };
+            /** @description Too many rows, or a row does not fit (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description More wishlists than you may keep (ERR_WISHLIST_LIMIT) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.getImport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The import */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WishlistImportStatus"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such import of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "wishlist.listItems": {
         parameters: {
             query?: {
                 limit?: number;
                 cursor?: string;
+                /** @description Comma-separated list ids (WL-04): only the wishes on these lists, as Tutor plans across them. */
+                wishlist_id?: string;
             };
             header?: never;
             path?: never;
@@ -15006,7 +38414,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path?: never;
             cookie?: never;
@@ -15066,7 +38474,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description You already wish for this product with the same printing, language, finish and treatment; change that wish instead (ERR_WISHLIST_ITEM_EXISTS) */
+            /** @description You already wish for this product with the same printing, language, finish and treatment; change that wish instead (ERR_WISHLIST_ITEM_EXISTS), or you asked for alerts while your plan's price-alert limit is reached (ERR_PLAN_LIMIT_PRICE_ALERTS, `details.limit`) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -15118,7 +38526,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -15195,7 +38603,7 @@ export interface operations {
             query?: never;
             header?: {
                 /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
-                "X-Nexus-CSRF"?: string;
+                "X-Tradeable-CSRF"?: string;
             };
             path: {
                 item_id: string;
@@ -15257,7 +38665,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The wish changed since you read it (ERR_CONCURRENT_MODIFICATION), or another wish already has this variant (ERR_WISHLIST_ITEM_EXISTS) */
+            /** @description The wish changed since you read it (ERR_CONCURRENT_MODIFICATION), another wish already has this variant (ERR_WISHLIST_ITEM_EXISTS), or alerts were turned on while your plan's price-alert limit is reached (ERR_PLAN_LIMIT_PRICE_ALERTS) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -15361,6 +38769,456 @@ export interface operations {
             };
             /** @description No such wish of yours (ERR_NOT_FOUND) */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.listLists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your lists */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Wishlist"][];
+                    };
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.createList": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WishlistCreate"];
+            };
+        };
+        responses: {
+            /** @description The new list */
+            201: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Wishlist"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You keep 50 lists already (ERR_WISHLIST_LIMIT) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.getList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                wishlist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The list */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        list: components["schemas"]["Wishlist"];
+                        items: components["schemas"]["WishlistListItem"][];
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such list, or you may not see it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.deleteList": {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                wishlist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such list of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The list changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.updateList": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                wishlist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WishlistUpdate"];
+            };
+        };
+        responses: {
+            /** @description The changed list */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Wishlist"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such list of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The list changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };

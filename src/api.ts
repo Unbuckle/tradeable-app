@@ -8,7 +8,7 @@ export type CollectionItem = Schemas['CollectionItem'];
 export type Account = Schemas['Account'];
 
 export const API_URL = (
-  process.env.EXPO_PUBLIC_API_URL ?? 'https://nexus-dev-run-web-679212846149.europe-north2.run.app'
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://alpha.tradeable.cards'
 ).replace(/\/$/, '');
 
 /** An RFC 7807 problem from the API; `code` is the `ERR_*` value. */

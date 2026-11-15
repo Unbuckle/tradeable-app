@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "tradeable.",
+    "name": "tradeable",
     "slug": "tradeable-app",
     "version": "0.1.0",
     "orientation": "portrait",
@@ -33,6 +33,12 @@
           "recordAudioAndroid": false
         }
       ]
-    ]
+    ],
+    "owner": "tradeable-expo-devs-team",
+    "extra": {
+      "eas": {
+        "projectId": "77816a87-f460-4516-83d5-a8ee31512738"
+      }
+    }
   }
 }

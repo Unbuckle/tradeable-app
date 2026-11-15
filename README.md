@@ -7,8 +7,9 @@ Built with Expo (React Native, SDK 58). It talks only to the tradeable. API (`/a
 ## What it does
 
 - Sign in with email and password, plus the authenticator code when two-step sign-in is on. Tokens are kept in the device's secure storage.
-- Scan: take a photo of the card's bottom-left corner; on-device text recognition (Google ML Kit) reads the set code, collector number, language and the foil star. Or type the set code and number.
-- Shows the card with its picture. Pick finish and language (the card's SKUs) and condition; they stay set between scans. One tap adds it to your collection.
+- Scan: hold the whole card in the camera frame. The app takes a photo about every second and reads it on the device (Google ML Kit): the set code, collector number, language and foil star from the collector line, and the card's name from its title. Once two photos agree it looks the card up by set code and number, or by name and number for cards printed before 2014. Or type the set code and number.
+- A card that can't be read can be found by name: pick the card, then its printing (set code and number).
+- Shows the card with its picture. Pick finish and language (the card's SKUs), condition and folder; they stay set between scans. One tap adds it to your collection.
 - A list of the cards added this session, with a running count and one-tap undo.
 
 ## Run it

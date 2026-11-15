@@ -35,6 +35,8 @@ export interface Preferences {
   condition: number;
   finish: string;
   language: string;
+  /** Folder new cards go into; null leaves them unfiled. */
+  folderId: string | null;
 }
 
 /** The single SKU closest to the preferred finish and language. */
@@ -54,21 +56,34 @@ export const conditions = () =>
     r.data.filter((c) => c.scale === 'card'),
   );
 
-export const addToCollection = (skuId: string, condition: number) =>
+export const addToCollection = (skuId: string, condition: number, folderId: string | null, quantity = 1) =>
   api<CollectionItem>('/collection/items', {
     method: 'POST',
-    body: JSON.stringify({ sku_id: skuId, condition, quantity: 1 }),
+    body: JSON.stringify({ sku_id: skuId, condition, quantity, folder_id: folderId }),
   });
 
-/** Takes back one added copy: archives a new item, or lowers the count of the stack it joined. */
-export async function undoAdd(added: CollectionItem): Promise<unknown> {
+export const folders = () =>
+  api<{ items: Schemas['CollectionFolder'][] }>('/collection/folders').then((r) => r.items);
+
+/** Single cards whose name matches, for cards whose collector line can't be read. */
+export const searchCards = (name: string) =>
+  api<Schemas['SearchResponse']>(`/search?scope=catalog&limit=10&q=${encodeURIComponent(name.trim())}`).then((r) =>
+    r.results.catalog.filter((hit) => hit.category === 'single'),
+  );
+
+/** Every printing of a card with its SKUs, newest set first. */
+export const printingsOfCard = (productId: string) =>
+  api<{ data: Printing[] }>(`/catalog/products/${productId}/printings`).then((r) => r.data.reverse());
+
+/** Takes back the added copies: archives a new item, or lowers the count of the stack it joined. */
+export async function undoAdd(added: CollectionItem, quantity = 1): Promise<unknown> {
   // Later scans may have joined the same stack, so act on its current count and version.
   const item = await api<CollectionItem>(`/collection/items/${added.id}`);
-  if (item.total_quantity <= 1) {
+  if (item.total_quantity <= quantity) {
     return api(`/collection/items/${item.id}?version=${item.version}`, { method: 'DELETE' });
   }
   return api(`/collection/items/${item.id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ version: item.version, total_quantity: item.total_quantity - 1 }),
+    body: JSON.stringify({ version: item.version, total_quantity: item.total_quantity - quantity }),
   });
 }
