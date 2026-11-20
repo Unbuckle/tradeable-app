@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "tradeable.",
+    "name": "tradeable",
     "slug": "tradeable-app",
     "version": "0.1.0",
     "orientation": "portrait",
@@ -28,11 +28,18 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "tradeable. uses the camera to read the set code and number on your cards.",
+          "cameraPermission": "tradeable. uses the camera to recognise your cards.",
           "microphonePermission": false,
           "recordAudioAndroid": false
         }
-      ]
-    ]
+      ],
+      "expo-font"
+    ],
+    "owner": "tradeable-expo-devs-team",
+    "extra": {
+      "eas": {
+        "projectId": "77816a87-f460-4516-83d5-a8ee31512738"
+      }
+    }
   }
 }
