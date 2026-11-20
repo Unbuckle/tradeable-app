@@ -1,4 +1,4 @@
-import { api, ApiError, type CollectionItem, type Printing, type Schemas, type Sku } from './api';
+import { api, ApiError, type CollectionItem, type Printing, type Schemas } from './api';
 
 type Page<T> = { data: T[]; page: { next_cursor: string | null } };
 
@@ -29,26 +29,6 @@ export async function findPrinting(setCode: string, collectorNumber: string): Pr
   const printing = (await printingsOf(setCode.trim())).find((p) => p.collector_number?.toLowerCase() === wanted);
   if (!printing) throw new ApiError(404, 'ERR_NOT_FOUND', `No card ${collectorNumber} in ${setCode.toUpperCase()}`);
   return api<Printing>(`/catalog/printings/${printing.id}`);
-}
-
-export interface Preferences {
-  condition: number;
-  finish: string;
-  language: string;
-  /** Folder new cards go into; null leaves them unfiled. */
-  folderId: string | null;
-}
-
-/** The single SKU closest to the preferred finish and language. */
-export function pickSku(skus: Sku[], prefs: Pick<Preferences, 'finish' | 'language'>): Sku | null {
-  const singles = skus.filter((sku) => sku.category === 'single' && sku.is_active);
-  return (
-    singles.find((s) => s.finish === prefs.finish && s.language === prefs.language) ??
-    singles.find((s) => s.language === prefs.language) ??
-    singles.find((s) => s.finish === prefs.finish) ??
-    singles[0] ??
-    null
-  );
 }
 
 export const conditions = () =>
@@ -87,3 +67,46 @@ export async function undoAdd(added: CollectionItem, quantity = 1): Promise<unkn
     body: JSON.stringify({ version: item.version, total_quantity: item.total_quantity - quantity }),
   });
 }
+
+/** One printing with its SKUs. */
+export const printingById = (id: string) => api<Printing>(`/catalog/printings/${id}`);
+
+export interface Candidate {
+  printing: Printing;
+  confidence: number;
+}
+
+// shortcut: `ignore_promos` is in nexustcg PR #614, not yet in the copied OpenAPI file; drop this type once it is.
+type RecognizeRequest = Schemas['RecognizeCardRequest'] & { ignore_promos?: boolean };
+
+/** Up to three printings the photo most likely shows, best first; empty when nothing matches. */
+export async function recognizePhoto(request: RecognizeRequest): Promise<Candidate[]> {
+  const { candidates } = await api<Schemas['CardRecognition']>('/recognitions', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+  return Promise.all(
+    candidates.slice(0, 3).map(async (c) => ({ printing: await printingById(c.printing_id), confidence: c.confidence })),
+  );
+}
+
+/** Market price of a printing in cents (lowest over its languages and finishes), or null. */
+export const marketPrice = (printing: Printing) =>
+  api<{ data: Schemas['PrintingPrice'][] }>(`/portfolio/market/printing-prices?product_id=${printing.product_id}`).then(
+    (r) => r.data.find((p) => p.printing_id === printing.id)?.market_cents ?? null,
+    () => null, // prices are a nice-to-have; the market data may be switched off
+  );
+
+type ItemPage = { data: CollectionItem[]; page: { next_cursor: string | null; total?: number } };
+
+// shortcut: shows the first 100 unfiled items only; page with `cursor` once people scan more before sorting.
+export const unfiledItems = () => api<ItemPage>('/collection/items?folder=unfiled&limit=100').then((r) => r.data);
+
+export const unfiledCount = () =>
+  api<ItemPage>('/collection/items?folder=unfiled&limit=100').then((r) => r.page.total ?? r.data.length);
+
+/** Moves up to 100 items into a folder (null: unfiled). */
+export const moveItems = (itemIds: string[], folderId: string | null) =>
+  api('/collection/items/move', { method: 'POST', body: JSON.stringify({ item_ids: itemIds, folder_id: folderId }) });
+
+export const myAccount = () => api<Schemas['Account']>('/identity/me');

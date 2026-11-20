@@ -33,4 +33,7 @@ export const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   chip: { borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#3A3045' },
   chipOn: { backgroundColor: colors.purple },
+  card: { backgroundColor: '#3A3045', borderRadius: 12, padding: 14 },
+  /** Floating over the camera. */
+  pill: { backgroundColor: 'rgba(42,34,51,0.85)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8 },
 });
