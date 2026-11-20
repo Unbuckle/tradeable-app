@@ -393,7 +393,11 @@ export interface paths {
          */
         put: operations["catalog.adminReplacePrintingImage"];
         post?: never;
-        delete?: never;
+        /**
+         * Restore the provider picture
+         * @description Undoes a staff upload: the provider picture it replaced shows again. With no provider picture kept, the printing shows a placeholder until the nightly image job fetches one. Nothing happens for a printing without a staff picture.
+         */
+        delete: operations["catalog.adminRestorePrintingImage"];
         options?: never;
         head?: never;
         patch?: never;
@@ -406,7 +410,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * What staff changed on a product
+         * @description The stored name and rank, the fields changed here with the provider value each would go back to (missing when it was changed before the provider value was kept), and the pictures the printings show now. Read past the caches, so a change shows at once.
+         */
+        get: operations["catalog.adminProductOverrides"];
         put?: never;
         post?: never;
         delete?: never;
@@ -455,6 +463,26 @@ export interface paths {
          * @description Provider aliases cannot be removed: the next sync would bring them back.
          */
         delete: operations["catalog.adminRemoveAlias"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/admin/products/{product_id}/fields/{field}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Reset a field to the provider value
+         * @description Puts the provider value back and lets the provider sync change the field again. A field changed before the provider value was kept goes back with the next sync. Nothing happens for a field not changed here.
+         */
+        delete: operations["catalog.adminResetProductField"];
         options?: never;
         head?: never;
         patch?: never;
@@ -798,6 +826,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/collection/automation-rules/folder-for/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The binder a rule would put an item in
+         * @description Tries your rules that move items to a binder, in their order, against the item as it is today (UX-38: the Edit item hint). Nothing is moved.
+         */
+        get: operations["collection.getItemRuleFolder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/collection/automation-rules/preview": {
         parameters: {
             query?: never;
@@ -972,7 +1020,7 @@ export interface paths {
         };
         /**
          * Your items
-         * @description Active items, cursor-paginated, newest first unless `sort` (`added`, `name` or `quantity`) and `direction` (`asc` or `desc`, ties broken by age) say otherwise. Filters combine: `game`, `folder` (an id, or `unfiled`), `tag` (a name), `set` (a catalog set id), `scale` (`card` for singles, `sealed`), `condition`, and `q` (part of the card or product name). `folder`, `tag` and `condition` may repeat; an item then needs to match any one of the values. COL-15 card facts: `language`, `rarity`, `mana_value` (7 is 7 or more) and `type` (a word of the type line) match any value; `color` (W U B R G, C for colourless) needs every colour; `legal` a format the card is legal or restricted in. Sorts `paid` (price per copy), `value` (the market value of the stack, refreshed hourly) and `gain` (value minus cost, EUR costs only) put items without one last when descending. `view=inventory` lists what you could sell: items that are not hidden and have units free or on a listing.
+         * @description Active items, cursor-paginated, newest first unless `sort` (`added`, `name` or `quantity`) and `direction` (`asc` or `desc`, ties broken by age) say otherwise. Filters combine: `game`, `folder` (an id, or `unfiled`), `tag` (a name), `set` (a catalog set id), `scale` (`card` for singles, `sealed`), `condition`, and `q` (part of the card or product name). `folder`, `tag` and `condition` may repeat; an item then needs to match any one of the values. COL-15 card facts: `language`, `rarity`, `mana_value` (7 is 7 or more) and `type` (a word of the type line) match any value; `color` (W U B R G, C for colourless) needs every colour; `legal` a format the card is legal or restricted in. Sorts `paid` (price per copy), `value` (the market value of the stack, refreshed hourly) and `gain` (value minus cost, EUR costs only) put items without one last when descending. `view=inventory` lists what you could still list: items that are not hidden and have free units.
          */
         get: operations["collection.listItems"];
         put?: never;
@@ -1309,7 +1357,7 @@ export interface paths {
         };
         /**
          * Items your rules staged for listing
-         * @description Newest first. An item leaves the queue when you dismiss it or it is no longer in your collection; listing it does not remove it.
+         * @description Newest first, only items with a free copy. An item leaves the queue when you dismiss it, list it, or it is no longer in your collection.
          */
         get: operations["collection.listStagedListings"];
         put?: never;
@@ -1407,7 +1455,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Members you blocked
+         * @description Only the members you blocked, newest first; never who blocked you.
+         */
+        get: operations["community.listBlocks"];
         put?: never;
         /**
          * Block a member
@@ -1576,7 +1628,7 @@ export interface paths {
         put?: never;
         /**
          * Import a decklist from text
-         * @description Paste a plain list ("4 Lightning Bolt"), an MTGA export, or a Moxfield or Archidekt text export. Each line is matched to a catalog card by name: resolved, ambiguous (pick one of the candidates) or unresolved. Private unless you choose otherwise.
+         * @description Paste a plain list ("4 Lightning Bolt"), an MTGA export, or a Moxfield or Archidekt text export. Lines are read like the collection's typed list (UX-106): set and number, foil marks and language are kept, condition and price are read but not stored. Each line is matched to a catalog card by name: resolved or ambiguous (pick one of the candidates). A resolved line keeps the printing it names or `picks` names, else the card's newest. Lines that match no card or cannot be read are not saved and come back in `unrecognised_lines`; a list with no known card is refused. Private unless you choose otherwise.
          */
         post: operations["community.importDecklist"];
         delete?: never;
@@ -1660,7 +1712,7 @@ export interface paths {
         get?: never;
         /**
          * Change a line of one of your decklists
-         * @description COM-12: sets the count (0 removes the line) or moves the line to another board, taking the decklist `version` you last read.
+         * @description COM-12: sets the count (0 removes the line), moves the line to another board, or (UX-106) picks its printing (`null`: any printing), taking the decklist `version` you last read.
          */
         put: operations["community.updateDecklistEntry"];
         post?: never;
@@ -1728,6 +1780,26 @@ export interface paths {
         get: operations["community.getDecklistOwnership"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/decklists/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check a pasted decklist before importing it
+         * @description UX-106 (the collection import's check step, COL-14): reads the list as POST decklists would and answers per line whether it is ready, needs a printing picked or cannot be saved. Saves nothing. Send the picks back with the import.
+         */
+        post: operations["community.checkDecklist"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2092,7 +2164,7 @@ export interface paths {
         put?: never;
         /**
          * Publish a showcase
-         * @description Shows one of your collection folders on your profile. Visibility defaults to public.
+         * @description Shows one of your collection folders on your profile. Visibility defaults to friends (UX-64): nothing becomes public without the member choosing it.
          */
         post: operations["community.createShowcase"];
         delete?: never;
@@ -2221,7 +2293,7 @@ export interface paths {
         put?: never;
         /**
          * Withdraw a trade
-         * @description Either member may, until the handshake.
+         * @description Either member may, until the handshake. Once the other member confirmed, use `withdraw` with a reason.
          */
         post: operations["community.cancelTrade"];
         delete?: never;
@@ -2281,6 +2353,26 @@ export interface paths {
         put?: never;
         /** Decline a proposal */
         post: operations["community.declineTrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/community/trades/{trade_id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw a trade, with a reason
+         * @description Either member may, until the handshake. The reason is required once the other member confirmed the handshake; that member sees it (UX-68b).
+         */
+        post: operations["community.withdrawTrade"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2579,7 +2671,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Your account
+         * @description Your account as it is now, read from the database rather than from the session token, so `is_email_verified` turns true as soon as the confirmation link is used.
+         */
+        get: operations["identity.getMyAccount"];
         put?: never;
         post?: never;
         /**
@@ -3017,7 +3113,7 @@ export interface paths {
         };
         /**
          * What the signed-in page frame needs
-         * @description Your profile, preferences, addresses and terms status in one call, so a page load needs one request instead of four (PERF-09). Each part is the same as its own endpoint; `terms` is `null` while the terms feature is off.
+         * @description Your profile, preferences, addresses and terms status in one call, so a page load needs one request instead of four (PERF-09). Each part is the same as its own endpoint; `terms` is `null` while the terms feature is off, `staff` says whether you hold a staff role, `seller` whether you have a seller account and `checklist` what the "Getting started" checklist ticks off.
          */
         get: operations["identity.getShell"];
         put?: never;
@@ -3216,6 +3312,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/password-resets/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check a password reset link
+         * @description Says whether the token from a reset email can still set a password, so the page can refuse an expired link before the member types one. Changes nothing. Unknown, used and expired tokens get the same answer, and no account data is returned. The token travels in the body so that it never appears in a URL.
+         */
+        post: operations["identity.checkPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/password-resets/confirm": {
         parameters: {
             query?: never;
@@ -3380,6 +3496,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/ship-from-countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Countries you can sell from
+         * @description The countries tradeable has postage rates for (UX-03). Seller sign-up and the payment onboarding refuse any other country.
+         */
+        get: operations["identity.listShipFromCountries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/integration/admin/catalog-sync/{provider}": {
         parameters: {
             query?: never;
@@ -3467,7 +3603,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List your earlier imports of one kind
+         * @description Newest first, your own imports only; dry-run previews (`options.dry_run`) are left out. Import and list shows the `listing_bulk` ones (UX-114a).
+         */
+        get: operations["integration.listMyImports"];
         put?: never;
         /**
          * Start importing an uploaded file
@@ -3568,7 +3708,7 @@ export interface paths {
         put?: never;
         /**
          * Check an uploaded file before importing it
-         * @description COL-14: reads the file as POST imports would and answers per row whether it is ready, needs a printing picked or cannot be read, plus a CSV file's columns and condition words. Imports nothing. Send the member's choices back as options: `columns` (mapped files), `conditions` (word to grade 1 to 7) and `picks` (typed lists: line number to `set_code` and `collector_number`).
+         * @description COL-14: reads the file as POST imports would and answers per row whether it is ready, needs a printing picked or cannot be read, plus a CSV file's columns and condition words. Imports nothing. Send the member's choices back as options: `columns` (mapped files), `conditions` (word to grade 1 to 7) and `picks` (typed lists: line number to `set_code` and `collector_number`). UX-56: kind `listing_bulk` with provider `stock_csv` and the stock options also prices and lists each found card as a dry run; a row the import would refuse is `bad` (`ERR_IMPORT_ROW_NO_PRICE` when it has no price).
          */
         post: operations["integration.checkImport"];
         delete?: never;
@@ -3617,6 +3757,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/integration/webhooks/17track": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Receive a 17TRACK tracking push
+         * @description Called by 17TRACK when a registered parcel changes status (`TRACKING_UPDATED`) or is no longer followed (`TRACKING_STOPPED`), signed in the `sign` header with the API key. The raw body is verified, recorded once per number, status and event time, and a delivered parcel marks its seller order delivered; a redelivery answers `replay` without running anything again. Recipient names and addresses are dropped before anything is stored.
+         */
+        post: operations["integration.trackingWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/integration/webhooks/stripe": {
         parameters: {
             query?: never;
@@ -3649,6 +3809,26 @@ export interface paths {
          * @description For moderators: disputes waiting for a decision, oldest first. Cursor-paginated.
          */
         get: operations["marketplace.listOpenDisputes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/admin/disputes/{dispute_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A dispute to decide
+         * @description For moderators (UX-35a): the dispute with both handles, the seller order (cards with prices, tracking, delivery dates), what it holds and the largest refund.
+         */
+        get: operations["marketplace.getDisputeCase"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3758,6 +3938,26 @@ export interface paths {
         patch: operations["marketplace.updateCartItem"];
         trace?: never;
     };
+    "/api/v1/marketplace/cart/items/{cart_item_id}/accept-price": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept a new price
+         * @description You accept the listing’s current price for this item, so checkout can go ahead.
+         */
+        post: operations["marketplace.acceptCartItemPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/cart/optimize": {
         parameters: {
             query?: never;
@@ -3798,6 +3998,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/cart/sellers/{seller_user_id}/shipping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose the postage for a parcel
+         * @description UX-136: tracked or untracked postage for this seller’s parcel. The quote and checkout use it while it is on offer; otherwise the cheapest option.
+         */
+        put: operations["marketplace.chooseCartShipping"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/checkout": {
         parameters: {
             query?: never;
@@ -3809,7 +4029,7 @@ export interface paths {
         put?: never;
         /**
          * Check out
-         * @description Turns the whole cart into an order shipped to one of your addresses, at the prices, postage and fees of the cart quote, and starts the payment. Holds that ran out are taken again first. The order waits for payment until its holds end; then it is cancelled. Repeating the request with the same `Idempotency-Key` returns the same order.
+         * @description Turns the whole cart into an order shipped to one of your addresses, at the prices, postage and fees of the cart quote, and starts the payment. Only held cards are ordered: a card whose hold ran out has left the cart (UX-66). The order waits for payment until its holds end; then it is cancelled. Repeating the request with the same `Idempotency-Key` returns the same order.
          */
         post: operations["marketplace.checkout"];
         delete?: never;
@@ -3852,6 +4072,26 @@ export interface paths {
          * @description For the seller: refunds what the buyer asked for and ends the dispute. You keep the rest of the order, less the commission on it.
          */
         post: operations["marketplace.acceptDisputeRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/disputes/{dispute_id}/escalation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Escalate to Support
+         * @description For the buyer and the seller: hands an open dispute to Support, whose staff then decide it. Calling it again changes nothing. Without it, Support steps in at `escalates_at`.
+         */
+        post: operations["marketplace.escalateDispute"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3907,7 +4147,7 @@ export interface paths {
         };
         /**
          * Listings
-         * @description Active listings, newest first, cursor-paginated; filter by `seller` or `sku`. Signed in, `seller` set to your own id lists your listings in every status but cancelled (or the one `status` you ask for).
+         * @description Active listings, newest first, cursor-paginated; filter by `seller` or `sku`. Signed in, `seller` set to your own id lists your listings in every status but cancelled (or the one `status` you ask for). `q` matches part of the card name and `sort`/`direction` order the list (UX-30); with `seller`, `page.total` counts every match.
          */
         get: operations["marketplace.listListings"];
         put?: never;
@@ -3960,6 +4200,26 @@ export interface paths {
          * @description Ends the listing for good; its units are free again in your collection (units in carts stay reserved).
          */
         post: operations["marketplace.cancelListing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/listings/{listing_id}/card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Which card a listing offers
+         * @description Names the card of any listing that was ever on sale, also a paused, sold-out or ended one, so a stale link can point to the card’s other offers. Says nothing else about the listing. Drafts are not found.
+         */
+        get: operations["marketplace.getListingCard"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4090,6 +4350,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/marketplace/listings/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause, resume, end or reprice several listings
+         * @description UX-30: up to 200 of your listings, each changed on its own as with its single action. A listing that is not yours, gone, in the wrong state or with copies in carts (for `reprice`) is skipped and named in `skipped`.
+         */
+        post: operations["marketplace.changeListings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/marketplace/orders": {
         parameters: {
             query?: never;
@@ -4121,6 +4401,46 @@ export interface paths {
         get: operations["marketplace.getMyOrder"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/orders/{order_id}/seller-orders/{seller_order_id}/cancel-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask the seller to cancel
+         * @description For the buyer, before the parcel is sent (UX-07b). The seller accepts or declines; without an answer in 3 days it is cancelled and refunded.
+         */
+        post: operations["marketplace.requestOrderCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/orders/{order_id}/seller-orders/{seller_order_id}/cancel-request/{answer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer the seller's cancel request
+         * @description Accept cancels the parcel and refunds you; decline keeps the order going (UX-07b).
+         */
+        post: operations["marketplace.answerOrderCancelRequest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4181,6 +4501,46 @@ export interface paths {
          * @description For the buyer, once this part of the order is received: a rating from 1 to 5 and an optional comment. Sending it again within 7 days changes it.
          */
         post: operations["marketplace.submitFeedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/orders/{order_id}/seller-orders/{seller_order_id}/lines/{line_id}/removal/{answer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Keep the order without a card, or cancel it
+         * @description UX-53c: answers the seller's question about a missing or damaged card. Keep sends the order without it and refunds its price; cancel cancels the parcel and refunds everything.
+         */
+        post: operations["marketplace.answerLineRemoval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/payment-setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * How orders are paid
+         * @description Which payment gateway this site uses and, for Stripe, the publishable key the card form loads Stripe with (UX-19). `fake` is the test gateway of local and test sites: no card is charged.
+         */
+        get: operations["marketplace.getPaymentSetup"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4434,9 +4794,29 @@ export interface paths {
         put?: never;
         /**
          * Cancel before dispatch
-         * @description Refunds the buyer for this part of the order (and the buyer protection fee once every part is cancelled) and puts the units back in your collection.
+         * @description With reason out_of_stock or damaged: refunds the buyer for this part of the order (and the buyer protection fee once every part is cancelled) and puts the units back in your collection. With any other reason (UX-07b) it asks the buyer instead, who accepts or declines; without an answer in 3 days it is cancelled.
          */
         post: operations["marketplace.cancelSellerOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/orders/{seller_order_id}/cancel-request/{answer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer the buyer's cancel request
+         * @description Accept cancels and refunds as above; decline keeps the order going (UX-07b).
+         */
+        post: operations["marketplace.answerSellerCancelRequest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4477,6 +4857,26 @@ export interface paths {
          */
         put: operations["marketplace.pickLine"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/orders/{seller_order_id}/lines/{line_id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask the buyer to send without this card
+         * @description UX-53c: before packing, asks the buyer whether to send the order without a missing or damaged card. If they keep the order (or do not answer in 48 hours) they get its price back (postage and buyer fees stay), the commission is charged on the cards that still ship, and the copies go back to your collection; if they cancel, the parcel is cancelled with a full refund. Marking the card picked withdraws the question. The last card cancels the order at once. A repeated call changes nothing.
+         */
+        post: operations["marketplace.removeOrderLine"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4592,6 +4992,26 @@ export interface paths {
          * @description Your balances: pending (held until your orders settle), available (ready to pay out; negative after a refund taken from it) and frozen (in dispute), with the smallest payout you may request.
          */
         get: operations["marketplace.getWallet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/marketplace/seller/wallet/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your wallet statement
+         * @description Every sale, commission, refund, payout and balance payment that changed your balance, newest first. Moves between pending, available and frozen are not lines; each sale line names where its money is now. Cursor-paginated.
+         */
+        get: operations["marketplace.listWalletActivity"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5129,7 +5549,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** What your collection is worth now */
+        /** What your collection is worth now, and how that moved over the period */
         get: operations["portfolio.mySummary"];
         put?: never;
         post?: never;
@@ -5150,7 +5570,7 @@ export interface paths {
         put?: never;
         /**
          * Recognize a photographed card
-         * @description Send one card, already found in the photo and flattened to its rectangle. Returns up to three printings it most likely shows, with a confidence; nothing is stored. Look the printings up in the catalog to show them.
+         * @description Send the camera photo; the server finds the card in it (up to ten outlines, any way up). Returns up to three printings it most likely shows, with a confidence; nothing is stored. Look the printings up in the catalog to show them.
          */
         post: operations["collection.recognizeCard"];
         delete?: never;
@@ -5392,7 +5812,7 @@ export interface paths {
         };
         /**
          * What members wish for
-         * @description Anonymous wishlist demand for restocking, most wishers first, rebuilt each night: one row per product (`printing_id` null) and one per printing members named. A row shows only when 5 or more members wish for it, and the median maximum price only when 5 or more of them set one in EUR, so no single member can be picked out.
+         * @description Anonymous wishlist demand for restocking, most wishers first, counted when asked: wishes added in the last `days` by members whose profile country the caller ships to. One row per product (`printing_id` null) and one per printing members named, each beside the cheapest offer from other sellers and the caller's free and listed copies (a product row adds up its printings). A row shows only when 5 or more of those members wish for it, and the median maximum price only when 5 or more of them set one in EUR, so no single member can be picked out. `tiles` count the rows before the `stock` filter.
          */
         get: operations["wishlist.listDemand"];
         put?: never;
@@ -5555,6 +5975,46 @@ export interface paths {
          * @description A new visibility carries over to the list's wishes. `version` is the version you last read.
          */
         patch: operations["wishlist.updateList"];
+        trace?: never;
+    };
+    "/api/v1/wishlist/lists/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set alerts for whole wishlists
+         * @description UX-89a: sets `alert_mode` on every wish of the lists. Wishes are switched on in priority order only while your plan's price-alert limit allows; the rest stay off and are counted in `left_off`. Sending the same call again changes nothing more.
+         */
+        post: operations["wishlist.setListAlerts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishlist/lists/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Merge wishlists into one
+         * @description UX-89a: the wishes of `merge_ids` move to `keep_id`, which keeps its name and who can see it; the merged lists are removed. A card already on the kept list for the same printing, language, finish and treatment stays once, with the higher quantity and the lower max price (no max counts as the higher); its other settings stay, and its alert stays on when either wish had one. All or nothing.
+         */
+        post: operations["wishlist.mergeLists"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/health/live": {
@@ -6039,6 +6499,8 @@ export interface components {
             display_currency?: string;
             /** @enum {string} */
             theme?: "system" | "light" | "dark";
+            /** @enum {string} */
+            date_format?: "day_month" | "month_day" | "iso";
             timezone?: string;
             default_game_id?: string | null;
             /** @enum {string} */
@@ -6046,6 +6508,7 @@ export interface components {
             onboarding_step?: ("account" | "type" | "plan" | "games" | "collection" | "wishlist" | "profile" | "seller" | "done") | null;
             onboarding_done?: boolean;
             checklist_hidden?: boolean;
+            checklist_skipped?: ("email" | "type" | "games" | "cards" | "binder" | "wishlist" | "profile" | "friend" | "seller")[];
             seller_reminder_after?: string | null;
         };
         ProfileUpdate: {
@@ -6078,6 +6541,8 @@ export interface components {
             vacation_until?: string | null;
             /** @description MKT-15: the smallest order you accept from one buyer, in EUR cents (at most 25.00); null or 0 removes it. Ignored while the minimum order feature is off. */
             min_order_cents?: number | null;
+            /** @description UX-03b: replaces the countries you do not ship to; [] ships everywhere your postage reaches. Ignored while the feature is off. */
+            excluded_destinations?: string[];
         };
         OpenSellerAccountRequest: {
             /** @enum {string} */
@@ -6121,6 +6586,9 @@ export interface components {
         };
         PasswordResetRequest: {
             email: string;
+        };
+        PasswordResetCheck: {
+            token: string;
         };
         PasswordResetConfirmation: {
             token: string;
@@ -6207,11 +6675,16 @@ export interface components {
             /** @default false */
             add_to_cart: boolean;
         };
+        ChooseCartShippingRequest: {
+            tracked: boolean;
+        };
         CheckoutRequest: {
             /** Format: uuid */
             address_id: string;
             /** @description MKT-14: pay from your available seller balance first (flag `marketplace.pay-with-balance`); a balance that covers the order drops the service fee. */
             pay_from_balance?: boolean;
+            /** @description UX-66: the cart quote total you were shown. When the order would cost anything else, nothing is ordered and the answer is 409 ERR_CART_TOTAL_CHANGED. */
+            expected_total_cents?: number;
         };
         PostDisputeMessageRequest: {
             body: string;
@@ -6222,6 +6695,8 @@ export interface components {
             /** @enum {string} */
             outcome: "refunded" | "released";
             refund_cents?: number | null;
+            /** @description UX-35a: "Explanation for both sides", shown on their dispute pages. Required. */
+            note?: string;
         };
         CreateListingRequest: {
             /**
@@ -6229,7 +6704,10 @@ export interface components {
              * @description One of your collection items; condition and SKU come from it.
              */
             collection_item_id: string;
-            price_cents: number;
+            /** @description Required unless `price_by_bot`; with it, the price to start from when the card has no market price yet. */
+            price_cents?: number;
+            /** @description UX-06b: your enabled Pricing Bot rules set the price from the market price (or `price_cents`), then your minimums apply. */
+            price_by_bot?: boolean;
             /** @constant */
             currency: "EUR";
             quantity: number;
@@ -6259,6 +6737,10 @@ export interface components {
                 quantity: number;
                 notes?: string | null;
             }[];
+        };
+        RequestOrderCancelRequest: {
+            /** @description An optional note for the other side, up to 500 characters. */
+            note?: string | null;
         };
         OpenDisputeRequest: {
             /** @enum {string} */
@@ -6329,6 +6811,8 @@ export interface components {
         CancelSellerOrderRequest: {
             /** @enum {string} */
             reason: "out_of_stock" | "damaged" | "buyer_request" | "other";
+            /** @description An optional note for the other side, up to 500 characters. */
+            note?: string | null;
         };
         DispatchRequest: {
             carrier?: string | null;
@@ -6339,6 +6823,10 @@ export interface components {
             status: "picked" | "issue" | "open";
             issue?: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
             note?: string | null;
+        };
+        RemoveOrderLineRequest: {
+            /** @enum {string} */
+            reason: "missing" | "damaged";
         };
         StartPickingRequest: {
             seller_order_ids: string[];
@@ -6383,15 +6871,20 @@ export interface components {
         RecognizeCardRequest: {
             /**
              * Format: base64
-             * @description The flattened card crop, base64 encoded, at most 512 KiB.
+             * @description The camera photo, base64 encoded, at most 700 KiB: shrink it to about 1600 pixels on the long side first.
              */
             image: string;
             /** @enum {string} */
             media_type: "image/jpeg" | "image/png" | "image/webp";
+            /** @description What the phone read on the card's collector line. It picks between printings with the same art when the picture agrees on the card. */
+            collector_line?: {
+                set_code?: string;
+                collector_number?: string;
+            };
         };
         SubmitReportRequest: {
             /** @enum {string} */
-            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user";
+            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user" | "trade";
             /** Format: uuid */
             target_id: string;
             reason: string;
@@ -6485,6 +6978,11 @@ export interface components {
              * @enum {string}
              */
             visibility?: "private" | "friends" | "public";
+            /**
+             * Format: uuid
+             * @description UX-89b: the list's game (the app sends the game picked in the top bar). Left out, the first card added sets it.
+             */
+            game_id?: string;
         };
         WishlistUpdate: {
             name?: string;
@@ -6495,6 +6993,20 @@ export interface components {
             visibility?: "private" | "friends" | "public";
             version: number;
         };
+        WishlistAlertsUpdate: {
+            wishlist_ids: string[];
+            /** @enum {string} */
+            alert_mode: "digest" | "instant" | "off";
+        };
+        WishlistMerge: {
+            /**
+             * Format: uuid
+             * @description The list that stays and takes the wishes.
+             */
+            keep_id: string;
+            /** @description The lists whose wishes move to `keep_id`; they are removed. */
+            merge_ids: string[];
+        };
         AuditLogEntry: {
             /** Format: uuid */
             id: string;
@@ -6502,8 +7014,12 @@ export interface components {
             /** @enum {string} */
             result: "success" | "denied";
             actor_user_id: string | null;
+            /** @description UX-35b: the actor's @handle; null for none or erased. */
+            actor_handle: string | null;
             target_type: string | null;
             target_entity_id: string | null;
+            /** @description UX-35b: the target's @handle when the target is a member, else null. */
+            target_handle: string | null;
             correlation_id: string;
             details: {
                 [key: string]: unknown;
@@ -6555,7 +7071,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user";
+            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user" | "trade";
             /** Format: uuid */
             target_id: string;
             reason: string;
@@ -6573,7 +7089,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user";
+            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user" | "trade";
             /** Format: uuid */
             target_id: string;
             reason: string;
@@ -6678,6 +7194,25 @@ export interface components {
                 queued: number;
                 active: number;
                 failed: number;
+            }[];
+        };
+        AdminProductOverrides: {
+            canonical_name: string;
+            popularity_rank: number | null;
+            changed_fields: {
+                /** @enum {string} */
+                field: "canonical_name" | "popularity_rank";
+                provider_value?: (string | number) | null;
+            }[];
+            pictures: {
+                /** Format: uuid */
+                printing_id: string;
+                /** @enum {string} */
+                kind: "front" | "back" | "art_crop";
+                /** @description The picture 292 px wide, read past the caches. */
+                url: string;
+                /** @description Uploaded by staff, so it can be restored. */
+                changed_here: boolean;
             }[];
         };
         ProductAlias: {
@@ -6947,6 +7482,19 @@ export interface components {
         CollectionAutomationMatching: {
             matching: number;
         };
+        CollectionItemRuleFolder: {
+            /** @description The first switched-on rule that matches the item and moves it; null when none. */
+            rule: {
+                /** Format: uuid */
+                rule_id: string;
+                rule_name: string;
+                /**
+                 * Format: uuid
+                 * @description The binder the rule moves matching items to.
+                 */
+                folder_id: string;
+            } | null;
+        };
         CollectionAutomationPreview: {
             matching: number;
             /** @description The first 8 matching items, oldest first, for the preview pictures. */
@@ -7038,6 +7586,11 @@ export interface components {
             acquisition_source: string;
             unit_cost_cents: number | null;
             currency: string | null;
+            /** @description UX-74: the price per unit as paid in another currency, when an import stored `unit_cost_cents` in euros. */
+            original_cost: {
+                cents: number;
+                currency: string;
+            } | null;
             acquired_at: string | null;
             notes: string | null;
             is_hidden: boolean;
@@ -7154,6 +7707,9 @@ export interface components {
             display_name: string | null;
             set_code: string | null;
             collector_number: string | null;
+            language: string | null;
+            /** @description nonfoil, foil or etched; null when unknown. */
+            finish: string | null;
             /** @description The binder the item sits in, if any. */
             folder_id: string | null;
             images: components["schemas"]["CatalogImages"] | null;
@@ -7224,6 +7780,16 @@ export interface components {
             is_misprint: boolean;
             card: components["schemas"]["CollectionItemCard"];
         };
+        BlockedMember: {
+            /** Format: uuid */
+            user_id: string;
+            /** @description Null if the account was deleted meanwhile. */
+            handle: string | null;
+            display_name: string | null;
+            avatar_url: string | null;
+            /** Format: date-time */
+            blocked_at: string;
+        };
         Comment: {
             /** Format: uuid */
             id: string;
@@ -7293,6 +7859,64 @@ export interface components {
             imported_at: string;
             version: number;
         };
+        ImportedDecklist: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            owner_user_id: string;
+            /** Format: uuid */
+            game_id: string;
+            name: string;
+            /** @enum {string} */
+            source: "text" | "moxfield" | "archidekt";
+            source_url: string | null;
+            /** @enum {string} */
+            visibility: "private" | "friends" | "public";
+            /** Format: date-time */
+            imported_at: string;
+            version: number;
+            entries: {
+                /** Format: uuid */
+                id: string;
+                position: number;
+                quantity: number;
+                /** @enum {string} */
+                board: "main" | "side" | "commander" | "maybe";
+                card_name: string;
+                raw_line: string;
+                /** @enum {string} */
+                resolution: "resolved" | "ambiguous" | "unresolved";
+                product_id: string | null;
+                candidate_product_ids: string[];
+                /** @description COM-12: the card's facts for grouping by type, mana value or colour; null when unresolved. */
+                card: {
+                    type_line: string;
+                    mana_cost: string | null;
+                    mana_value: number | null;
+                    colors: string[];
+                } | null;
+                /** @description The line's printing's pictures, else the card's (its newest printing with one), for the grid and stacks views. */
+                images: components["schemas"]["CatalogImages"] | null;
+                /** @description UX-106: the exact printing the line holds, read from the pasted line ("(C21) 263") or picked later; null means any printing of the card. */
+                printing: {
+                    /** Format: uuid */
+                    id: string;
+                    set_code: string;
+                    set_name: string;
+                    collector_number: string | null;
+                    rarity: string | null;
+                } | null;
+                /**
+                 * @description UX-106: from `*F*` or `*E*` on the line.
+                 * @enum {string}
+                 */
+                finish: "nonfoil" | "foil" | "etched";
+                /** @description UX-106: the language the line names; `en` otherwise. */
+                language: string;
+            }[];
+            /** @description The lines that match no catalog card, as typed; they are not part of the deck. */
+            unrecognised_lines: string[];
+        };
         Decklist: {
             /** Format: uuid */
             id: string;
@@ -7329,8 +7953,24 @@ export interface components {
                     mana_value: number | null;
                     colors: string[];
                 } | null;
-                /** @description The card's pictures (its newest printing with one), for the grid and stacks views. */
+                /** @description The line's printing's pictures, else the card's (its newest printing with one), for the grid and stacks views. */
                 images: components["schemas"]["CatalogImages"] | null;
+                /** @description UX-106: the exact printing the line holds, read from the pasted line ("(C21) 263") or picked later; null means any printing of the card. */
+                printing: {
+                    /** Format: uuid */
+                    id: string;
+                    set_code: string;
+                    set_name: string;
+                    collector_number: string | null;
+                    rarity: string | null;
+                } | null;
+                /**
+                 * @description UX-106: from `*F*` or `*E*` on the line.
+                 * @enum {string}
+                 */
+                finish: "nonfoil" | "foil" | "etched";
+                /** @description UX-106: the language the line names; `en` otherwise. */
+                language: string;
             }[];
         };
         DecklistCartFill: {
@@ -7350,6 +7990,8 @@ export interface components {
         DecklistOwnership: {
             owned: number;
             total: number;
+            /** @description UX-63: copies in `total` whose name matches no catalog card (maybeboard left out); they are counted as missing but cannot be bought. */
+            not_in_catalog: number;
             lines: {
                 /** Format: uuid */
                 entry_id: string;
@@ -7367,6 +8009,52 @@ export interface components {
                 /** @description Missing copies no offer covers (not in cents). */
                 unpriced: number;
             };
+        };
+        DecklistCheck: {
+            counts: {
+                all: number;
+                ready: number;
+                pick: number;
+                bad: number;
+            };
+            rows: {
+                line: number;
+                /** @enum {string} */
+                board: "main" | "side" | "commander" | "maybe";
+                /**
+                 * @description `ready`: the card and printing are found; `pick`: the name fits several cards, pick one of `printings`; `bad`: see `problem` (not saved).
+                 * @enum {string}
+                 */
+                status: "ready" | "pick" | "bad";
+                /** @description The line as typed. */
+                text: string;
+                card: {
+                    name: string;
+                    set_code: string | null;
+                    collector_number: string | null;
+                    language: string;
+                    /** @enum {string} */
+                    finish: "nonfoil" | "foil" | "etched";
+                    quantity: number;
+                };
+                product_id: string | null;
+                printing_id: string | null;
+                /** @description The line names no printing (or one the catalog lacks), so it gets the card's newest. */
+                newest: boolean;
+                printings: {
+                    /** Format: uuid */
+                    printing_id: string;
+                    product_name: string;
+                    set_code: string;
+                    set_name: string;
+                    collector_number: string | null;
+                    release_date: string | null;
+                }[];
+                problem: {
+                    code: string;
+                    message: string;
+                } | null;
+            }[];
         };
         FeedEntry: {
             /** Format: uuid */
@@ -7475,6 +8163,13 @@ export interface components {
             }[];
             /** @description Whether the For sale tab shows (COM-09) */
             shows_for_sale: boolean;
+            /** @description UX-61: what this member is to you. Absent when signed out or on your own profile. A declined request reads `none`. */
+            friendship?: {
+                /** @enum {string} */
+                state: "none" | "request_sent" | "request_received" | "friends";
+                /** @description The friendship or request to accept, withdraw or remove; null for `none`. */
+                id: string | null;
+            };
         };
         DeckStats: {
             /** @description Commander decks, those with a known commander */
@@ -7565,6 +8260,11 @@ export interface components {
             proposer_confirmed_at: string | null;
             recipient_confirmed_at: string | null;
             parent_proposal_id: string | null;
+            accepted_at: string | null;
+            cancelled_by_user_id: string | null;
+            cancelled_at: string | null;
+            /** @description Why the member cancelled; required once the other member confirmed (UX-68b). */
+            cancel_reason: string | null;
             /** Format: date-time */
             expires_at: string;
             /** Format: date-time */
@@ -7813,6 +8513,8 @@ export interface components {
             display_currency: string;
             /** @enum {string} */
             theme: "system" | "light" | "dark";
+            /** @enum {string} */
+            date_format: "day_month" | "month_day" | "iso";
             timezone: string;
             default_game_id: string | null;
             /** @enum {string} */
@@ -7820,6 +8522,7 @@ export interface components {
             onboarding_step: ("account" | "type" | "plan" | "games" | "collection" | "wishlist" | "profile" | "seller" | "done") | null;
             onboarding_done: boolean;
             checklist_hidden: boolean;
+            checklist_skipped: ("email" | "type" | "games" | "cards" | "binder" | "wishlist" | "profile" | "friend" | "seller")[];
             seller_reminder_after: string | null;
         };
         Profile: {
@@ -7878,6 +8581,10 @@ export interface components {
             vacation_until: string | null;
             min_order_cents: number | null;
             activated_at: string | null;
+            /** @description UX-03: where you ship from, set by the payment onboarding; null before it. */
+            country_code: string | null;
+            /** @description UX-03b: countries you do not ship to; buyers there cannot order from you. */
+            excluded_destinations: string[];
         };
         Dac7Status: {
             year: number;
@@ -7920,6 +8627,18 @@ export interface components {
             preferences: components["schemas"]["Preferences"];
             addresses: components["schemas"]["AddressList"];
             terms: components["schemas"]["TermsStatus"] | null;
+            /** @description Whether you are a moderator or admin, so the frame can link the admin console (UX-35b) */
+            staff: boolean;
+            /** @description Whether you have a seller account, so the frame shows seller links without a call of its own (UX-11); false while selling is off */
+            seller: boolean;
+            /** @description The "Getting started" facts read from collection, wishlist and community, so the checklist on every page needs no reads of its own (UX-96); `null` while onboarding is off or was never started. A part whose feature is off reads false. */
+            checklist: {
+                email_verified: boolean;
+                has_cards: boolean;
+                has_binder: boolean;
+                has_wishlist_card: boolean;
+                has_friend: boolean;
+            } | null;
         };
         TermsStatus: {
             items: {
@@ -7967,6 +8686,9 @@ export interface components {
         OAuthProviderList: {
             providers: ("google" | "apple" | "discord")[];
         };
+        PasswordResetStatus: {
+            usable: boolean;
+        };
         DeviceSessionList: {
             items: components["schemas"]["DeviceSession"][];
         };
@@ -7989,6 +8711,10 @@ export interface components {
             access_token_expires_at: string;
             /** Format: date-time */
             refresh_token_expires_at: string;
+        };
+        ShipFromCountries: {
+            /** @description UX-03: countries a seller can sell from, i.e. those with postage rates, sorted. */
+            countries: string[];
         };
         CatalogSyncRequested: {
             provider: string;
@@ -8052,6 +8778,33 @@ export interface components {
             expires_at: string | null;
             rows: number | null;
         };
+        MemberImport: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "catalog_sync" | "collection_import" | "listing_bulk" | "decklist";
+            provider: string;
+            /** @enum {string} */
+            trigger: "manual_upload" | "scheduled_cron" | "webhook";
+            /** @enum {string} */
+            status: "pending" | "processing" | "completed" | "partial_failure" | "failed" | "cancelled";
+            total_records: number;
+            /** @description Records with an outcome, including skipped and failed. */
+            processed_records: number;
+            failed_records: number;
+            skipped_records: number;
+            started_at: string | null;
+            completed_at: string | null;
+            /** Format: date-time */
+            created_at: string;
+            outcomes: {
+                [key: string]: number;
+            };
+            /** @description The uploaded file's name as sent in `options.file_name`; null when not sent. */
+            file_name: string | null;
+            /** @description The file's layout from `options.format`, for example `cardmarket_csv`. */
+            format: string | null;
+        };
         ImportJob: {
             /** Format: uuid */
             id: string;
@@ -8088,6 +8841,27 @@ export interface components {
             outcome: string | null;
             /** @description The card and the change, for example `Sol Ring · 5 × 1.00 → 9 × 1.00 EUR`. */
             note: string | null;
+            /** @description UX-114b, stock imports only: the listing before and after this row; null otherwise. */
+            change: {
+                /** @description The row's line in the file; absent for a missing card. */
+                line?: number;
+                /** Format: uuid */
+                sku_id: string;
+                /** @description Null for a new listing. */
+                before: {
+                    quantity: number;
+                    price_cents: number;
+                } | null;
+                /** @description Null when the listing ends. */
+                after: {
+                    quantity: number;
+                    price_cents: number;
+                } | null;
+                /** @description The file's price per card. */
+                file_cents?: number | null;
+                /** @description The 7-day market average the price rule used. */
+                market_cents?: number | null;
+            } | null;
             /** Format: date-time */
             processed_at: string;
         };
@@ -8143,6 +8917,8 @@ export interface components {
                     cents: string;
                     currency: string;
                 } | null;
+                /** @description UX-74: a cost in another currency in euro cents at today's ECB rate; null for EUR or without a rate. */
+                unit_cost_eur_cents: string | null;
             } | null;
             sku_id: string | null;
             printings: {
@@ -8196,11 +8972,182 @@ export interface components {
             currency: string;
             requested_refund_cents: number;
             resolution_refund_cents: number | null;
+            /** @description UX-35a: the moderator's explanation of the decision, for both sides; null otherwise. */
+            resolution_note: string | null;
+            /** @description What the dispute froze until it ends. */
+            held_cents: number;
             /** @description Opened by a chargeback from the buyer's bank. */
             chargeback: boolean;
             /** Format: date-time */
             created_at: string;
+            /**
+             * Format: date-time
+             * @description UX-35c: from then on Support decides, unless a side escalated sooner (`escalated`).
+             */
+            escalates_at: string;
             resolved_at: string | null;
+        };
+        DisputeCase: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            seller_order_id: string;
+            /** Format: uuid */
+            order_id: string;
+            /** Format: uuid */
+            buyer_user_id: string;
+            /** Format: uuid */
+            seller_user_id: string;
+            /** @enum {string} */
+            reason: "not_received" | "condition_mismatch" | "wrong_item" | "damaged" | "other";
+            /** @enum {string} */
+            status: "open" | "awaiting_seller" | "awaiting_buyer" | "escalated" | "resolved_refunded" | "resolved_released";
+            currency: string;
+            requested_refund_cents: number;
+            resolution_refund_cents: number | null;
+            /** @description UX-35a: the moderator's explanation of the decision, for both sides; null otherwise. */
+            resolution_note: string | null;
+            /** @description What the dispute froze until it ends. */
+            held_cents: number;
+            /** @description Opened by a chargeback from the buyer's bank. */
+            chargeback: boolean;
+            /** Format: date-time */
+            created_at: string;
+            /**
+             * Format: date-time
+             * @description UX-35c: from then on Support decides, unless a side escalated sooner (`escalated`).
+             */
+            escalates_at: string;
+            resolved_at: string | null;
+            messages: components["schemas"]["DisputeMessage"][];
+            /** @description Null for an erased account. */
+            buyer_handle: string | null;
+            seller_handle: string | null;
+            /** @description The seller order's goods (cards, postage, packaging): the most a decision refunds. */
+            max_refund_cents: number;
+            seller_order: components["schemas"]["SellerOrder"];
+        };
+        DisputeMessage: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            author_user_id: string;
+            body: string;
+            attachment_keys: string[];
+            /** Format: date-time */
+            created_at: string;
+        };
+        SellerOrder: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            order_id: string;
+            /** Format: uuid */
+            buyer_user_id: string;
+            /** @enum {string} */
+            status: "to_pack" | "packed" | "dispatched" | "in_transit" | "delivered" | "received" | "completed" | "cancelled" | "in_dispute" | "resolved_refunded" | "resolved_released";
+            /** @description Must be dispatched with a tracking number. */
+            is_tracked: boolean;
+            carrier: string | null;
+            tracking_number: string | null;
+            currency: string;
+            items_subtotal_cents: number;
+            shipping_cents: number;
+            packaging_fee_cents: number;
+            commission_cents: number;
+            ship_to_country: string;
+            /** Format: date-time */
+            placed_at: string;
+            dispatched_at: string | null;
+            delivered_at: string | null;
+            received_at: string | null;
+            /** @description Counts as received then, 60 days after dispatch. */
+            auto_confirm_at: string | null;
+            /** @description Non-delivery claims open then, 30 days after dispatch. */
+            claim_opens_at: string | null;
+            /** @description Disputes close then, 90 days after delivery or receipt. */
+            claim_closes_at: string | null;
+            /** @enum {string} */
+            shipping_format: "letter" | "large_letter" | "parcel";
+            /** @description When you started picking it (to_pack only). */
+            picking_started_at: string | null;
+            /**
+             * @description Where it is in the fulfilment center: new (paid), picking, issues, picked (ready to pack), packed, sent, or closed.
+             * @enum {string}
+             */
+            stage: "new" | "picking" | "issues" | "picked" | "packed" | "sent" | "cancelled" | "in_dispute" | "resolved";
+            /** @description The latest dispute on it, open or decided; null if none. */
+            dispute_id: string | null;
+            /** @description What the buyer got back: when cancelled, the refund; after a staff decision, its refund. Before either, what a cancel now would give back (cards, postage, and the buyer fee once no other parcel of the order stands). Otherwise 0. */
+            refund_cents: number;
+            /** @description Why the seller cancelled it; null unless the seller cancelled it. */
+            cancel_reason: ("out_of_stock" | "damaged" | "buyer_request" | "other") | null;
+            /** @description When it was cancelled; null unless cancelled. */
+            cancelled_at: string | null;
+            /** @description Who asked for the cancel; null unless cancelled. */
+            cancelled_by: ("seller" | "buyer") | null;
+            /** @description The note left with the cancel, if any. */
+            cancel_note: string | null;
+            /** @description A cancel request waiting for the other side (UX-07b); null if none. */
+            cancel_request: {
+                /** @enum {string} */
+                requested_by: "seller" | "buyer";
+                /** @enum {string} */
+                reason: "out_of_stock" | "damaged" | "buyer_request" | "other";
+                note: string | null;
+                /** Format: date-time */
+                requested_at: string;
+                /**
+                 * Format: date-time
+                 * @description Cancelled then if the other side has not answered.
+                 */
+                expires_at: string;
+            } | null;
+            lines: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                listing_id: string;
+                /** Format: uuid */
+                sku_id: string;
+                title: string;
+                condition: number;
+                unit_price_cents: number;
+                quantity: number;
+                /** @description UX-53: the seller sent the order without this line (missing or damaged card); its price was refunded. */
+                removed: boolean;
+                /** @description UX-53c: the seller cannot send this card and asked the buyer to keep the order without it or cancel; null if not asked. */
+                removal_question: {
+                    /** @enum {string} */
+                    reason: "missing" | "damaged";
+                    /** @description What the buyer gets back if they keep the order. */
+                    refund_cents: number;
+                    /**
+                     * Format: date-time
+                     * @description Sent without the card if the buyer has not answered.
+                     */
+                    answer_by: string;
+                } | null;
+                /** @description null while open, and for a removed line (UX-53: see `removed`). */
+                pick_status: ("picked" | "issue") | null;
+                pick_issue: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
+                pick_note: string | null;
+                /** @description The printing sold, from the catalog. */
+                card: {
+                    /** @description "Lightning Bolt (MH3 302)". */
+                    display_name: string;
+                    product_name: string;
+                    game_code: string;
+                    set_code: string;
+                    set_name: string;
+                    collector_number: string | null;
+                    language: string;
+                    finish: string | null;
+                    /** @description The printing's rarity code, such as `rare` (UX-136). */
+                    rarity: string | null;
+                    images: components["schemas"]["CatalogImages"];
+                } | null;
+            }[];
         };
         Cart: {
             sellers: {
@@ -8208,6 +9155,10 @@ export interface components {
                 seller_user_id: string;
                 items: components["schemas"]["CartItem"][];
             }[];
+            /** @description Cards the seller took out of your cart, and why; shown until you dismiss them. */
+            notices: components["schemas"]["CartNotice"][];
+            /** @description UX-66: cards whose 10-hour hold ran out, so they left your cart; shown until you dismiss them. Add a card again to hold it anew. */
+            expired_holds: components["schemas"]["CartExpiredHold"][];
         };
         CartItem: {
             /** Format: uuid */
@@ -8227,6 +9178,10 @@ export interface components {
             hold_expires_at: string | null;
             /** @description Null once the listing has ended. */
             listing: components["schemas"]["Listing"] | null;
+            /** @description The price you last saw for this item, in cents of `listing.currency`; null on older items. */
+            seen_price_cents: number | null;
+            /** @description The listing now costs more than `seen_price_cents`. Checkout waits until you accept the new price or remove the item. */
+            price_changed: boolean;
         };
         Listing: {
             /** Format: uuid */
@@ -8256,6 +9211,17 @@ export interface components {
             photo_urls: string[];
             /** @enum {string} */
             status: "draft" | "active" | "paused" | "sold_out" | "cancelled" | "suspended";
+            /** @description Listing lists with `seller` and the cart only: the copy is signed. */
+            is_signed?: boolean;
+            /** @description Listing lists with `seller` and the cart only: the copy is altered. */
+            is_altered?: boolean;
+            /** @description UX-114c, your own listings (`seller` is you) only: the collection folder the copies sit in; null while unfiled. */
+            binder?: {
+                name: string;
+                is_trade_binder: boolean;
+            } | null;
+            /** @description UX-114c, your own listings only: copies of the collection item neither listed nor reserved, so they could go on sale too. */
+            free_quantity?: number;
             version: number;
             /** Format: date-time */
             created_at: string;
@@ -8272,6 +9238,58 @@ export interface components {
                 collector_number: string | null;
                 language: string;
                 finish: string | null;
+                /** @description The printing's rarity code, such as `rare` (UX-136). */
+                rarity: string | null;
+                images: components["schemas"]["CatalogImages"];
+            } | null;
+        };
+        CartNotice: {
+            /**
+             * Format: uuid
+             * @description Dismiss with `DELETE cart/items/{id}`.
+             */
+            id: string;
+            /** Format: uuid */
+            listing_id: string;
+            /** @enum {string} */
+            reason: "listing_ended" | "removed_by_seller";
+            card: {
+                /** @description "Lightning Bolt (MH3 302)". */
+                display_name: string;
+                product_name: string;
+                game_code: string;
+                set_code: string;
+                set_name: string;
+                collector_number: string | null;
+                language: string;
+                finish: string | null;
+                /** @description The printing's rarity code, such as `rare` (UX-136). */
+                rarity: string | null;
+                images: components["schemas"]["CatalogImages"];
+            } | null;
+        };
+        CartExpiredHold: {
+            /**
+             * Format: uuid
+             * @description Dismiss with `DELETE cart/items/{id}`.
+             */
+            id: string;
+            /** Format: uuid */
+            listing_id: string;
+            /** @description When the hold ran out. */
+            hold_ended_at: string | null;
+            card: {
+                /** @description "Lightning Bolt (MH3 302)". */
+                display_name: string;
+                product_name: string;
+                game_code: string;
+                set_code: string;
+                set_name: string;
+                collector_number: string | null;
+                language: string;
+                finish: string | null;
+                /** @description The printing's rarity code, such as `rare` (UX-136). */
+                rarity: string | null;
                 images: components["schemas"]["CatalogImages"];
             } | null;
         };
@@ -8357,6 +9375,10 @@ export interface components {
             total_cents: number;
             /** @description The rate is a starting estimate, not a carrier price (OQ-07). */
             placeholder: boolean;
+            /** @description UX-136: usual working days to delivery, at least. */
+            delivery_days_min: number;
+            /** @description UX-136: usual working days to delivery, at most. */
+            delivery_days_max: number;
         };
         CartQuote: {
             /** @constant */
@@ -8380,7 +9402,7 @@ export interface components {
                     tracked_required_because: ("order_value" | "trust_tier" | "unconfirmed_in_transit" | "loss_rate")[];
                     options: components["schemas"]["ShippingOption"][];
                 } | null;
-                /** @description The cheapest allowed option; the totals use it. */
+                /** @description The buyer's choice while on offer (UX-136), else the cheapest option; the totals use it. */
                 selected_shipping: components["schemas"]["ShippingOption"] | null;
                 /** @description Why this seller cannot ship to the country; null when it can. */
                 problem: ("no_ship_from" | "unknown_weight" | "unsupported_destination" | "no_fitting_rate" | "empty_shipment") | null;
@@ -8435,22 +9457,39 @@ export interface components {
             currency: string;
             requested_refund_cents: number;
             resolution_refund_cents: number | null;
+            /** @description UX-35a: the moderator's explanation of the decision, for both sides; null otherwise. */
+            resolution_note: string | null;
+            /** @description What the dispute froze until it ends. */
+            held_cents: number;
             /** @description Opened by a chargeback from the buyer's bank. */
             chargeback: boolean;
             /** Format: date-time */
             created_at: string;
+            /**
+             * Format: date-time
+             * @description UX-35c: from then on Support decides, unless a side escalated sooner (`escalated`).
+             */
+            escalates_at: string;
             resolved_at: string | null;
             messages: components["schemas"]["DisputeMessage"][];
         };
-        DisputeMessage: {
+        ListingCardResponse: {
             /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            author_user_id: string;
-            body: string;
-            attachment_keys: string[];
-            /** Format: date-time */
-            created_at: string;
+            product_id: string;
+            card: {
+                /** @description "Lightning Bolt (MH3 302)". */
+                display_name: string;
+                product_name: string;
+                game_code: string;
+                set_code: string;
+                set_name: string;
+                collector_number: string | null;
+                language: string;
+                finish: string | null;
+                /** @description The printing's rarity code, such as `rare` (UX-136). */
+                rarity: string | null;
+                images: components["schemas"]["CatalogImages"];
+            } | null;
         };
         BulkListingJob: {
             /** Format: uuid */
@@ -8516,6 +9555,31 @@ export interface components {
                 shipping_format: "letter" | "large_letter" | "parcel";
                 /** @description The latest dispute on it, open or decided; null if none. */
                 dispute_id: string | null;
+                /** @description What the buyer got back: when cancelled, the refund; after a staff decision, its refund. Before either, what a cancel now would give back (cards, postage, and the buyer fee once no other parcel of the order stands). Otherwise 0. */
+                refund_cents: number;
+                /** @description Why the seller cancelled it; null unless the seller cancelled it. */
+                cancel_reason: ("out_of_stock" | "damaged" | "buyer_request" | "other") | null;
+                /** @description When it was cancelled; null unless cancelled. */
+                cancelled_at: string | null;
+                /** @description Who asked for the cancel; null unless cancelled. */
+                cancelled_by: ("seller" | "buyer") | null;
+                /** @description The note left with the cancel, if any. */
+                cancel_note: string | null;
+                /** @description A cancel request waiting for the other side (UX-07b); null if none. */
+                cancel_request: {
+                    /** @enum {string} */
+                    requested_by: "seller" | "buyer";
+                    /** @enum {string} */
+                    reason: "out_of_stock" | "damaged" | "buyer_request" | "other";
+                    note: string | null;
+                    /** Format: date-time */
+                    requested_at: string;
+                    /**
+                     * Format: date-time
+                     * @description Cancelled then if the other side has not answered.
+                     */
+                    expires_at: string;
+                } | null;
                 lines: {
                     /** Format: uuid */
                     id: string;
@@ -8527,9 +9591,47 @@ export interface components {
                     condition: number;
                     unit_price_cents: number;
                     quantity: number;
+                    /** @description UX-53: the seller sent the order without this line (missing or damaged card); its price was refunded. */
+                    removed: boolean;
+                    /** @description UX-53c: the seller cannot send this card and asked the buyer to keep the order without it or cancel; null if not asked. */
+                    removal_question: {
+                        /** @enum {string} */
+                        reason: "missing" | "damaged";
+                        /** @description What the buyer gets back if they keep the order. */
+                        refund_cents: number;
+                        /**
+                         * Format: date-time
+                         * @description Sent without the card if the buyer has not answered.
+                         */
+                        answer_by: string;
+                    } | null;
+                    /** @description The printing bought, from the catalog. */
+                    card: {
+                        /** @description "Lightning Bolt (MH3 302)". */
+                        display_name: string;
+                        product_name: string;
+                        game_code: string;
+                        set_code: string;
+                        set_name: string;
+                        collector_number: string | null;
+                        language: string;
+                        finish: string | null;
+                        /** @description The printing's rarity code, such as `rare` (UX-136). */
+                        rarity: string | null;
+                        images: components["schemas"]["CatalogImages"];
+                    } | null;
+                    /** @description UX-136c: the seller's note as it was when you bought the card. */
+                    notes: string | null;
+                    /** @description UX-136c: the seller's photos of the copy as they were when you bought it. */
+                    photo_urls: string[];
+                    is_signed: boolean;
+                    is_altered: boolean;
                 }[];
                 /** Format: uuid */
                 seller_user_id: string;
+                /** @description UX-136c: the usual delivery range of the postage chosen, in working days (an estimate); null on orders placed before. */
+                delivery_days_min: number | null;
+                delivery_days_max: number | null;
             }[];
         };
         Feedback: {
@@ -8539,6 +9641,12 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+        };
+        PaymentSetup: {
+            /** @enum {string} */
+            gateway: "stripe" | "fake";
+            /** @description Stripe's public key (`pk_...`); null with the fake gateway. */
+            publishable_key: string | null;
         };
         PricingPreview: {
             listings_checked: number;
@@ -8669,6 +9777,19 @@ export interface components {
                 cents: number;
                 currency: string;
             } | null;
+            seller: components["schemas"]["OfferSeller"];
+            /** @description UX-03: whether the seller has a postage option to `ship_to` (any sort); null without `ship_to`. Offers with false cannot be bought there. */
+            ships_to: boolean | null;
+            /** @description UX-06c: the seller's photos of this exact copy, in display order; empty for most offers. */
+            photo_urls: string[];
+        };
+        /** @description The seller as buyers see them (UX-17); public fields only. */
+        OfferSeller: {
+            /** @description The public display name; null when the profile is gone. */
+            name: string | null;
+            /** @description The @handle of the public profile (`/u/{handle}`). */
+            handle: string | null;
+            trust_tier: ("bronze" | "silver" | "gold" | "platinum") | null;
         };
         OfferPriceFacet: {
             /** Format: uuid */
@@ -8714,11 +9835,30 @@ export interface components {
                 /** @constant */
                 currency: "EUR";
             };
-            wallet: components["schemas"]["Wallet"];
+            wallet: {
+                /** @constant */
+                currency: "EUR";
+                pending_cents: number;
+                available_cents: number;
+                frozen_cents: number;
+                minimum_payout_cents: number;
+                /** @description UX-34: one per open dispute that holds money, oldest first. */
+                holds: {
+                    /** Format: uuid */
+                    dispute_id: string;
+                    /** Format: uuid */
+                    seller_order_id: string;
+                    held_cents: number;
+                    /** @description What the buyer asks for. */
+                    requested_refund_cents: number;
+                }[];
+            };
             /** @description Your listings per status; statuses without listings are left out. */
             listings: {
                 [key: string]: number;
             };
+            /** @description UX-114c: units on sale across your active listings. */
+            cards_on_sale?: number;
             /** @description Up to 20 active listings with 2 units or fewer on sale, fewest first. */
             low_stock: {
                 /** Format: uuid */
@@ -8746,86 +9886,8 @@ export interface components {
                 value_cents: number;
             }[];
         };
-        Wallet: {
-            /** @constant */
-            currency: "EUR";
-            pending_cents: number;
-            available_cents: number;
-            frozen_cents: number;
-            minimum_payout_cents: number;
-        };
         ReleasedReservations: {
             released: number;
-        };
-        SellerOrder: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            order_id: string;
-            /** Format: uuid */
-            buyer_user_id: string;
-            /** @enum {string} */
-            status: "to_pack" | "packed" | "dispatched" | "in_transit" | "delivered" | "received" | "completed" | "cancelled" | "in_dispute" | "resolved_refunded" | "resolved_released";
-            /** @description Must be dispatched with a tracking number. */
-            is_tracked: boolean;
-            carrier: string | null;
-            tracking_number: string | null;
-            currency: string;
-            items_subtotal_cents: number;
-            shipping_cents: number;
-            packaging_fee_cents: number;
-            commission_cents: number;
-            ship_to_country: string;
-            /** Format: date-time */
-            placed_at: string;
-            dispatched_at: string | null;
-            delivered_at: string | null;
-            received_at: string | null;
-            /** @description Counts as received then, 60 days after dispatch. */
-            auto_confirm_at: string | null;
-            /** @description Non-delivery claims open then, 30 days after dispatch. */
-            claim_opens_at: string | null;
-            /** @description Disputes close then, 90 days after delivery or receipt. */
-            claim_closes_at: string | null;
-            /** @enum {string} */
-            shipping_format: "letter" | "large_letter" | "parcel";
-            /** @description When you started picking it (to_pack only). */
-            picking_started_at: string | null;
-            /**
-             * @description Where it is in the fulfilment center: new (paid), picking, issues, picked (ready to pack), packed, sent, or closed.
-             * @enum {string}
-             */
-            stage: "new" | "picking" | "issues" | "picked" | "packed" | "sent" | "cancelled" | "in_dispute" | "resolved";
-            /** @description The latest dispute on it, open or decided; null if none. */
-            dispute_id: string | null;
-            lines: {
-                /** Format: uuid */
-                id: string;
-                /** Format: uuid */
-                listing_id: string;
-                /** Format: uuid */
-                sku_id: string;
-                title: string;
-                condition: number;
-                unit_price_cents: number;
-                quantity: number;
-                pick_status: ("picked" | "issue") | null;
-                pick_issue: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
-                pick_note: string | null;
-                /** @description The printing sold, from the catalog. */
-                card: {
-                    /** @description "Lightning Bolt (MH3 302)". */
-                    display_name: string;
-                    product_name: string;
-                    game_code: string;
-                    set_code: string;
-                    set_name: string;
-                    collector_number: string | null;
-                    language: string;
-                    finish: string | null;
-                    images: components["schemas"]["CatalogImages"];
-                } | null;
-            }[];
         };
         SellerOrderDetails: {
             /** Format: uuid */
@@ -8868,6 +9930,31 @@ export interface components {
             stage: "new" | "picking" | "issues" | "picked" | "packed" | "sent" | "cancelled" | "in_dispute" | "resolved";
             /** @description The latest dispute on it, open or decided; null if none. */
             dispute_id: string | null;
+            /** @description What the buyer got back: when cancelled, the refund; after a staff decision, its refund. Before either, what a cancel now would give back (cards, postage, and the buyer fee once no other parcel of the order stands). Otherwise 0. */
+            refund_cents: number;
+            /** @description Why the seller cancelled it; null unless the seller cancelled it. */
+            cancel_reason: ("out_of_stock" | "damaged" | "buyer_request" | "other") | null;
+            /** @description When it was cancelled; null unless cancelled. */
+            cancelled_at: string | null;
+            /** @description Who asked for the cancel; null unless cancelled. */
+            cancelled_by: ("seller" | "buyer") | null;
+            /** @description The note left with the cancel, if any. */
+            cancel_note: string | null;
+            /** @description A cancel request waiting for the other side (UX-07b); null if none. */
+            cancel_request: {
+                /** @enum {string} */
+                requested_by: "seller" | "buyer";
+                /** @enum {string} */
+                reason: "out_of_stock" | "damaged" | "buyer_request" | "other";
+                note: string | null;
+                /** Format: date-time */
+                requested_at: string;
+                /**
+                 * Format: date-time
+                 * @description Cancelled then if the other side has not answered.
+                 */
+                expires_at: string;
+            } | null;
             lines: {
                 /** Format: uuid */
                 id: string;
@@ -8879,6 +9966,21 @@ export interface components {
                 condition: number;
                 unit_price_cents: number;
                 quantity: number;
+                /** @description UX-53: the seller sent the order without this line (missing or damaged card); its price was refunded. */
+                removed: boolean;
+                /** @description UX-53c: the seller cannot send this card and asked the buyer to keep the order without it or cancel; null if not asked. */
+                removal_question: {
+                    /** @enum {string} */
+                    reason: "missing" | "damaged";
+                    /** @description What the buyer gets back if they keep the order. */
+                    refund_cents: number;
+                    /**
+                     * Format: date-time
+                     * @description Sent without the card if the buyer has not answered.
+                     */
+                    answer_by: string;
+                } | null;
+                /** @description null while open, and for a removed line (UX-53: see `removed`). */
                 pick_status: ("picked" | "issue") | null;
                 pick_issue: ("missing" | "wrong_condition" | "wrong_finish" | "wrong_language" | "damaged" | "other") | null;
                 pick_note: string | null;
@@ -8893,9 +9995,13 @@ export interface components {
                     collector_number: string | null;
                     language: string;
                     finish: string | null;
+                    /** @description The printing's rarity code, such as `rare` (UX-136). */
+                    rarity: string | null;
                     images: components["schemas"]["CatalogImages"];
                 } | null;
             }[];
+            /** @description What you get: cards, postage and packaging minus commission; after a dispute decision also minus the refund, with the commission on the refunded part given back; 0 once cancelled. */
+            net_cents: number;
             ship_to: {
                 name: string;
                 line1: string;
@@ -8917,6 +10023,52 @@ export interface components {
         };
         SellerOrderStageCounts: {
             [key: string]: number;
+        };
+        Wallet: {
+            /** @constant */
+            currency: "EUR";
+            pending_cents: number;
+            available_cents: number;
+            frozen_cents: number;
+            minimum_payout_cents: number;
+            /** @description UX-34: one per open dispute that holds money, oldest first. */
+            holds: {
+                /** Format: uuid */
+                dispute_id: string;
+                /** Format: uuid */
+                seller_order_id: string;
+                held_cents: number;
+                /** @description What the buyer asks for. */
+                requested_refund_cents: number;
+            }[];
+            /** @description UX-54: what a payout still needs. */
+            payout: {
+                two_step_on: boolean;
+                /** @description Payment onboarding finished and payouts enabled. */
+                account_ready: boolean;
+                /** @description End of the 48-hour pause after a sign-in change; null when none. */
+                paused_until: string | null;
+                /** @description Last four digits of the payout bank account; null when unknown or not asked for (dashboard). */
+                account_last4: string | null;
+            };
+        };
+        WalletActivity: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            occurred_at: string;
+            /**
+             * @description `refund`: a cancelled sale; `staff_refund`: refunded after a dispute; `balance`: spent from, or returned to, your balance at checkout. A failed payout comes back as a positive `payout`.
+             * @enum {string}
+             */
+            kind: "sale" | "commission" | "refund" | "staff_refund" | "payout" | "balance";
+            /** @description Signed: what the line added to, or took from, your balance. */
+            amount_cents: number;
+            /** @constant */
+            currency: "EUR";
+            seller_order_id: string | null;
+            /** @description Where the sale's money is now, or the payout's status; null for balance lines. */
+            state: ("on_its_way" | "ready" | "held" | "refunded" | "requested" | "in_transit" | "paid" | "failed") | null;
         };
         Payout: {
             /** Format: uuid */
@@ -8952,6 +10104,8 @@ export interface components {
             page: {
                 limit: number;
                 next_cursor: string | null;
+                /** @description Every match, on lists that count them. */
+                total?: number;
             };
             /** @description Unread items in the whole inbox. */
             unread_count: number;
@@ -8992,6 +10146,8 @@ export interface components {
             printing_id: string;
             /** Format: uuid */
             product_id: string;
+            /** @description The card page's slug, so a link needs no redirect from the id form. */
+            product_slug: string | null;
             name: string;
             set_code: string;
             collector_number: string | null;
@@ -9107,6 +10263,10 @@ export interface components {
                 quantity: number;
                 /** @description In 1/100 % of the total. */
                 share_bps: number;
+                /** @description The slice's market value now minus 30 days ago (daily market averages), over the copies valued both times; null when none was. */
+                change_30d_cents: number | null;
+                /** @description The same change in 1/100 %. */
+                change_30d_bps: number | null;
             }[];
         };
         CollectionFacts: {
@@ -9242,6 +10402,10 @@ export interface components {
             reference_sources: string[];
             /** @description Holdings valued at an external reference price (MD-06); not counted in valued_by. */
             reference_valued_count: number;
+            /** @description How the value moved over the period: value now minus the value at the first snapshot in it, leaving out cards added or removed since (at their value when they came or went). Null before the first snapshot. */
+            change_cents: number | null;
+            /** @description The days change_cents covers: from the first snapshot in the period to today. Null with it. */
+            change_days: number | null;
         };
         CardRecognition: {
             /** @description Most likely first; empty when nothing is close enough. */
@@ -9255,7 +10419,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user";
+            target_type: "listing" | "message" | "profile" | "comment" | "showcase" | "user" | "trade";
             /** Format: uuid */
             target_id: string;
             reason: string;
@@ -9298,6 +10462,13 @@ export interface components {
                             count: number;
                         }[];
                     };
+                    /** @description Single cards by what their offers come in: `condition` (card grade code such as `NM`, counted at its own grade), `offer_language` and `finish` (`nonfoil`, `foil`, `etched`). A card counts once per value; with offer filters in `q`, only offers that pass them count. */
+                    offer_counts: {
+                        [key: string]: {
+                            value: string;
+                            count: number;
+                        }[];
+                    };
                 };
             } | null;
             /** @description SRCH-06: how many hits each other scope has for this query, for the "Also see" chips. Only on the first page of `scope=all`; a section the caller cannot see (signed out, or its flag off) is null. */
@@ -9329,6 +10500,8 @@ export interface components {
                 cents: number;
                 currency: string;
             } | null;
+            /** @description The SKU of the cheapest offer, so a link opens the card on it; null without offers. */
+            min_price_sku_id: string | null;
             /** @description Active listings of the card. */
             offers_count: number;
             /** @description The cheapest SKU's global 7-day average in EUR cents; null without sales. */
@@ -9569,8 +10742,22 @@ export interface components {
             total_target_quantity: number;
             median_max_price_cents: number | null;
             currency: string | null;
+            /** @description The cheapest offer in EUR on sale from other sellers; null when there is none. */
+            cheapest_offer_cents: number | null;
+            /** @description The caller's copies not listed or held. */
+            free_copies: number;
+            /** @description The caller's copies on sale now. */
+            listed_copies: number;
+            /** @description The caller's lowest asking price in EUR; null when nothing is listed. */
+            listed_price_cents: number | null;
             /** Format: date-time */
             computed_at: string;
+        };
+        WishlistDemandTiles: {
+            /** @description Cards with a row you hold free copies of but list none. */
+            in_stock_not_listed: number;
+            /** @description Cards with a row where your lowest price is above the cheapest other offer. */
+            priced_above_market: number;
         };
         WishlistImportResult: {
             rows: {
@@ -9650,6 +10837,8 @@ export interface components {
                 set_name: string;
                 collector_number: string | null;
             } | null;
+            /** @description The wished printing's pictures, else the card's newest printing with one; for the grid view. */
+            images: components["schemas"]["CatalogImages"] | null;
         };
         WishlistItem: {
             printing_id: string | null;
@@ -9707,8 +10896,16 @@ export interface components {
              * @enum {string}
              */
             visibility: "private" | "friends" | "public";
+            /** @description UX-89b: the one game whose cards go on the list. Null on an older empty list until its first card sets it. */
+            game_id: string | null;
             item_count: number;
             version: number;
+        };
+        WishlistAlertsResult: {
+            /** @description Wishes whose alert mode changed. */
+            switched: number;
+            /** @description Wishes left with alerts off because your plan's price-alert limit was reached. */
+            left_off: number;
         };
         HealthReport: {
             /** @enum {string} */
@@ -11998,6 +13195,164 @@ export interface operations {
             };
         };
     };
+    "catalog.adminRestorePrintingImage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                printing_id: string;
+                kind: "front" | "back" | "art_crop";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminProductOverrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The changes */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductOverrides"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "catalog.adminEditProduct": {
         parameters: {
             query?: never;
@@ -12309,6 +13664,84 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such catalog entry, or you are not staff */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "catalog.adminResetProductField": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                product_id: string;
+                field: "canonical_name" | "popularity_rank";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reset */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -13126,6 +14559,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -13804,6 +15239,86 @@ export interface operations {
                 };
             };
             /** @description No such rule of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "collection.getItemRuleFolder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The matching rule, or none */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionItemRuleFolder"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such item of yours (ERR_NOT_FOUND) */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14834,6 +16349,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -15458,6 +16975,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -16918,7 +18437,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A page of staged items */
+            /** @description A page of staged items, with how many there are over all pages */
             200: {
                 headers: {
                     /** @description Requests allowed in the window */
@@ -16933,7 +18452,10 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
+                        total: number;
                     };
                 };
             };
@@ -17276,6 +18798,95 @@ export interface operations {
             };
         };
     };
+    "community.listBlocks": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of blocked members */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BlockedMember"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "community.blockMember": {
         parameters: {
             query?: never;
@@ -17483,6 +19094,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                         reactions: components["schemas"]["ReactionSummary"];
                     };
@@ -17742,6 +19355,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -17943,6 +19558,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -18393,6 +20010,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -18472,6 +20091,13 @@ export interface operations {
                     text: string;
                     /** @enum {string} */
                     visibility?: "private" | "friends" | "public";
+                    /** @description UX-106: the printing picked in the check step, by line number (1-based). */
+                    picks?: {
+                        [key: string]: {
+                            set_code: string;
+                            collector_number: string;
+                        };
+                    };
                 };
             };
         };
@@ -18486,7 +20112,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Decklist"];
+                    "application/json": components["schemas"]["ImportedDecklist"];
                 };
             };
             /** @description No cards found, too many lines, or a bad count (ERR_VALIDATION) */
@@ -19086,6 +20712,11 @@ export interface operations {
                     quantity?: number;
                     /** @enum {string} */
                     board?: "main" | "side" | "commander" | "maybe";
+                    /** @description UX-106: one of the line's card's printings, or null for any printing. */
+                    printing_id?: string | null;
+                    /** @enum {string} */
+                    finish?: "nonfoil" | "foil" | "etched";
+                    language?: string;
                     version: number;
                 };
             };
@@ -19416,7 +21047,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Missing copies sent to the wishlist */
                         wished: number;
+                        /** @description UX-63: wishes that are new or whose target went up; 0 when all were already wished for */
+                        added: number;
+                        /** @description UX-63: copies left out because their name matches no catalog card */
+                        not_in_catalog: number;
                     };
                 };
             };
@@ -19529,6 +21165,120 @@ export interface operations {
             };
             /** @description No such decklist, or you may not see it (ERR_NOT_FOUND) */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.checkDecklist": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    game_id: string;
+                    text: string;
+                    /** @description UX-106: the printing picked in the check step, by line number (1-based). */
+                    picks?: {
+                        [key: string]: {
+                            set_code: string;
+                            collector_number: string;
+                        };
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The checked lines */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecklistCheck"];
+                };
+            };
+            /** @description No cards found, too many lines, or a bad count (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -19709,7 +21459,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Decklist"];
+                    "application/json": components["schemas"]["ImportedDecklist"];
                 };
             };
             /** @description Not a Moxfield or Archidekt deck URL, a private or missing deck, or a list the parser rejects (ERR_VALIDATION) */
@@ -19822,6 +21572,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -19911,6 +21663,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -19998,6 +21752,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -21825,6 +23581,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -22570,6 +24328,122 @@ export interface operations {
             };
             /** @description The trade is no longer open (ERR_TRADE_NOT_OPEN) or waits for your friend (ERR_TRADE_NOT_YOUR_TURN) */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "community.withdrawTrade": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                trade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description The trade */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeProposal"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such trade of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The trade is no longer open (ERR_TRADE_NOT_OPEN) or waits for your friend (ERR_TRADE_NOT_YOUR_TURN) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23980,6 +25854,75 @@ export interface operations {
             };
         };
     };
+    "identity.getMyAccount": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your account */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Account"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.requestErasure": {
         parameters: {
             query?: never;
@@ -24554,7 +26497,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The latest export */
+            /** @description The latest export, or null when you have not asked for your data yet */
             200: {
                 headers: {
                     /** @description Requests allowed in the window */
@@ -24564,7 +26507,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DataExportRequest"];
+                    "application/json": components["schemas"]["DataExportRequest"] | null;
                 };
             };
             /** @description Authentication is required or the token is invalid */
@@ -24585,7 +26528,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description You have not asked for your data yet */
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -24722,7 +26665,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The pending request */
+            /** @description The pending request, or null when nothing is scheduled */
             200: {
                 headers: {
                     /** @description Requests allowed in the window */
@@ -24732,7 +26675,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ErasureRequest"];
+                    "application/json": components["schemas"]["ErasureRequest"] | null;
                 };
             };
             /** @description Authentication is required or the token is invalid */
@@ -24753,7 +26696,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Nothing is scheduled (ERR_ERASURE_REQUEST_NOT_FOUND) */
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -26567,6 +28510,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description No postage rates exist for this country (UX-03) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description Rate limit exceeded; see Retry-After */
             429: {
                 headers: {
@@ -27573,6 +29525,97 @@ export interface operations {
             };
         };
     };
+    "identity.checkPasswordReset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetCheck"];
+            };
+        };
+        responses: {
+            /** @description Whether the link still works */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasswordResetStatus"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "identity.confirmPasswordReset": {
         parameters: {
             query?: never;
@@ -28246,6 +30289,57 @@ export interface operations {
             };
         };
     };
+    "identity.listShipFromCountries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The countries */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShipFromCountries"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "integration.requestCatalogSync": {
         parameters: {
             query?: never;
@@ -28585,6 +30679,96 @@ export interface operations {
                 };
             };
             /** @description No such export of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "integration.listMyImports": {
+        parameters: {
+            query: {
+                limit?: number;
+                cursor?: string;
+                kind: "catalog_sync" | "collection_import" | "listing_bulk" | "decklist";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of imports */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MemberImport"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -29028,6 +31212,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -29372,6 +31558,62 @@ export interface operations {
             };
         };
     };
+    "integration.trackingWebhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The push was recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookReceipt"];
+                };
+            };
+            /** @description The signature is missing or invalid (ERR_WEBHOOK_SIGNATURE_INVALID), or the body is not a 17TRACK push */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The body is larger than 512 KB */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "integration.stripeWebhook": {
         parameters: {
             query?: never;
@@ -29455,6 +31697,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -29487,6 +31731,86 @@ export interface operations {
                 };
             };
             /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getDisputeCase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dispute_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The dispute and its order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DisputeCase"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such dispute of yours (ERR_NOT_FOUND) */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -30079,6 +32403,89 @@ export interface operations {
             };
         };
     };
+    "marketplace.acceptCartItemPrice": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                cart_item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The cart item */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartItem"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such cart item (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.optimizePurchase": {
         parameters: {
             query?: never;
@@ -30263,6 +32670,105 @@ export interface operations {
             };
         };
     };
+    "marketplace.chooseCartShipping": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                seller_user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChooseCartShippingRequest"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.checkout": {
         parameters: {
             query?: never;
@@ -30330,7 +32836,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description An item is no longer available, this checkout ended, or your balance changed (ERR_INVENTORY_EXCEEDED, ERR_LISTING_UNAVAILABLE, ERR_CHECKOUT_CLOSED, ERR_INSUFFICIENT_FUNDS) */
+            /** @description An item is no longer available, a hold ran out, a price rose since you saw it, the total is not the one you saw, this checkout ended, or your balance changed (ERR_INVENTORY_EXCEEDED, ERR_LISTING_UNAVAILABLE, ERR_CART_HOLDS_ENDED, ERR_CART_PRICE_CHANGED, ERR_CART_TOTAL_CHANGED, ERR_CHECKOUT_CLOSED, ERR_INSUFFICIENT_FUNDS) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -30567,6 +33073,98 @@ export interface operations {
             };
         };
     };
+    "marketplace.escalateDispute": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                dispute_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The dispute */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dispute"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such dispute of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Already resolved (ERR_DISPUTE_CLOSED) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.postDisputeMessage": {
         parameters: {
             query?: never;
@@ -30712,7 +33310,7 @@ export interface operations {
                     "application/json": components["schemas"]["Dispute"];
                 };
             };
-            /** @description Refund missing, not allowed, or more than the goods (ERR_VALIDATION) */
+            /** @description Refund missing, not allowed, or more than the goods (the message names the limit), or no note (ERR_VALIDATION) */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -30804,6 +33402,12 @@ export interface operations {
                 seller?: string;
                 sku?: string;
                 status?: "draft" | "active" | "paused" | "sold_out" | "suspended";
+                /** @description UX-30: part of the card name. */
+                q?: string;
+                /** @description UX-30: `newest` (the default), `name`, `copies` (listed), `price` or `state`; ties by age. */
+                sort?: "newest" | "name" | "copies" | "price" | "state";
+                /** @description Defaults to `desc` for `newest`, `asc` for the other sorts. */
+                direction?: "asc" | "desc";
             };
             header?: never;
             path?: never;
@@ -30826,6 +33430,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -31109,7 +33715,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description It changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            /** @description It changed since you read it, or copies are in buyers’ carts and the price cannot change until you remove them (ERR_CONCURRENT_MODIFICATION, ERR_LISTING_PRICE_LOCKED) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -31212,6 +33818,68 @@ export interface operations {
             };
             /** @description The caller lacks the required scope, or CSRF validation failed */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such listing (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getListingCard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listing_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The card the listing offers */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListingCardResponse"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -31903,6 +34571,123 @@ export interface operations {
             };
         };
     };
+    "marketplace.changeListings": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    listing_ids: string[];
+                    /** @enum {string} */
+                    action: "pause" | "resume" | "cancel" | "reprice";
+                    /** @description With `reprice`: each price changes by this many percent, rounded to the cent. */
+                    percent?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description What changed and what was skipped */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changed: string[];
+                        /** @description Listings left as they were, each with the error code that stopped it. */
+                        skipped: {
+                            /** Format: uuid */
+                            listing_id: string;
+                            code: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Invalid fields (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.listMyOrders": {
         parameters: {
             query?: {
@@ -31930,6 +34715,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -32043,6 +34830,203 @@ export interface operations {
             };
             /** @description No such order of yours (ERR_NOT_FOUND) */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.requestOrderCancel": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                order_id: string;
+                seller_order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestOrderCancelRequest"];
+            };
+        };
+        responses: {
+            /** @description Asked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description A cancel request already waits for an answer (ERR_CANCEL_REQUEST_OPEN) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.answerOrderCancelRequest": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                order_id: string;
+                seller_order_id: string;
+                answer: "accept" | "decline";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Answered */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No cancel request from the other side is waiting (ERR_NO_CANCEL_REQUEST) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -32360,6 +35344,146 @@ export interface operations {
             };
             /** @description The request body must be application/json */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.answerLineRemoval": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                order_id: string;
+                seller_order_id: string;
+                line_id: string;
+                answer: "keep" | "cancel";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Answered */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours, or no such line in it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No question about this card is waiting (ERR_NO_REMOVAL_QUESTION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.getPaymentSetup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The payment setup */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentSetup"];
+                };
+            };
+            /** @description Not found, or the feature behind this endpoint is not enabled for the caller */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -33501,6 +36625,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -33708,7 +36834,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Not possible in its current status (ERR_SELLER_ORDER_STATE) */
+            /** @description A cancel request already waits for an answer (ERR_CANCEL_REQUEST_OPEN) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -33728,6 +36854,99 @@ export interface operations {
             };
             /** @description The request body must be application/json */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.answerSellerCancelRequest": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                seller_order_id: string;
+                answer: "accept" | "decline";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The seller order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOrder"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No cancel request from the other side is waiting (ERR_NO_CANCEL_REQUEST) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -33822,7 +37041,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Not possible in its current status (ERR_SELLER_ORDER_STATE) */
+            /** @description A cancel request already waits for an answer (ERR_CANCEL_REQUEST_OPEN) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -33938,6 +37157,121 @@ export interface operations {
                 };
             };
             /** @description Not possible in its current status (ERR_SELLER_ORDER_STATE) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "marketplace.removeOrderLine": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path: {
+                seller_order_id: string;
+                line_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveOrderLineRequest"];
+            };
+        };
+        responses: {
+            /** @description The seller order */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOrder"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such order of yours, or no such line in it (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Already packed, sent or cancelled (ERR_SELLER_ORDER_STATE), or a cancel request is waiting (ERR_CANCEL_REQUEST_OPEN) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -34522,6 +37856,95 @@ export interface operations {
             };
         };
     };
+    "marketplace.listWalletActivity": {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of the statement */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WalletActivity"][];
+                        page: {
+                            limit: number;
+                            next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
+                        };
+                    };
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description You have no seller account (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     "marketplace.listPayouts": {
         parameters: {
             query?: {
@@ -34549,6 +37972,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -36527,6 +39952,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -36784,7 +40211,9 @@ export interface operations {
     };
     "portfolio.mySummary": {
         parameters: {
-            query?: never;
+            query?: {
+                range?: "7d" | "30d" | "90d" | "180d" | "1y" | "all";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -36802,6 +40231,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PortfolioSummary"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description Authentication is required or the token is invalid */
@@ -36889,7 +40327,7 @@ export interface operations {
                     "application/json": components["schemas"]["CardRecognition"];
                 };
             };
-            /** @description Not a JPEG, PNG or WebP image of at most 512 KiB (ERR_VALIDATION) */
+            /** @description Not a JPEG, PNG or WebP image of at most 700 KiB (ERR_VALIDATION) */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -37069,7 +40507,7 @@ export interface operations {
     "search.search": {
         parameters: {
             query?: {
-                /** @description The search box text: words plus filters such as `c:ub mv<=3 t:elf set:dom f:modern r:rare a:"Chris Rallis" price<=10.00`. Unreadable filters come back as warnings. */
+                /** @description The search box text: words plus filters such as `c:ub mv<=3 t:elf set:dom f:modern r:rare a:"Chris Rallis" price<=10.00`. Offer filters `cond:nm` (that grade or better), `lang:de` and `finish:foil` (`nonfoil`, `foil`, `etched`) keep single cards with one offer that passes all of them together; `lang:` keeps sealed products made in that language. Unreadable filters come back as warnings. */
                 q?: string;
                 /** @description Only cards this artist illustrated, the same as `a:"<name>"` in `q`. Case, accents and punctuation are ignored, so `chris-rallis` finds Chris Rallis. */
                 artist?: string;
@@ -37077,7 +40515,7 @@ export interface operations {
                 game?: string;
                 /** @description `all` pages the catalog and adds the first listings and, when signed in, the first of your items and of your friends’ trade binders. `collection` and `community` need a signed-in caller. */
                 scope?: "all" | "catalog" | "marketplace" | "collection" | "community";
-                /** @description Comma-separated facets to count: colors, mana_value, rarity, set, format, category, product_type, brand, language. First page only. */
+                /** @description Comma-separated facets to count: colors, mana_value, rarity, set, format, category, product_type, brand, language, condition, offer_language, finish. First page only. */
                 facets?: string;
                 /** @description How catalog rows are ordered: `relevance` (best match), `name`, or `price` (the lowest listing; cards without one come last). Sections other than the catalog keep their own order. */
                 sort?: "relevance" | "name" | "price";
@@ -37403,6 +40841,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -38036,6 +41476,10 @@ export interface operations {
                 offset?: number;
                 game_id?: string;
                 product_id?: string;
+                /** @description Wishes added in the last 7 or 30 days. */
+                days?: "7" | "30";
+                /** @description `in_stock`: you hold a free or listed copy; `not_in_stock`: you hold none. */
+                stock?: "all" | "in_stock" | "not_in_stock";
             };
             header?: never;
             path?: never;
@@ -38060,6 +41504,7 @@ export interface operations {
                             offset: number;
                             total: number;
                         };
+                        tiles: components["schemas"]["WishlistDemandTiles"];
                     };
                 };
             };
@@ -38327,6 +41772,8 @@ export interface operations {
                 cursor?: string;
                 /** @description Comma-separated list ids (WL-04): only the wishes on these lists, as Tutor plans across them. */
                 wishlist_id?: string;
+                /** @description UX-50: only the wishes for this card or product, on any of your lists. */
+                product_id?: string;
             };
             header?: never;
             path?: never;
@@ -38349,6 +41796,8 @@ export interface operations {
                         page: {
                             limit: number;
                             next_cursor: string | null;
+                            /** @description Every match, on lists that count them. */
+                            total?: number;
                         };
                     };
                 };
@@ -38474,7 +41923,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description You already wish for this product with the same printing, language, finish and treatment; change that wish instead (ERR_WISHLIST_ITEM_EXISTS), or you asked for alerts while your plan's price-alert limit is reached (ERR_PLAN_LIMIT_PRICE_ALERTS, `details.limit`) */
+            /** @description You already wish for this product with the same printing, language, finish and treatment; change that wish instead (ERR_WISHLIST_ITEM_EXISTS), you asked for alerts while your plan's price-alert limit is reached (ERR_PLAN_LIMIT_PRICE_ALERTS, `details.limit`), or the list holds another game's cards (ERR_WISHLIST_OTHER_GAME, UX-89b) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -39200,6 +42649,221 @@ export interface operations {
                 };
             };
             /** @description The list changed since you read it (ERR_CONCURRENT_MODIFICATION) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.setListAlerts": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WishlistAlertsUpdate"];
+            };
+        };
+        responses: {
+            /** @description How many wishes changed */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WishlistAlertsResult"];
+                };
+            };
+            /** @description The request is malformed or failed validation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such list of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body is too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The request body must be application/json */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Rate limit exceeded; see Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    "wishlist.mergeLists": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Double-submit token from the nx_csrf cookie; required for cookie-authenticated requests */
+                "X-Tradeable-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WishlistMerge"];
+            };
+        };
+        responses: {
+            /** @description The kept list */
+            200: {
+                headers: {
+                    /** @description Requests allowed in the window */
+                    "RateLimit-Limit"?: number;
+                    /** @description Requests left in the window */
+                    "RateLimit-Remaining"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Wishlist"];
+                };
+            };
+            /** @description No list to merge other than the one kept (ERR_VALIDATION) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Authentication is required or the token is invalid */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The caller lacks the required scope, or CSRF validation failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description No such list of yours (ERR_NOT_FOUND) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The lists hold cards of different games (ERR_WISHLIST_OTHER_GAME, UX-89b) */
             409: {
                 headers: {
                     [name: string]: unknown;
