@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { signOut } from './src/api';
-import { Scanner } from './src/Scanner';
+import { Shell } from './src/Shell';
 import { SignIn } from './src/SignIn';
 import { styles } from './src/theme';
 
@@ -17,7 +17,7 @@ export default function App() {
   return (
     <View style={styles.screen}>
       <StatusBar style="light" />
-      {signedIn === true && <Scanner onSignedOut={() => signOut().then(() => setSignedIn(false))} />}
+      {signedIn === true && <Shell onSignedOut={() => signOut().then(() => setSignedIn(false))} />}
       {signedIn === false && <SignIn onSignedIn={() => setSignedIn(true)} />}
     </View>
   );

@@ -25,7 +25,7 @@ Run `npm run lint`, `npm run typecheck` and `npm test` before declaring any task
 
 ## Layout
 
-- `App.tsx` switches between `src/SignIn.tsx` and `src/Scanner.tsx`; there is no router while the app has two screens.
+- `App.tsx` switches between `src/SignIn.tsx` and `src/Shell.tsx`. The shell keeps the tab and open screen in state (bottom bar, settings, account, Unsorted); there is no router while that stays this small.
 - `src/api.ts` is the only place that calls the API. `src/api-schema.ts` is generated (`npm run api:types`); never edit it.
 - Read `README.md` and `docs/api-gaps.md`. When the app needs an endpoint nexustcg lacks, note it in `docs/api-gaps.md` instead of building it here.
 
