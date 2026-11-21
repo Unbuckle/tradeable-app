@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readCard, sameCard } from './card-reader.ts';
+import { readCard } from './card-reader.ts';
 
 test('reads the title and collector line of a recent card', () => {
   const read = readCard([
@@ -23,9 +23,3 @@ test('skips mana costs and numbers when looking for the title', () => {
   assert.equal(read.setCode, null);
 });
 
-test('two reads match on set and number, or on name and number without a set', () => {
-  const base = { language: null, foil: null };
-  assert.ok(sameCard({ ...base, setCode: 'M19', collectorNumber: '5', name: 'A' }, { ...base, setCode: 'M19', collectorNumber: '5', name: 'B' }));
-  assert.ok(sameCard({ ...base, setCode: null, collectorNumber: null, name: 'Shivan Dragon' }, { ...base, setCode: null, collectorNumber: null, name: 'Shivan Dragon' }));
-  assert.ok(!sameCard({ ...base, setCode: null, collectorNumber: null, name: null }, { ...base, setCode: null, collectorNumber: null, name: null }));
-});

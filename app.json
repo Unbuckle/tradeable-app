@@ -9,10 +9,14 @@
     "backgroundColor": "#2A2233",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.tradeable.companion"
+      "bundleIdentifier": "app.tradeable.companion",
+      "infoPlist": {
+        "NSCameraUsageDescription": "tradeable. uses the camera to recognise your cards."
+      }
     },
     "android": {
       "package": "app.tradeable.companion",
+      "permissions": ["android.permission.CAMERA"],
       "adaptiveIcon": {
         "backgroundColor": "#2A2233",
         "foregroundImage": "./assets/adaptive-icon.png"
@@ -25,14 +29,6 @@
     "plugins": [
       "expo-secure-store",
       "expo-image",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "tradeable. uses the camera to recognise your cards.",
-          "microphonePermission": false,
-          "recordAudioAndroid": false
-        }
-      ],
       "expo-font"
     ],
     "owner": "tradeable-expo-devs-team",

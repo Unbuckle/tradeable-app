@@ -1,9 +1,22 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
+import Svg, { Polygon } from 'react-native-svg';
+import {
+  Camera,
+  type CameraRef,
+  type Frame,
+  type Point,
+  useCameraPermission,
+  useFrameOutput,
+  usePhotoOutput,
+} from 'react-native-vision-camera';
+import { useResizer } from 'react-native-vision-camera-resizer';
+import { createSynchronizable, scheduleOnRN } from 'react-native-worklets';
 import { ApiError, type CollectionItem, type Printing, type Schemas } from './api';
-import { type CardRead, readCard, sameCard } from './card-reader';
+import { findCard } from './card-detector';
+import { isSteady, type Quad, type Sample, scaleQuad, smoothQuad } from './card-outline';
+import { type CardRead, readCard } from './card-reader';
 import { addToCollection, findPrinting, recognizePhoto, undoAdd } from './catalog';
 import { NameSearch } from './NameSearch';
 import { shrinkPhoto } from './photo';
@@ -12,7 +25,7 @@ import { BatchSheet, type Target } from './BatchSheet';
 import { pickSku, type ScanSettings, defaultsSummary, wantedFinish } from './scan-rules';
 import { loadLastFolder, saveLastFolder } from './settings';
 import { Sheet } from './Sheet';
-import { canReadText, readLines } from './text-recognition';
+import { readLines } from './text-recognition';
 import { colors, styles } from './theme';
 
 interface Added {
@@ -23,11 +36,13 @@ interface Added {
   pick: Pick;
 }
 
-interface Photo {
-  uri: string;
-  width: number;
-  height: number;
-}
+/** The small portrait image the outline is looked for in, about 12 times a second. */
+const DETECT = { width: 192, height: 256 };
+const DETECT_EVERY_MS = 80;
+/** The outline must hold still this long before the photo is taken. */
+const HOLD_MS = 500;
+/** Detections without a card before the outline goes away. */
+const LOST_AFTER = 3;
 
 export function Scanner(props: {
   settings: ScanSettings;
@@ -40,8 +55,9 @@ export function Scanner(props: {
   paused: boolean;
 }) {
   const { settings, folders } = props;
-  const camera = useRef<CameraView>(null);
-  const [permission, requestPermission] = useCameraPermissions();
+  const camera = useRef<CameraRef>(null);
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const { width: viewWidth } = useWindowDimensions();
   const [torch, setTorch] = useState(false);
   // Where this batch goes: chosen on the sheet, else the one named in settings, else ask.
   const [chosenTarget, setChosenTarget] = useState<Target | undefined>();
@@ -61,8 +77,11 @@ export function Scanner(props: {
   const [showSession, setShowSession] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  // The card the camera shows when we stop looking for it: auto-scan waits until a different card is in view.
-  const ignored = useRef<CardRead | null>(null);
+  // The live outline in screen points, and what it did lately.
+  const [outline, setOutline] = useState<Quad | null>(null);
+  // `waiting`: after a photo, the card in view has been dealt with; wait until it leaves before taking the next.
+  const track = useRef({ samples: [] as Sample[], misses: 0, shown: null as Quad | null, waiting: false });
+  const [waiting, setWaiting] = useState(false);
 
   useEffect(() => {
     loadLastFolder().then(setLastFolder);
@@ -106,12 +125,15 @@ export function Scanner(props: {
     return entry;
   }
 
-  /** Sends the photo to the server; Lightning adds the best match at once, Normal shows it first. */
-  const recognise = (read: CardRead | null, photo: Photo) =>
+  const photoOutput = usePhotoOutput();
+  /** Takes the photo, reads it on the phone and sends both to the server; Lightning adds the best match at once, Normal shows it first. */
+  const capture = () =>
     run('Recognising', async () => {
-      ignored.current = read;
-      const image = await shrinkPhoto(photo);
-      const line = read?.setCode && read.collectorNumber ? { set_code: read.setCode, collector_number: read.collectorNumber } : undefined;
+      const file = await photoOutput.capturePhotoToFile({ flashMode: 'off', enableShutterSound: false }, {});
+      const uri = file.filePath.startsWith('file://') ? file.filePath : `file://${file.filePath}`;
+      const read = readCard(await readLines(uri));
+      const image = await shrinkPhoto(uri);
+      const line = read.setCode && read.collectorNumber ? { set_code: read.setCode, collector_number: read.collectorNumber } : undefined;
       let candidates = (
         await recognizePhoto({ image, media_type: 'image/jpeg', collector_line: line, ignore_promos: settings.ignorePromos })
       ).map((c) => c.printing);
@@ -125,43 +147,74 @@ export function Scanner(props: {
       setNote(await add(choice));
     });
 
-  async function snap(): Promise<{ read: CardRead | null; photo: Photo } | null> {
-    try {
-      const photo = await camera.current?.takePictureAsync({ quality: 0.8, shutterSound: false });
-      if (!photo) return null;
-      return { photo, read: canReadText ? readCard(await readLines(photo.uri)) : null };
-    } catch {
-      return null; // camera not ready yet
-    }
-  }
-
-  // Auto-scan: read a photo on the phone about every second; once two reads agree, send that photo to the server.
-  const looking = canReadText && !props.paused && !!permission?.granted && !!target && !choosingTarget && !pick && !searching && !busy;
+  // Live outline: the frame thread looks for the card about 12 times a second and hands its corners over here.
+  const watching = !props.paused && hasPermission && !!target && !choosingTarget && !pick && !searching;
+  const canCapture = watching && !busy;
+  // What the corner handler needs from the latest render; the frame thread keeps one handler.
+  const latest = useRef({ canCapture, capture, viewWidth });
   useEffect(() => {
-    if (!looking) return;
-    let stopped = false;
-    let previous: CardRead | null = null;
-    (async () => {
-      while (!stopped) {
-        const shot = await snap();
-        if (stopped) return;
-        const read = shot?.read;
-        const readable = read && (read.setCode || read.name);
-        if (shot && read && readable && !(ignored.current && sameCard(read, ignored.current))) {
-          if (previous && sameCard(read, previous)) return void recognise(read, shot.photo);
-          previous = read;
-        } else {
-          previous = null;
-          if (!readable) ignored.current = null; // the card left the view: the same card may be scanned again
-        }
-        await new Promise((resolve) => setTimeout(resolve, 300));
+    latest.current = { canCapture, capture, viewWidth };
+  });
+  const handleCorners = useCallback((corners: Point[] | null) => {
+    const t = track.current;
+    if (!corners || !camera.current) {
+      if (++t.misses < LOST_AFTER) return;
+      // The card left the view: the next one may be taken.
+      track.current = { samples: [], misses: t.misses, shown: null, waiting: false };
+      setWaiting(false);
+      return setOutline(null);
+    }
+    let seen: Quad;
+    try {
+      seen = corners.map((p) => camera.current!.convertCameraPointToViewPoint(p));
+    } catch {
+      return; // preview not ready yet
+    }
+    const now = Date.now();
+    t.misses = 0;
+    t.shown = smoothQuad(t.shown, seen);
+    t.samples = [...t.samples.filter((s) => s.at >= now - 2 * HOLD_MS), { at: now, quad: t.shown }];
+    setOutline(t.shown);
+    const { canCapture: ready, capture: take, viewWidth: width } = latest.current;
+    if (ready && !t.waiting && isSteady(t.samples, now, HOLD_MS, 0.03 * width)) {
+      t.waiting = true;
+      setWaiting(true);
+      take();
+    }
+  }, []);
+
+  // Outlines from before a pause do not count towards holding still.
+  useEffect(() => {
+    track.current = { ...track.current, samples: [], shown: null };
+  }, [watching]);
+
+  const { resizer } = useResizer({ ...DETECT, channelOrder: 'rgb', dataType: 'uint8', scaleMode: 'stretch', pixelLayout: 'interleaved' });
+  const lastRun = useMemo(() => createSynchronizable(0), []);
+  const onFrame = useCallback(
+    (frame: Frame) => {
+      'worklet';
+      try {
+        const now = Date.now();
+        if (!resizer || now - lastRun.getDirty() < DETECT_EVERY_MS) return;
+        lastRun.setBlocking(now);
+        const small = resizer.resize(frame);
+        const quad = findCard(new Uint8Array(small.getPixelBuffer()), DETECT.width, DETECT.height);
+        small.dispose();
+        const corners = quad && scaleQuad(quad, frame.width / DETECT.width, frame.height / DETECT.height).map((p) => frame.convertFramePointToCameraPoint(p));
+        scheduleOnRN(handleCorners, corners);
+      } finally {
+        frame.dispose();
       }
-    })();
-    return () => {
-      stopped = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- restart only when looking starts or stops
-  }, [looking]);
+    },
+    [resizer, lastRun, handleCorners],
+  );
+  const frameOutput = useFrameOutput({
+    targetResolution: { width: 480, height: 640 },
+    pixelFormat: 'yuv',
+    // Upright frames, so the 3:4 detection image is not squeezed.
+    enablePhysicalBufferRotation: true,
+    onFrame: watching ? onFrame : undefined,
+  });
 
   const undo = (entry: Added) =>
     run('Undoing', async () => {
@@ -183,7 +236,11 @@ export function Scanner(props: {
   const condition = props.conditions.find((c) => c.id === settings.condition)?.code;
   const describe = (p: Printing) => `${p.set_code.toUpperCase()} ${p.collector_number ?? ''}`;
 
-  if (!permission?.granted) {
+  const status = busy ? `${busy}…` : !outline ? 'Hold a card in view' : waiting ? 'Show the next card' : 'Hold still…';
+  // Under the card while there is one, else in the middle.
+  const statusTop = outline ? Math.max(...outline.map((p) => p.y)) + 16 : undefined;
+
+  if (!hasPermission) {
     return (
       <View style={[styles.pad, { flex: 1, justifyContent: 'center' }]}>
         <Text style={styles.text}>tradeable. needs the camera to recognise your cards.</Text>
@@ -196,7 +253,27 @@ export function Scanner(props: {
 
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
-      <CameraView ref={camera} style={{ flex: 1 }} facing="back" animateShutter={false} enableTorch={torch} />
+      <Camera
+        ref={camera}
+        style={{ flex: 1 }}
+        device="back"
+        isActive
+        outputs={[photoOutput, frameOutput]}
+        // The app stays portrait: keep frames and photos portrait too, however the phone is turned.
+        orientationSource="interface"
+        torchMode={torch ? 'on' : 'off'}
+      />
+      {watching && outline && (
+        <Svg pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <Polygon
+            points={outline.map((p) => `${p.x},${p.y}`).join(' ')}
+            fill="none"
+            stroke={colors.green}
+            strokeWidth={4}
+            strokeLinejoin="round"
+          />
+        </Svg>
+      )}
 
       {/* Top: mode, light, scan settings; then the count of this session. */}
       <View style={{ position: 'absolute', top: 48, left: 12, right: 12, gap: 8 }}>
@@ -235,27 +312,22 @@ export function Scanner(props: {
         )}
       </View>
 
-      {/* Middle: what is going on. No guide box; the live card outline comes later. */}
-      <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, bottom: 0, left: 24, right: 24, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-        <Text style={[styles.text, { textShadowColor: 'black', textShadowRadius: 4 }]}>
-          {busy ? `${busy}…` : canReadText ? 'Hold a card in view' : 'Take a photo of the card'}
-        </Text>
+      {/* Middle, or under the card: what is going on. */}
+      <View
+        pointerEvents="box-none"
+        style={{
+          position: 'absolute',
+          left: 24,
+          right: 24,
+          alignItems: 'center',
+          gap: 12,
+          ...(statusTop === undefined ? { top: 0, bottom: 0, justifyContent: 'center' } : { top: statusTop }),
+        }}
+      >
+        <Text style={[styles.text, { textShadowColor: 'black', textShadowRadius: 4 }]}>{status}</Text>
         {message && (
           <Pressable onPress={() => setSearching(true)} style={styles.pill} accessibilityRole="button">
             <Text style={styles.error}>{message}</Text>
-          </Pressable>
-        )}
-        {!canReadText && !busy && (
-          // Expo Go has no on-device text reading, so there is no automatic capture: take the photo by hand.
-          <Pressable
-            style={[styles.button, { paddingHorizontal: 24 }]}
-            onPress={async () => {
-              const shot = await snap();
-              if (shot) recognise(null, shot.photo);
-            }}
-            accessibilityRole="button"
-          >
-            <Text style={styles.buttonText}>Take photo</Text>
           </Pressable>
         )}
       </View>

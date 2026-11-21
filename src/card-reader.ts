@@ -27,8 +27,3 @@ export function readCard(lines: OcrLine[]): CardRead {
   return { ...parseCollectorLine(bottom.map((l) => l.text).join('\n')), name: title ?? null };
 }
 
-/** The same card in two reads: same set code and number, or, without a set code, the same name and number. */
-export function sameCard(a: CardRead, b: CardRead): boolean {
-  if (a.setCode && b.setCode) return a.setCode === b.setCode && a.collectorNumber === b.collectorNumber;
-  return !!a.name && a.name === b.name && a.collectorNumber === b.collectorNumber;
-}
